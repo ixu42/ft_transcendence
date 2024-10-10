@@ -8,10 +8,13 @@ networks:
   #  driver: bridge
   #  name: monitoring-network
 
+  backend-network:
+    driver: bridge
+    name: backend-network
 
 volumes:
   grafana-storage:
-
+  postgres-data:
 
 services:
 
@@ -29,7 +32,6 @@ services:
       - frontend
     networks:
       - app-network
-      - monitoring-network
 
   backend:
     build: ./srcs/backend
@@ -38,9 +40,28 @@ services:
       - "8000"
     networks:
       - app-network
+      - backend-network
+    environment:
+      - POSTGRES_DB=pong_db
+      - POSTGRES_USER=pong_user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_HOST=postgres
+    depends_on:
+      - postgres
     volumes:
       - ./srcs/backend/app:/app
 
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_DB: pong_db
+      POSTGRES_USER: pong_user
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend-network
 
   frontend:
     build: ./srcs/frontend
@@ -65,9 +86,9 @@ services:
       - ./srcs/server-tools/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - app-network
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --web.external-url=http://localhost/prometheus
+    #command:
+    #  - --config.file=/etc/prometheus/prometheus.yml
+    #  - --web.external-url=http://localhost/prometheus
 
   grafana:
     image: grafana/grafana:latest
@@ -78,8 +99,8 @@ services:
       - grafana-storage:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=1234
-      - GF_UPDATE_CHECK=false
-      - GF_SERVER_ROOT_URL=http://localhost/grafana
+    #  - GF_UPDATE_CHECK=false
+    #  - GF_SERVER_ROOT_URL=http://localhost/grafana
     networks:
       - app-network
 
