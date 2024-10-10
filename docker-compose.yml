@@ -1,7 +1,17 @@
 networks:
+  
   app-network:
     driver: bridge
     name: app-network
+  
+  #monitoring-network:
+  #  driver: bridge
+  #  name: monitoring-network
+
+
+volumes:
+  grafana-storage:
+
 
 services:
 
@@ -19,6 +29,7 @@ services:
       - frontend
     networks:
       - app-network
+      - monitoring-network
 
   backend:
     build: ./srcs/backend
@@ -28,7 +39,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./srcs/backend:/app
+      - ./srcs/backend/app:/app
 
 
   frontend:
@@ -39,8 +50,38 @@ services:
     networks:
       - app-network
     volumes:
-      - ./srcs/frontend:/app
+      - ./srcs/frontend/app:/app
 
+
+
+
+  # Monitoring services
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./srcs/server-tools/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - app-network
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.external-url=http://localhost/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=1234
+      - GF_UPDATE_CHECK=false
+      - GF_SERVER_ROOT_URL=http://localhost/grafana
+    networks:
+      - app-network
 
 
 
