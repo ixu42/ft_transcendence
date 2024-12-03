@@ -1,0 +1,57 @@
+/* Navbar Styles */
+.navbar {
+    background: linear-gradient(45deg, #1a1a2e, #16213e);
+    color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: #00d4ff; 
+}
+
+/* Auth Button */
+#auth-btn {
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px 15px;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 25px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+#auth-btn:hover {
+    color: #16213e;
+    background: #ffffff;
+    border-color: #00d4ff;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    #auth-btn {
+        font-size: 0.875rem;
+        padding: 8px 12px;
+    }
+}

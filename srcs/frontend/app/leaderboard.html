@@ -4,20 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poggers - Leaderboards</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/leaderboard.css">
 </head>
 <body>
-    <div class="container text-center" id="leaderboard-container">
-        <h2 class="mt-5">Leaderboards</h2>
-        <div id="leaderboard">
-            <ul class="list-unstyled">
-                <li>Player 1: <span class="badge bg-primary">100 points</span></li>
-                <li>Player 2: <span class="badge bg-success">80 points</span></li>
-                <li>Player 3: <span class="badge bg-warning">60 points</span></li>
-            </ul>
-        </div>
-        <a href="index.html" class="btn btn-secondary mt-3">Back to Menu</a>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- Leaderboard Content -->
+    <div id="leaderboard-container">
+        <h2>Leaderboards</h2>
+        <ul>
+            <li>Player 1: 100 points</li>
+            <li>Player 2: 80 points</li>
+            <li>Player 3: 60 points</li>
+        </ul>
+        <a href="index.html" class="btn btn-secondary">Back to Menu</a>
     </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
 </body>
 </html>
