@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poggers - Menu</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/menu.css">
 </head>
 <body>
     <div id="menu-container">
-        <h1>Poggers</h1>
-        <div id="menu-options">
-            <a href="lobby.html"><button>Play</button></a>
-            <a href="leaderboard.html"><button>Leaderboards</button></a>
-            <a href="credits.html"><button>Credits</button></a>
+        <h1 class="menu-title">Poggers</h1>
+        <div id="menu-options" class="d-flex flex-column gap-4">
+            <a href="lobby.html" class="btn custom-btn custom-btn-play">Play</a>
+            <a href="leaderboard.html" class="btn custom-btn custom-btn-leaderboard">Leaderboards</a>
+            <a href="credits.html" class="btn custom-btn custom-btn-credits">Credits</a>
         </div>
     </div>
-
     <script src="js/menu.js"></script>
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
 </body>
 </html>

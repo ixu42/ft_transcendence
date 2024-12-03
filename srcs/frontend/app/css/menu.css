@@ -1,21 +1,60 @@
 #menu-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
+    background-color: #0f0f13;
+    color: #ffffff;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 10;
 }
 
-#menu-options button {
-    padding: 10px 20px;
+.menu-title {
+    font-size: 4rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+}
+
+.custom-btn {
+    width: 300px;
+    padding: 20px;
+    border-radius: 50px;
     font-size: 1.5rem;
-    margin: 10px;
-    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    border: none;
+}
+
+.custom-btn-play {
+    background: linear-gradient(45deg, #1d8348, #239b56);
+}
+
+.custom-btn-play:hover {
+    background: linear-gradient(45deg, #239b56, #1d8348);
+    transform: scale(1.1);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
+}
+
+.custom-btn-leaderboard {
+    background: linear-gradient(45deg, #1a5276, #2471a3);
+}
+
+.custom-btn-leaderboard:hover {
+    background: linear-gradient(45deg, #2471a3, #1a5276);
+    transform: scale(1.1);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
+}
+
+.custom-btn-credits {
+    background: linear-gradient(45deg, #af601a, #d35400);
+}
+
+.custom-btn-credits:hover {
+    background: linear-gradient(45deg, #d35400, #af601a);
+    transform: scale(1.1);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
 }
