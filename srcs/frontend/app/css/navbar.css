@@ -2,36 +2,44 @@
 .navbar {
     background: linear-gradient(45deg, #1a1a2e, #16213e);
     color: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 0.75rem 1rem;
-    position: sticky;
+    position: fixed;
     top: 0;
+    width: 100%;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
 }
 
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     color: #ffffff;
     text-decoration: none;
-    transition: color 0.3s ease;
+    flex-shrink: 0;
 }
 
 .navbar-brand:hover {
-    color: #00d4ff; 
+    color: #00d4ff;
 }
 
-/* Auth Button */
+.auth-container {
+    margin-left: auto;
+    position: relative;
+    flex-shrink: 0;
+}
+
 #auth-btn {
     font-size: 1rem;
     font-weight: bold;
     padding: 10px 15px;
     color: #ffffff;
+    background: transparent;
     border: 2px solid #ffffff;
     border-radius: 25px;
-    background: transparent;
+    cursor: pointer;
+    white-space: nowrap;
     transition: all 0.3s ease;
 }
 
@@ -41,17 +49,76 @@
     border-color: #00d4ff;
 }
 
-@media (max-width: 768px) {
-    .navbar {
-        padding: 0.5rem 1rem;
-    }
+#auth-box {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 320px;
+    background: #1a1a2e;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    z-index: 1100;
+}
 
-    .navbar-brand {
-        font-size: 1.25rem;
-    }
+#auth-box.visible {
+    display: block;
+}
 
-    #auth-btn {
-        font-size: 0.875rem;
-        padding: 8px 12px;
-    }
+.auth-content {
+    display: none;
+}
+
+.auth-content.visible {
+    display: block;
+}
+
+.auth-content h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #00d4ff;
+}
+
+.auth-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+.auth-content button {
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #00d4ff;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.auth-content button:hover {
+    background: #008fb3;
+}
+
+.toggle-link {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.toggle-link a {
+    color: #00d4ff;
+    text-decoration: none;
+}
+
+.toggle-link a:hover {
+    text-decoration: underline;
+}
+
+/* Hide elements with the 'hidden' class */
+.hidden {
+    display: none;
 }
