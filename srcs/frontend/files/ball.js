@@ -9,7 +9,7 @@ function createBall(x, y) {
     };
 }
 
-function moveBall(ball, player, ai, canvas) {
+function moveBall(ball, player, player2, canvas) {
     ball.x += ball.dx;
     ball.y += ball.dy;
 
@@ -23,13 +23,17 @@ function moveBall(ball, player, ai, canvas) {
         ball.dx *= -1;
     }
 
-    if (ball.x > ai.x - ball.radius &&
-        ball.y > ai.y &&
-        ball.y < ai.y + ai.height) {
+    if (ball.x > player2.x - ball.radius &&
+        ball.y > player2.y &&
+        ball.y < player2.y + player2.height) {
         ball.dx *= -1;
     }
 
     if (ball.x < 0 || ball.x > canvas.width) {
+        if (ball.x < 0)
+            player2.score++;
+        else if (ball.x > canvas.width)
+            player.score++;    
         ball.x = canvas.width / 2;
         ball.y = canvas.height / 2;
         ball.dx = 4 * (Math.random() > 0.5 ? 1 : -1);

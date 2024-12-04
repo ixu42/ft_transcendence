@@ -6,7 +6,8 @@ function createPaddle(x, y) {
         height: 100,
         speed: 8,
         keyboardUp: false,
-        keyboardDown: false
+        keyboardDown: false,
+        score: 0
     };
 }
 
