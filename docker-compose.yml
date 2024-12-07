@@ -36,6 +36,8 @@ services:
   backend:
     build: ./srcs/backend
     container_name: backend
+    # ports:
+    #   - "8000:8000"
     expose:
       - "8000"
     networks:
@@ -48,8 +50,8 @@ services:
       - POSTGRES_HOST=postgres
     depends_on:
       - postgres
-    volumes:
-      - ./srcs/backend/app:/app
+    # volumes:
+    #   - ./srcs/backend/app:/app
 
   postgres:
     image: postgres:13

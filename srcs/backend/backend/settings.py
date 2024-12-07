@@ -120,12 +120,18 @@ USE_I18N = True
 
 USE_TZ = True
 
+# prepend /backend to all urls e.g. 
+# http://localhost:8000/admin/ -> http://localhost:4242/backend/admin/
+# FORCE_SCRIPT_NAME = '/backend'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+# STATIC_URL = '/backend/static/'
+# MEDIA_URL = '/backend/media/'
+# STATIC_ROOT = BASE_DIR / 'static'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
@@ -142,4 +148,8 @@ AXES_LOCKOUT_PARAMETERS = ["username"]
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',  # Django Axes backend
     'django.contrib.auth.backends.ModelBackend',  # Default Django backend
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:4242',
 ]

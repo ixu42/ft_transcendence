@@ -21,8 +21,15 @@ from django.conf import settings
 from django.views.static import serve
 
 urlpatterns = [
+    # serve media files under /media/
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    
+    # admin url
     path('admin/', admin.site.urls),
+
+    # users app urls
     path('users/', include('users.urls')),
+
+    # backend path
     path('', views.homepage),
 ]
