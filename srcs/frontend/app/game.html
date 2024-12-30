@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poggers - Game</title>
-    <link rel="stylesheet" href="css/game.css">
+    <title>Pong Game</title>
+    <style>
+        canvas {
+            background: #000;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
-    <!-- Game Canvas -->
-    <div id="game-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <div id="scoreboard">
-            <span id="player1-score">0</span> - <span id="player2-score">0</span>
-        </div>
-    </div>
-
-    <script src="js/game.js"></script>
+    <canvas id="pong" width="800" height="400"></canvas>
+    <script src="js/game/controls.js"></script>
+    <script src="js/game/paddle.js"></script>
+    <script src="js/game/ball.js"></script>
+    <script src="js/game/game.js"></script>
+    <script src="js/game/main.js"></script>
 </body>
 </html>
+
