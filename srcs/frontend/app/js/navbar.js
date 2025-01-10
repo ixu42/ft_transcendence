@@ -99,18 +99,20 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
 
                             // Real registration call
-                            fetch('/users/register/', {
+                            fetch('http://localhost:8000/users/register/', {
                                 method: 'POST',
                                 headers: {
-                                    'Content-Type': 'application/json'
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': csrfToken,
                                 },
                                 body: JSON.stringify({
-                                    username: username,
-                                    password1: password1,
-                                    password2: password2,
-                                    display_name: displayName
+                                    username: 'newuser',
+                                    password1: 'securepassword123',
+                                    password2: 'securepassword123',
+                                    display_name: 'foo'
                                 })
                             })
+                            
                             .then(response => {
                                 if (!response.ok) {
                                     throw new Error('Registration failed. Please try again.');

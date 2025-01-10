@@ -1,0 +1,23 @@
+{% extends "base/base.html" %}
+
+{% block title %}Lobby{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="css/lobby.css">
+{% endblock %}
+
+{% block content %}
+<div id="lobby-container">
+    <h1>Game Waiting Room</h1>
+    <p class="waiting-text">Waiting for other players to join...</p>
+    <div class="button-group">
+        <button id="start-local-btn" class="btn btn-primary">Start Local Game</button>
+        <button id="start-online-btn" class="btn btn-success">Start Online Game</button>
+    </div>
+    <a href="menu.html" class="btn btn-secondary mt-4">Back to Menu</a>        
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="js/lobby.js"></script>
+{% endblock %}

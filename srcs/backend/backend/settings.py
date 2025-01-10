@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'axes',
+   
 
     # Default Django apps
     'django.contrib.admin',
@@ -151,4 +152,14 @@ AUTHENTICATION_BACKENDS = [
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:4242',
+    'http://0.0.0.0:8080',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://0.0.0.0:8080',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+]
+
