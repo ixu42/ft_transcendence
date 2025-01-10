@@ -1,22 +1,31 @@
-{% extends "base/base.html" %}
-
-{% block title %}Menu{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="css/menu.css">
-{% endblock %}
-
-{% block content %}
-<div id="menu-container">
-    <h1>Poggers</h1>
-    <div id="menu-options" class="d-flex flex-column gap-4">
-        <a href="lobby.html" id="play-btn" class="btn custom-btn custom-btn-play disabled" aria-disabled="true">Play</a>
-        <a href="leaderboard.html" class="btn custom-btn custom-btn-leaderboard">Leaderboards</a>
-        <a href="credits.html" class="btn custom-btn custom-btn-credits">Credits</a>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="../js/menu.js"></script>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/menu.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="menu.html">Menu</a>
+        </nav>
+    </header>
+    <main>
+        <div id="menu-container">
+            <h1>Poggers</h1>
+            <div id="menu-options" class="d-flex flex-column gap-4">
+                <a href="lobby.html" id="play-btn" class="btn custom-btn custom-btn-play disabled" aria-disabled="true">Play</a>
+                <a href="leaderboard.html" class="btn custom-btn custom-btn-leaderboard">Leaderboards</a>
+                <a href="credits.html" class="btn custom-btn custom-btn-credits">Credits</a>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 My Website</p>
+    </footer>
+    <script src="../js/menu.js"></script>
+</body>
+</html>
