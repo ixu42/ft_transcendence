@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Single Page App</title>
-        <link rel="stylesheet" href="css/main.css">
-        <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/menu.css">
-        <link rel="stylesheet" href="css/credits.css">
-        <link rel="stylesheet" href="css/leaderboard.css">
-        <link rel="stylesheet" href="css/lobby.css">
-        <link rel="stylesheet" href="css/terms-privacy.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Page App</title>
     
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="css/credits.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+    <link rel="stylesheet" href="css/lobby.css">
+    <link rel="stylesheet" href="css/terms-privacy.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/navbar.css">
+
+</head>
+
 <body>
     <header>
         <nav>
@@ -25,8 +34,32 @@
         </nav>
     </header>
     <main id="app">
-        <!-- Dynamic content will be loaded here -->
     </main>
+
+    <!-- Bootstrap JS -->
+    <script src="js/bootstrap/bootstrap.bundle.min.js" defer></script>
+    
+    <!-- Router -->
     <script src="js/router.js" defer></script>
+
+    <!-- General Application Scripts -->
+    <script src="js/app.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/footer.js" defer></script>
+    <script src="js/navbar.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    
+    <!-- Page-Specific Scripts -->
+    <script src="js/menu.js" defer></script>
+    <script src="js/lobby.js" defer></script>
+    <script src="js/login.js" defer></script>
+
+    <!-- Game-Specific Scripts -->
+    <script src="js/game/ball.js" defer></script>
+    <script src="js/game/controls.js" defer></script>
+    <script src="js/game/game.js" defer></script>
+    <script src="js/game/main.js" defer></script>
+    <script src="js/game/paddle.js" defer></script>
+    <script src="js/game/pong_onefile.js" defer></script>
 </body>
 </html>
