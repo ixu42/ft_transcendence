@@ -1,11 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Redirecting...</title>
-    <meta http-equiv="refresh" content="0; url=pages/menu.html">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Single Page App</title>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/menu.css">
+        <link rel="stylesheet" href="css/credits.css">
+        <link rel="stylesheet" href="css/leaderboard.css">
+        <link rel="stylesheet" href="css/lobby.css">
+        <link rel="stylesheet" href="css/terms-privacy.css">
+    </head>
+    
 <body>
-    <p>If you are not redirected automatically, follow this <a href="pages/menu.html">link to the menu</a>.</p>
+    <header>
+        <nav>
+            <a href="#menu">Menu</a>
+            <a href="#credits">Credits</a>
+            <a href="#leaderboard">Leaderboard</a>
+            <a href="#lobby">Lobby</a>
+            <a href="#terms">Terms & Privacy</a>
+            <a href="#login">Login</a>
+        </nav>
+    </header>
+    <main id="app">
+        <!-- Dynamic content will be loaded here -->
+    </main>
+    <script src="js/router.js" defer></script>
 </body>
 </html>

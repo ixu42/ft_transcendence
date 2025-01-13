@@ -1,4 +1,4 @@
-#menu-container {
+.menu-container {
     background-color: #0f0f13;
     color: #ffffff;
     height: 100vh;
@@ -10,8 +10,7 @@
     z-index: 10;
 }
 
-
-.menu-title {
+.menu-container .menu-title {
     font-size: 4rem;
     font-weight: bold;
     text-transform: uppercase;
@@ -19,7 +18,7 @@
     margin-bottom: 2rem;
 }
 
-.custom-btn {
+.menu-container .custom-btn {
     width: 300px;
     padding: 20px;
     border-radius: 50px;
@@ -32,31 +31,31 @@
     border: none;
 }
 
-.custom-btn-play {
+.menu-container .custom-btn-play {
     background: linear-gradient(45deg, #1d8348, #239b56);
 }
 
-.custom-btn-play:hover {
+.menu-container .custom-btn-play:hover {
     background: linear-gradient(45deg, #239b56, #1d8348);
     transform: scale(1.1);
     box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
 }
 
-.custom-btn-leaderboard {
+.menu-container .custom-btn-leaderboard {
     background: linear-gradient(45deg, #1a5276, #2471a3);
 }
 
-.custom-btn-leaderboard:hover {
+.menu-container .custom-btn-leaderboard:hover {
     background: linear-gradient(45deg, #2471a3, #1a5276);
     transform: scale(1.1);
     box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
 }
 
-.custom-btn-credits {
+.menu-container .custom-btn-credits {
     background: linear-gradient(45deg, #af601a, #d35400);
 }
 
-.custom-btn-credits:hover {
+.menu-container .custom-btn-credits:hover {
     background: linear-gradient(45deg, #d35400, #af601a);
     transform: scale(1.1);
     box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
