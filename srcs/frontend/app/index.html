@@ -11,7 +11,6 @@
     <!-- General Application CSS -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="css/base.css">
 
     <!-- Page-Specific CSS -->
     <link rel="stylesheet" href="css/views/menu.css">
@@ -26,9 +25,14 @@
 </head>
 
 <body>
-    <header id="navbar-container"></header>
+    <div id="navbar-container" class="navbar bg-light">
+        <a class="navbar-brand" href="#menu">Poggers</a>
+        <div class="auth-container">
+            <button id="auth-btn">Login / Register</button>
+        </div>
+    </div>
     <main id="app"></main>
-    <footer id="footer-container">
+    <footer id="footer-container" class="bg-dark text-white p-3 text-center">
         <p>&copy; 2025 My Website</p>
     </footer>
 
