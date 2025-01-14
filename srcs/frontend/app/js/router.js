@@ -1,13 +1,14 @@
 const routes = {
-    "#": "/views/login.html",
-    "#menu": "/views/menu.html",
-    "#credits": "/views/credits.html",
-    "#leaderboard": "/views/leaderboard.html",
-    "#lobby": "/views/lobby.html",
-    "#terms": "/views/terms-privacy.html",
-    "#login": "/views/login.html",
-    "#game": "/views/game.html",
-    404: "/views/404.html",
+  "#": "/views/login.html",
+  "#menu": "/views/menu.html",
+  "#credits": "/views/credits.html",
+  "#leaderboard": "/views/leaderboard.html",
+  "#lobby": "/views/lobby.html",
+  "#terms": "/views/terms-privacy.html",
+  "#login": "/views/login.html",
+  "#register": "/views/register.html",
+  "#game": "/views/game.html",
+  404: "/views/404.html",
 };
 
 const protectedRoutes = ["#leaderboard", "#lobby", "#game"];
@@ -15,92 +16,97 @@ const protectedRoutes = ["#leaderboard", "#lobby", "#game"];
 const isUserLoggedIn = () => true;
 
 const redirectToLogin = () => {
-    window.location.hash = "#login";
+  window.location.hash = "#login";
 };
 
 const loadGameScripts = () => {
-    const scriptPaths = [
-        "/js/game/ball.js",
-        "/js/game/controls.js",
-        "/js/game/paddle.js",
-        "/js/game/game.js",
-        "/js/game/main.js",
-    ];
+  const scriptPaths = [
+      "/js/game/ball.js",
+      "/js/game/controls.js",
+      "/js/game/paddle.js",
+      "/js/game/game.js",
+      "/js/game/main.js",
+  ];
 
-    scriptPaths.forEach((scriptPath) => {
-        const script = document.createElement("script");
-        script.src = scriptPath;
-        script.defer = true;
-        script.onload = () => console.log(`Loaded: ${scriptPath}`);
-        script.onerror = () => console.error(`Failed to load: ${scriptPath}`);
-        document.body.appendChild(script);
-    });
+  scriptPaths.forEach((scriptPath) => {
+      const script = document.createElement("script");
+      script.src = scriptPath;
+      script.defer = true;
+      document.body.appendChild(script);
+  });
 };
 
 const bindLobbyEventListeners = () => {
-    const startLocalBtn = document.getElementById("start-local-btn");
-    if (startLocalBtn) {
-        startLocalBtn.addEventListener("click", () => {
-            window.location.hash = "#game";
-        });
-    }
+  const startLocalBtn = document.getElementById("start-local-btn");
+  if (startLocalBtn) {
+      startLocalBtn.addEventListener("click", () => {
+          window.location.hash = "#game";
+      });
+  }
 
-    const startOnlineBtn = document.getElementById("start-online-btn");
-    if (startOnlineBtn) {
-        startOnlineBtn.addEventListener("click", () => {
-            alert("Online game functionality is coming soon!");
-        });
-    }
+  const startOnlineBtn = document.getElementById("start-online-btn");
+  if (startOnlineBtn) {
+      startOnlineBtn.addEventListener("click", () => {
+          alert("Online game functionality is coming soon!");
+      });
+  }
 };
 
 const initializeGame = () => {
-    console.log("Initializing Game...");
-    const gameContainer = document.getElementById("pong");
-    if (gameContainer) {
-        const game = createGame();
-        setupControls(game.player, game.player2);
+  const gameContainer = document.getElementById("pong");
+  if (gameContainer) {
+      const game = createGame();
+      setupControls(game.player, game.player2);
 
-        function gameLoop() {
-            updateGame(game);
-            drawGame(game);
-            requestAnimationFrame(gameLoop);
-        }
+      function gameLoop() {
+          updateGame(game);
+          drawGame(game);
+          requestAnimationFrame(gameLoop);
+      }
 
-        gameLoop();
-        console.log("Game Initialized");
-    } else {
-        console.error("Game container not found!");
-    }
+      gameLoop();
+  }
 };
 
+const toggleNavFooterVisibility = (isVisible) => {
+  const navbar = document.getElementById("navbar-container");
+  const footer = document.getElementById("footer-container");
+  if (navbar) navbar.style.display = isVisible ? "block" : "none";
+  if (footer) footer.style.display = isVisible ? "block" : "none";
+};
 
 const handleLocation = async () => {
-    const path = window.location.hash || "#";
-    const route = routes[path] || routes[404];
+  const path = window.location.hash || "#";
+  const route = routes[path] || routes[404];
 
-    if (protectedRoutes.includes(path) && !isUserLoggedIn()) {
-        redirectToLogin();
-        return;
-    }
+  if (protectedRoutes.includes(path) && !isUserLoggedIn()) {
+      redirectToLogin();
+      return;
+  }
 
-    try {
-        const html = await fetch(route).then((data) => data.text());
-        document.getElementById("app").innerHTML = html;
+  try {
+      const html = await fetch(route).then((data) => data.text());
+      document.getElementById("app").innerHTML = html;
 
-        if (path === "#game") {
-            loadGameScripts();
-            setTimeout(() => initializeGame(), 100);
-        } else if (path === "#lobby") {
-            bindLobbyEventListeners();
-        }
-    } catch (error) {
-        document.getElementById("app").innerHTML = "<h1>Error loading page</h1>";
-        console.error(`Failed to load route ${path}:`, error);
-    }
+      if (path === "#game") {
+          toggleNavFooterVisibility(false);
+          loadGameScripts();
+          setTimeout(() => initializeGame(), 100);
+      } else {
+          toggleNavFooterVisibility(true);
+          if (path === "#lobby") {
+              bindLobbyEventListeners();
+          }
+      }
+  } catch (error) {
+      document.getElementById("app").innerHTML = "<h1>Error loading page</h1>";
+      console.error(`Failed to load route ${path}:`, error);
+  }
 };
 
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
+
 
 
    /* Just the basics first 

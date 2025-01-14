@@ -17,24 +17,16 @@
     <link rel="stylesheet" href="css/terms-privacy.css">
     <link rel="stylesheet" href="css/game.css">
     <link rel="stylesheet" href="css/login.css">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/navbar.css">
-
+    <link rel="stylesheet" href="css/register.css">
+    <link rel="stylesheet" href="css/base.css">
 </head>
 
 <body>
-    <header>
-        <nav>
-            <a href="#menu">Menu</a>
-            <a href="#credits">Credits</a>
-            <a href="#leaderboard">Leaderboard</a>
-            <a href="#lobby">Lobby</a>
-            <a href="#terms">Terms & Privacy</a>
-            <a href="#login">Login</a>
-        </nav>
-    </header>
-    <main id="app">
-    </main>
+    <header id="navbar-container"></header>
+    <main id="app"></main>
+    <footer id="footer-container">
+        <p>&copy; 2025 My Website</p>
+    </footer>
 
     <!-- Bootstrap JS -->
     <script src="js/bootstrap/bootstrap.bundle.min.js" defer></script>
@@ -43,16 +35,16 @@
     <script src="js/router.js" defer></script>
 
     <!-- General Application Scripts -->
-    <script src="js/app.js" defer></script>
-    <script src="js/auth.js" defer></script>
     <script src="js/footer.js" defer></script>
     <script src="js/navbar.js" defer></script>
-    <script src="js/ui.js" defer></script>
     
     <!-- Page-Specific Scripts -->
     <script src="js/menu.js" defer></script>
     <script src="js/lobby.js" defer></script>
-    <script src="js/login.js" defer></script>
+
+    <!-- Authentication Scripts -->
+    <script src="js/auth/login.js" defer></script>
+    <script src="js/auth/register.js" defer></script>
 
     <!-- Game-Specific Scripts -->
     <script src="js/game/ball.js" defer></script>

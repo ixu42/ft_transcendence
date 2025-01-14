@@ -126,3 +126,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
+
+document.getElementById("register-btn").addEventListener("click", () => {
+    window.location.hash = "#register";
+});
