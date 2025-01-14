@@ -72,6 +72,13 @@ const handleLocation = async () => {
   const path = window.location.hash || "#";
   const route = routes[path] || routes[404];
 
+  const navbar = document.getElementById("navbar-container");
+  const footer = document.getElementById("footer-container");
+  const hideNavbarAndFooter = ["#login", "#register"].includes(path);
+
+  if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
+  if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
+
   if (protectedRoutes.includes(path) && !isUserLoggedIn()) {
     redirectToLogin();
     return;
