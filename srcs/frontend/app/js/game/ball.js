@@ -1,4 +1,4 @@
-function createBall(x, y) {
+const createBall = (x, y) => {
     return {
         x: x,
         y: y,
@@ -10,7 +10,7 @@ function createBall(x, y) {
     };
 }
 
-function resetBall(ball, canvas) {
+const resetBall = (ball, canvas) => {
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
     ball.dx = Math.cos(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1;
@@ -18,7 +18,7 @@ function resetBall(ball, canvas) {
     ball.speed = 2;
 }
 
-function hitPaddle(ball, player, direction) {
+const hitPaddle = (ball, player, direction) => {
     let relativeIntersectY = (player.y + (player.height / 2)) - ball.y;
     let normalizedRelativeIntersectionY = (relativeIntersectY / (player.height / 2));
     let bounceAngle = normalizedRelativeIntersectionY * Math.PI / 4; // 45 degrees
@@ -28,7 +28,7 @@ function hitPaddle(ball, player, direction) {
     ball.speed += ball.speedUp;
 }
 
-function moveBall(ball, player, player2, canvas) {
+const moveBall = (ball, player, player2, canvas) => {
     ball.x += ball.dx * ball.speed;
     ball.y += ball.dy * ball.speed;
 
@@ -54,7 +54,7 @@ function moveBall(ball, player, player2, canvas) {
     }
 }
 
-function drawBall(context, ball) {
+const drawBall = (context, ball) => {
     context.beginPath();
     context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
     context.fill();

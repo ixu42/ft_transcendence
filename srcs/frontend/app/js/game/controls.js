@@ -1,4 +1,4 @@
-function setupControls(player, player2, game) {
+const setupControls = (player, player2, game) => {
     document.addEventListener('keydown', function(event) {
         const key = event.key.toLowerCase();
         key === 'arrowup' ? player2.keyboardUp = true :
