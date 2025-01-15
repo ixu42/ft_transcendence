@@ -5,8 +5,7 @@ const setupControls = (player, player2, game) => {
             key === 'arrowdown' ? player2.keyboardDown = true :
             key === 'w' ? player.keyboardUp = true :
             key === 's' ? player.keyboardDown = true :
-            key === ' ' || key === 'escape' ? game.pause = !(game.pause) : 
-            null;
+            key === ' ' || key === 'escape' ? game.pause = !(game.pause) : null;
     });
 
     document.addEventListener('keyup', function(event) {
