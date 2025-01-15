@@ -19,22 +19,22 @@ const redirectToLogin = () => {
   window.location.hash = "#login";
 };
 
-const loadGameScripts = () => {
-  const scriptPaths = [
-      "/js/game/ball.js",
-      "/js/game/controls.js",
-      "/js/game/paddle.js",
-      "/js/game/game.js",
-      "/js/game/main.js",
-  ];
+// const loadGameScripts = () => {
+//   const scriptPaths = [
+//       "/js/game/ball.js",
+//       "/js/game/controls.js",
+//       "/js/game/paddle.js",
+//       "/js/game/game.js",
+//       "/js/game/main.js",
+//   ];
 
-  scriptPaths.forEach((scriptPath) => {
-      const script = document.createElement("script");
-      script.src = scriptPath;
-      script.defer = true;
-      document.body.appendChild(script);
-  });
-};
+//   scriptPaths.forEach((scriptPath) => {
+//       const script = document.createElement("script");
+//       script.src = scriptPath;
+//       script.defer = true;
+//       document.body.appendChild(script);
+//   });
+// };
 
 const bindLobbyEventListeners = () => {
   const startLocalBtn = document.getElementById("start-local-btn");
@@ -52,21 +52,21 @@ const bindLobbyEventListeners = () => {
   }
 };
 
-const initializeGame = () => {
-  const gameContainer = document.getElementById("pong");
-  if (gameContainer) {
-      const game = createGame();
-      setupControls(game.player, game.player2);
+// const initializeGame = () => {
+//   const gameContainer = document.getElementById("pong");
+//   if (gameContainer) {
+//       const game = createGame();
+//       setupControls(game.player, game.player2, game);
+//       resetBall(drawBall, game.canvas);
 
-      function gameLoop() {
-          updateGame(game);
-          drawGame(game);
-          requestAnimationFrame(gameLoop);
-      }
-
-      gameLoop();
-  }
-};
+//       function gameLoop() {
+//           updateGame(game);
+//           drawGame(game);
+//           requestAnimationFrame(gameLoop);
+//       }
+//       gameLoop();
+//   }
+// };
 
 const toggleNavFooterVisibility = (isVisible) => {
   const navbar = document.getElementById("navbar-container");
@@ -90,7 +90,7 @@ const handleLocation = async () => {
 
       if (path === "#game") {
           toggleNavFooterVisibility(false);
-          loadGameScripts();
+          // loadGameScripts();
           setTimeout(() => initializeGame(), 100);
       } else {
           toggleNavFooterVisibility(true);

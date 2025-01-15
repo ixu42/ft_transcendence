@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+const initializeGame = () => {
     const canvas = document.getElementById('pong');
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");
@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const game = createGame();
-    setupControls(game.player, game.player2);
+    setupControls(game.player, game.player2, game);
+    resetBall(drawBall, canvas);
 
     function gameLoop() {
         updateGame(game);
@@ -16,4 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Starting game loop");
     gameLoop();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeGame();
 });
