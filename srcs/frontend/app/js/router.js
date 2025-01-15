@@ -19,6 +19,8 @@ const redirectToLogin = () => {
   window.location.hash = "#login";
 };
 
+
+//Game scripts are already loaded in index.html
 // const loadGameScripts = () => {
 //   const scriptPaths = [
 //       "/js/game/ball.js",
@@ -52,6 +54,7 @@ const bindLobbyEventListeners = () => {
   }
 };
 
+//This function exists in game/main.js
 // const initializeGame = () => {
 //   const gameContainer = document.getElementById("pong");
 //   if (gameContainer) {
