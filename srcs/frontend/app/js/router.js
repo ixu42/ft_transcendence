@@ -19,22 +19,24 @@ const redirectToLogin = () => {
   window.location.hash = "#login";
 };
 
-const loadGameScripts = () => {
-  const scriptPaths = [
-      "/js/game/ball.js",
-      "/js/game/controls.js",
-      "/js/game/paddle.js",
-      "/js/game/game.js",
-      "/js/game/main.js",
-  ];
 
-  scriptPaths.forEach((scriptPath) => {
-      const script = document.createElement("script");
-      script.src = scriptPath;
-      script.defer = true;
-      document.body.appendChild(script);
-  });
-};
+//Game scripts are already loaded in index.html
+// const loadGameScripts = () => {
+//   const scriptPaths = [
+//       "/js/game/ball.js",
+//       "/js/game/controls.js",
+//       "/js/game/paddle.js",
+//       "/js/game/game.js",
+//       "/js/game/main.js",
+//   ];
+
+//   scriptPaths.forEach((scriptPath) => {
+//       const script = document.createElement("script");
+//       script.src = scriptPath;
+//       script.defer = true;
+//       document.body.appendChild(script);
+//   });
+// };
 
 const bindLobbyEventListeners = () => {
   const startLocalBtn = document.getElementById("start-local-btn");
@@ -52,20 +54,28 @@ const bindLobbyEventListeners = () => {
   }
 };
 
-const initializeGame = () => {
-  const gameContainer = document.getElementById("pong");
-  if (gameContainer) {
-      const game = createGame();
-      setupControls(game.player, game.player2);
+//This function exists in game/main.js
+// const initializeGame = () => {
+//   const gameContainer = document.getElementById("pong");
+//   if (gameContainer) {
+//       const game = createGame();
+//       setupControls(game.player, game.player2, game);
+//       resetBall(drawBall, game.canvas);
 
-      function gameLoop() {
-          updateGame(game);
-          drawGame(game);
-          requestAnimationFrame(gameLoop);
-      }
+//       function gameLoop() {
+//           updateGame(game);
+//           drawGame(game);
+//           requestAnimationFrame(gameLoop);
+//       }
+//       gameLoop();
+//   }
+// };
 
-      gameLoop();
-  }
+const toggleNavFooterVisibility = (isVisible) => {
+  const navbar = document.getElementById("navbar-container");
+  const footer = document.getElementById("footer-container");
+  if (navbar) navbar.style.display = isVisible ? "block" : "none";
+  if (footer) footer.style.display = isVisible ? "block" : "none";
 };
 
 const handleLocation = async () => {
@@ -88,6 +98,16 @@ const handleLocation = async () => {
     const html = await fetch(route).then((data) => data.text());
     document.getElementById("app").innerHTML = html;
 
+      if (path === "#game") {
+          toggleNavFooterVisibility(false);
+          // loadGameScripts();
+          setTimeout(() => initializeGame(), 100);
+      } else {
+          toggleNavFooterVisibility(true);
+          if (path === "#lobby") {
+              bindLobbyEventListeners();
+          }
+      }
     if (path === "#game") {
       loadGameScripts();
       setTimeout(() => initializeGame(), 100);
