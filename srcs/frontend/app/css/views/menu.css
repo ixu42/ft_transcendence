@@ -1,4 +1,4 @@
-.menu-container {
+#menu-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -6,28 +6,37 @@
     height: 100vh;
     background-color: var(--primary-bg-color);
     color: var(--primary-text-color);
-}
-
-.menu-container .menu-title {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.menu-container .custom-btn {
-    width: 250px;
-    padding: 10px;
-    border-radius: 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: var(--primary-btn-text-color);
-    background-color: var(--primary-btn-bg);
     text-align: center;
-    text-transform: uppercase;
-    border: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.menu-container .custom-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+.menu-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: var(--primary-text-color);
+}
+
+#menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.menu-btn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    background: linear-gradient(45deg, #1d8348, #239b56);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.menu-btn:hover {
+    transform: scale(1.1);
+    background: linear-gradient(45deg, #239b56, #1d8348);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }

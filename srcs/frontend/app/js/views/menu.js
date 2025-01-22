@@ -4,4 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     playBtn.addEventListener('click', () => {
         window.location.hash = "#lobby";
     });
+
+    
+
+
+
+
+
 });

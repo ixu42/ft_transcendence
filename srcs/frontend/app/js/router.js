@@ -55,20 +55,21 @@ const bindLobbyEventListeners = () => {
 };
 
 //This function exists in game/main.js
- const initializeGame = () => {
-   const gameContainer = document.getElementById("pong");
-   if (gameContainer) {
-       const game = createGame();
-       setupControls(game.player, game.player2, game);
-       resetBall(drawBall, game.canvas);
-       function gameLoop() {
-           updateGame(game);
-           drawGame(game);
-           requestAnimationFrame(gameLoop);
-       }
-       gameLoop();
-   }
- };
+// const initializeGame = () => {
+//   const gameContainer = document.getElementById("pong");
+//   if (gameContainer) {
+//       const game = createGame();
+//       setupControls(game.player, game.player2, game);
+//       resetBall(drawBall, game.canvas);
+
+//       function gameLoop() {
+//           updateGame(game);
+//           drawGame(game);
+//           requestAnimationFrame(gameLoop);
+//       }
+//       gameLoop();
+//   }
+// };
 
 const toggleNavFooterVisibility = (isVisible) => {
   const navbar = document.getElementById("navbar-container");
@@ -81,35 +82,44 @@ const handleLocation = async () => {
   const path = window.location.hash || "#";
   const route = routes[path] || routes[404];
 
+  console.log(`Navigating to: ${path}`); // Debug here
+
+  const navbar = document.getElementById("navbar-container");
+  const footer = document.getElementById("footer-container");
+
+  // Set isLoggedIn to true for guest access
+  const isLoggedIn = true; // isUserLoggedIn();
+
   const hideNavbarAndFooter = ["#login", "#register"].includes(path);
+  if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
+  if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
 
-  document.getElementById("navbar-container").style.display = hideNavbarAndFooter ? "none" : "block";
-  document.getElementById("footer-container").style.display = hideNavbarAndFooter ? "none" : "block";
-
-  if (protectedRoutes.includes(path) && !isUserLoggedIn()) {
-    redirectToLogin();
-    return;
+  if (protectedRoutes.includes(path) && !isLoggedIn) {
+      redirectToLogin();
+      return;
   }
 
   try {
-    const html = await fetch(route).then((data) => data.text());
-    document.getElementById("app").innerHTML = html;
+      const html = await fetch(route).then((data) => data.text());
+      document.getElementById("app").innerHTML = html;
 
-    if (path === "#game") {
-      loadGameScripts();
-      setTimeout(() => initializeGame(), 100);
-    } else if (path === "#lobby") {
-      bindLobbyEventListeners();
-    }
+      if (path === "#game") {
+          setTimeout(() => initializeGame(), 100);
+      } else if (path === "#lobby") {
+          bindLobbyEventListeners();
+      }
+
+      console.log(`Loaded route content: ${path}`); // Debug here
   } catch (error) {
-    document.getElementById("app").innerHTML = "<h1>Error loading page</h1>";
-    console.error(`Failed to load route ${path}:`, error);
+      document.getElementById("app").innerHTML = "<h1>Error loading page</h1>";
+      console.error(`Failed to load route ${path}:`, error);
   }
 };
 
+
+
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
-
 
 
 
