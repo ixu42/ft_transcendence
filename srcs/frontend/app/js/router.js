@@ -55,21 +55,20 @@ const bindLobbyEventListeners = () => {
 };
 
 //This function exists in game/main.js
-// const initializeGame = () => {
-//   const gameContainer = document.getElementById("pong");
-//   if (gameContainer) {
-//       const game = createGame();
-//       setupControls(game.player, game.player2, game);
-//       resetBall(drawBall, game.canvas);
-
-//       function gameLoop() {
-//           updateGame(game);
-//           drawGame(game);
-//           requestAnimationFrame(gameLoop);
-//       }
-//       gameLoop();
-//   }
-// };
+ const initializeGame = () => {
+   const gameContainer = document.getElementById("pong");
+   if (gameContainer) {
+       const game = createGame();
+       setupControls(game.player, game.player2, game);
+       resetBall(drawBall, game.canvas);
+       function gameLoop() {
+           updateGame(game);
+           drawGame(game);
+           requestAnimationFrame(gameLoop);
+       }
+       gameLoop();
+   }
+ };
 
 const toggleNavFooterVisibility = (isVisible) => {
   const navbar = document.getElementById("navbar-container");
@@ -82,12 +81,10 @@ const handleLocation = async () => {
   const path = window.location.hash || "#";
   const route = routes[path] || routes[404];
 
-  const navbar = document.getElementById("navbar-container");
-  const footer = document.getElementById("footer-container");
   const hideNavbarAndFooter = ["#login", "#register"].includes(path);
 
-  if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
-  if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
+  document.getElementById("navbar-container").style.display = hideNavbarAndFooter ? "none" : "block";
+  document.getElementById("footer-container").style.display = hideNavbarAndFooter ? "none" : "block";
 
   if (protectedRoutes.includes(path) && !isUserLoggedIn()) {
     redirectToLogin();
@@ -98,16 +95,6 @@ const handleLocation = async () => {
     const html = await fetch(route).then((data) => data.text());
     document.getElementById("app").innerHTML = html;
 
-      if (path === "#game") {
-          toggleNavFooterVisibility(false);
-          // loadGameScripts();
-          setTimeout(() => initializeGame(), 100);
-      } else {
-          toggleNavFooterVisibility(true);
-          if (path === "#lobby") {
-              bindLobbyEventListeners();
-          }
-      }
     if (path === "#game") {
       loadGameScripts();
       setTimeout(() => initializeGame(), 100);
