@@ -1,0 +1,53 @@
+/* Profile Container */
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100vh;
+    background-color: var(--primary-bg-color);
+    color: var(--primary-text-color);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Avatar Styling */
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid var(--accent-color);
+}
+
+/* Headline Styling */
+.profile-container h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+/* Paragraph Styling */
+.profile-container p {
+    font-size: 1.2rem;
+    margin: 5px 0;
+}
+
+/* Logout Button Styling */
+#profile-menu-btn, #logout-btn {
+    background-color: var(--accent-color);
+    color: var(--primary-text-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#profile-menu-btn:hover, #logout-btn:hover {
+    background-color: var(--link-hover-color);
+    transform: scale(1.05);
+}

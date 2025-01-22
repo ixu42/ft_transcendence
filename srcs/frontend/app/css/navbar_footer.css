@@ -28,6 +28,14 @@
     align-items: center;
 }
 
+#profile-btn {
+    display: inline-block !important;
+    background-color: var(--accent-color) !important;
+    color: var(--text-color) !important;
+    padding: 8px 15px !important;
+    border-radius: 5px !important;
+    margin-left: 10px !important;
+}
 #auth-btn {
     background-color: var(--accent-color);
     color: var(--text-color);
@@ -43,7 +51,6 @@
     background-color: var(--link-hover-color);
     color: var(--text-color);
 }
-
 
 
 

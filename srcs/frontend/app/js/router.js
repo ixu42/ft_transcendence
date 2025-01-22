@@ -8,6 +8,7 @@ const routes = {
   "#login": "/views/login.html",
   "#register": "/views/register.html",
   "#game": "/views/game.html",
+  "#profile": "/views/profile.html",
   404: "/views/404.html",
 };
 
@@ -82,15 +83,13 @@ const handleLocation = async () => {
   const path = window.location.hash || "#";
   const route = routes[path] || routes[404];
 
-  console.log(`Navigating to: ${path}`); // Debug here
+  const isLoggedIn = true; // Allow guest access for now
+  const hideNavbarAndFooter = ["#login", "#register"].includes(path);
 
   const navbar = document.getElementById("navbar-container");
   const footer = document.getElementById("footer-container");
+  const app = document.getElementById("app");
 
-  // Set isLoggedIn to true for guest access
-  const isLoggedIn = true; // isUserLoggedIn();
-
-  const hideNavbarAndFooter = ["#login", "#register"].includes(path);
   if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
   if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
 
@@ -101,7 +100,7 @@ const handleLocation = async () => {
 
   try {
       const html = await fetch(route).then((data) => data.text());
-      document.getElementById("app").innerHTML = html;
+      app.innerHTML = html;
 
       if (path === "#game") {
           setTimeout(() => initializeGame(), 100);
@@ -109,12 +108,13 @@ const handleLocation = async () => {
           bindLobbyEventListeners();
       }
 
-      console.log(`Loaded route content: ${path}`); // Debug here
+      console.log(`Loaded route content: ${path}`);
   } catch (error) {
-      document.getElementById("app").innerHTML = "<h1>Error loading page</h1>";
+      app.innerHTML = "<h1>Error loading page</h1>";
       console.error(`Failed to load route ${path}:`, error);
   }
 };
+
 
 
 
