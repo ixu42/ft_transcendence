@@ -36,23 +36,27 @@ const drawGame = (game) => {
     drawScore(game);
 };
 
-const initializeGame = () => {
-    const canvas = document.getElementById('pong');
-    if (!canvas) {
-        console.error("Canvas element '#pong' not found.");
-        return;
-    }
-
-    const game = createGame();
-    setupControls(game.player, game.player2, game);
+const resetGame = (game) => {
+    game.player.score = 0;
+    game.player2.score = 0;
     resetBall(game.ball, game.canvas);
+};
 
-    const gameLoop = () => {
-        updateGame(game);
-        drawGame(game);
-        requestAnimationFrame(gameLoop);
-    };
+const gameLoop = (game) => {
+    updateGame(game);
+    drawGame(game);
+    requestAnimationFrame(() => gameLoop(game));
+};
 
-    console.log("Starting game loop");
-    gameLoop();
+const initializeGame = () => {
+        const canvas = document.getElementById('pong');
+        if (!canvas) {
+            console.error("Canvas element '#pong' not found.");
+            resolve([0, 0]);
+            return;
+        }
+        const game = createGame();
+        setupControls(game.player, game.player2, game);
+        console.log("Starting game loop");
+        gameLoop(game);
 };

@@ -10,10 +10,9 @@ const createPaddle = (x, y) => ({
 });
 
 const movePaddle = (paddle, canvas) => {
-    if (paddle.keyboardUp !== paddle.keyboardDown) {
+    if (paddle.keyboardUp != paddle.keyboardDown)
         paddle.y += paddle.keyboardUp ? -paddle.speed : paddle.speed;
-    }
-
+    
     if (paddle.y < 0) {
         paddle.y = 0;
     } else if (paddle.y > canvas.height - paddle.height) {
