@@ -36,7 +36,7 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'axes',
-   
+    'rest_framework',
 
     # Default Django apps
     'django.contrib.admin',

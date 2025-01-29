@@ -1,9 +1,11 @@
 from django.urls import path
-from . import views
+from .views import RegisterUserView, LoginUserView
 
 app_name = 'users'
 
 urlpatterns = [
-    path('register/', views.register_user, name='register_user'),
-    path('login/', views.login_user, name='login_user'),
+    path('register/', RegisterUserView.as_view(), name='register'),
+    path('login/', LoginUserView.as_view(), name='login'),
+    # path('set-display-name/', SetDisplayNameView.as_view(), name='set_display_name'),
+    # path('dashboard/', views.dashboard, name='dashboard'),
 ]
