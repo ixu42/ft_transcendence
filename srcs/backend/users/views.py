@@ -13,13 +13,6 @@ from users.models import CustomUser
 def register_user(request):
     try:
         data = json.loads(request.body)
-        display_name = data.get('display_name', '')
-        username = data.get('username')
-        if not display_name:
-            display_name = username
-            data['display_name'] = display_name
-        print(data)
-        print(display_name)
     except json.JSONDecodeError:
         return JsonResponse({'errors': 'Invalid JSON input'}, status=400)
 
