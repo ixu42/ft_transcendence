@@ -9,19 +9,24 @@ http://localhost:8000/
 ## Endpoints Overview
 
 - **Admin Panel**
-   - **URL**: `/admin/`
-   - **Method**: `GET`
-   - **Description**: Access the Django Admin interface for managing the system and users.
+    - **URL**: `/admin/`
+    - **Method**: `GET`
+    - **Description**: Access the Django Admin interface for managing the system and users.
 
 - **User Registration**
-   - **URL**: `/users/register/`
-   - **Method**: `POST`
-   - **Description**: Register a new user in the system.
+    - **URL**: `/users/register/`
+    - **Method**: `POST`
+    - **Description**: Register a new user in the system.
 
 - **User Login**
-   - **URL**: `/users/login/`
-   - **Method**: `POST`
-   - **Description**: Authenticate a user and logs them in. If a user fails to log in with incorrect credentials 5 times in a row, their account will be temporarily locked for 15 minutes to prevent brute-force attacks.
+    - **URL**: `/users/login/`
+    - **Method**: `POST`
+    - **Description**: Authenticate a user and logs them in. If a user fails to log in with incorrect credentials 5 times in a row, their account will be temporarily locked for 15 minutes to prevent brute-force attacks.
+
+- **Set Display Name**
+    - **URL**: `/users/set-display-name/`
+    - **Method**: `POST`
+    - **Description**: Set a unique display name for the logged in user.
 
 ## Endpoints specifications
 
@@ -32,10 +37,8 @@ http://localhost:8000/
         "username": "newuser",
         "password1": "securepassword123",
         "password2": "securepassword123",
-        "display_name": "foo"
     }
     ```
-    display_name is optional - if no display_name is provided, it is set to username.
 - **Response**
     - **201**
         ```json
@@ -71,4 +74,57 @@ http://localhost:8000/
             "errors": "Invalid password"
         }
         ```
+        ```json
+        {
+            "errors": "Username does not exist"
+        }
+        ```
+        - When username and/or password are/is missing
+        ```json
+        {
+            "errors": "Username and password are required."
+        }
+        ```
 
+### `/users/set-display-name/`
+- **Expected Request Body**:
+    ```json
+    {
+        "display_name": "display_name42"
+    }
+    ```
+- **Response**
+    - **200**
+        - When the display name is successfully set:
+        ```json
+        {
+            "message": "Display name set"
+        }
+        ```
+        - When the display name is unchanged (no update made, because the input is the same as the current value):
+        ```json
+        {
+            "message": "Display name is unchanged"
+        }
+        ```
+    - **400**
+        - When the display name is already taken:
+        ```json
+        {
+            "errors": {
+                "display_name": [
+                    "Display name already taken. Please choose another one."
+                ]
+            }
+        }
+        ```
+        - When the display name is missing or invalid:
+        ```json
+        {
+            "errors": {
+                "display_name": [
+                    "Display name is required to join tournaments."
+                ]
+            }
+        }
+        ```
