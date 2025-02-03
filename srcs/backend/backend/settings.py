@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@auby^w*3yw6(7hx*0eiu*b)0-pnhgm@ntm8un^^m65+jg%w%8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'axes',
-   
+    'rest_framework',
 
     # Default Django apps
     'django.contrib.admin',
