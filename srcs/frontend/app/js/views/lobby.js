@@ -15,18 +15,37 @@ const bindLobbyEventListeners = () => {
 };
 
 const showGameModal = () => {
-    const modal = document.getElementById("game-modal");
-    if (!modal) {
-        console.error("Game modal not found!");
+    const modalOverlay = document.getElementById("modal-overlay");
+    const gameModal = document.getElementById("game-modal");
+
+    if (!modalOverlay || !gameModal) {
+        console.error("❌ Game modal not found!");
         return;
     }
 
-    modal.style.display = "flex";
+    modalOverlay.style.display = "flex";
+    gameModal.style.display = "block";
+
     document.getElementById("start-tournament-btn")?.addEventListener("click", () => startGame("local", "tournament"));
     document.getElementById("start-1v1-btn")?.addEventListener("click", () => startGame("local", "1v1"));
-    document.getElementById("cancel-game")?.addEventListener("click", () => (modal.style.display = "none"));
+    document.getElementById("close-btn")?.addEventListener("click", closeGameModal);
+
+    modalOverlay.addEventListener("click", (event) => {
+        if (event.target === modalOverlay) {
+            closeGameModal();
+        }
+    });
+};
+
+const closeGameModal = () => {
+    const modalOverlay = document.getElementById("modal-overlay");
+    const gameModal = document.getElementById("game-modal");
+
+    if (modalOverlay) modalOverlay.style.display = "none";
+    if (gameModal) gameModal.style.display = "none";
 };
 
 const startGame = (type, mode) => {
+    closeGameModal();
     window.location.hash = `#game?type=${type}&mode=${mode}`;
 };

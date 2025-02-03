@@ -9,7 +9,6 @@ const checkGameMode = () => {
 
     console.log(`🎮 Starting ${type.toUpperCase()} | Mode: ${mode.toUpperCase()}`);
 
-    // ✅ Wait for the DOM to load before initializing the game
     setTimeout(() => {
         const canvas = document.getElementById("pong");
         if (!canvas) {
@@ -17,12 +16,23 @@ const checkGameMode = () => {
             return;
         }
 
-        if (type === "online") {
-            initializeOnlineGame(mode);
-        } else if (mode === "tournament") {
-            initializeTournament();
-        } else {
-            initializeGame();
+        switch (type) {
+            case "online":
+                initializeOnlineGame(mode);
+                break;
+            case "local":
+                switch (mode) {
+                    case "tournament":
+                        initializeTournament();
+                        break;
+                    case "1v1":
+                    default:
+                        initializeGame();
+                        break;
+                }
+                break;
+            default:
+                console.error(`❌ Unknown game type: ${type}`);
         }
     }, 100);
 };
