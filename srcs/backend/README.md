@@ -23,11 +23,6 @@ http://localhost:8000/
     - **Method**: `POST`
     - **Description**: Authenticate a user and logs them in. If a user fails to log in with incorrect credentials 5 times in a row, their account will be temporarily locked for 15 minutes to prevent brute-force attacks.
 
-- **Set Display Name**
-    - **URL**: `/users/set-display-name/`
-    - **Method**: `POST`
-    - **Description**: Set a unique display name for the logged in user.
-
 ## Endpoints specifications
 
 ### `/users/register/`
@@ -83,48 +78,5 @@ http://localhost:8000/
         ```json
         {
             "errors": "Username and password are required."
-        }
-        ```
-
-### `/users/set-display-name/`
-- **Expected Request Body**:
-    ```json
-    {
-        "display_name": "display_name42"
-    }
-    ```
-- **Response**
-    - **200**
-        - When the display name is successfully set:
-        ```json
-        {
-            "message": "Display name set"
-        }
-        ```
-        - When the display name is unchanged (no update made, because the input is the same as the current value):
-        ```json
-        {
-            "message": "Display name is unchanged"
-        }
-        ```
-    - **400**
-        - When the display name is already taken:
-        ```json
-        {
-            "errors": {
-                "display_name": [
-                    "Display name already taken. Please choose another one."
-                ]
-            }
-        }
-        ```
-        - When the display name is missing or invalid:
-        ```json
-        {
-            "errors": {
-                "display_name": [
-                    "Display name is required to join tournaments."
-                ]
-            }
         }
         ```
