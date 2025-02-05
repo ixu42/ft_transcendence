@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 from users.models import CustomUser
 
 class Tournament(models.Model):
@@ -20,20 +22,33 @@ class Tournament(models.Model):
         default=TournamentStatus.PENDING,
     )
 
+    def check_status(self):
+        if self.status == Tournament.TournamentStatus.ACTIVE:
+            raise ValidationError('Tournament has already started')
+        if self.status == Tournament.TournamentStatus.COMPLETED:
+            raise ValidationError('Tournament has already completed')
+        if self.status == Tournament.TournamentStatus.CANCELED:
+            raise ValidationError('Tournament has been canceled')
+
     def add_player(self, user, display_name):
-        if self.status != Tournament.TournamentStatus.PENDING:
-            raise ValueError('You cannot join a tournament that has already started or is completed or canceled.')
+        self.check_status()
         if self.players.count() >= Tournament.MAX_PLAYERS:
-            raise ValueError('Tournament is full')
+            raise ValidationError('Tournament is full')
         if TournamentPlayer.objects.filter(tournament=self, user=user).exists():
-            raise ValueError('You are already in this tournament.')
+            raise ValidationError('You are already in this tournament.')
         if TournamentPlayer.objects.filter(tournament=self, display_name=display_name).exists():
-            raise ValueError('Display name is already taken in this tournament. Choose another.')
+            raise ValidationError('Display name is already taken in this tournament. Choose another.')
         return TournamentPlayer.objects.create(tournament=self, user=user, display_name=display_name)
 
-    def can_start(self):
-        return self.players.count() >= 2 and self.status == Tournament.TournamentStatus.PENDING
-        # check if even number of players?
+    def start(self, user):
+        self.check_status()
+        if self.players.count() < 2:
+            raise ValidationError('Cannot start tournament with less than 2 players.')
+        if user != self.creator:
+            raise ValidationError('Only the creator of the tournament can start it.')
+        self.status = Tournament.TournamentStatus.ACTIVE
+        self.started_at = timezone.now()  # UTC time or user's local time (if interacting with the user)? Currently UTC
+        self.save()
 
     def __str__(self):
         players = ", ".join([f"{player.username}" for player in self.players.all()])
