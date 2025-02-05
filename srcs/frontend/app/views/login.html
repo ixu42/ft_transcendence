@@ -1,4 +1,14 @@
-<div id="login-container" class="d-flex flex-column align-items-center justify-content-center vh-100 bg-dark text-white">
+
+
+<!-- Splash Screen -->
+<div class="splash-screen" onclick="hideSplash()">
+    <img src="static/ping-pong.gif" alt="Pong Animation">
+    <h1 class="splash-title">Ready to Play Pong?</h1>
+    <p class="splash-subtitle">Click the screen to move forward</p>
+</div>
+
+<!-- Login Screen -->
+<div id="login-container" class="login-container d-flex flex-column align-items-center justify-content-center vh-100 bg-dark text-white" style="display: none;">
     <h1 class="login-title mb-4">Welcome to Poggers</h1>
     <p class="mb-4">Please log in to continue</p>
     <form id="login-form" class="text-center w-50">

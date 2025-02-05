@@ -1,3 +1,10 @@
+
+
+
+
+
+// REGISTER EXAMPLE
+
 async function handleRegister() {
     // Fetch necessary translations and placeholders for the form
     const translations = await Promise.all([
@@ -96,4 +103,10 @@ async function getCSRFCookie() {
     return csrfCookie ? csrfCookie.split("=")[1] : null;
 }
 
+
+
+
+
 document.addEventListener("DOMContentLoaded", handleRegister);
+
+

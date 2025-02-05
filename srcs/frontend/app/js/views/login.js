@@ -127,7 +127,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-
 document.getElementById("register-btn").addEventListener("click", () => {
     window.location.hash = "#register";
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const splashScreen = document.querySelector(".splash-screen");
+    
+    if (splashScreen) {
+        splashScreen.addEventListener("click", hideSplash);
+    }
+});
+
+
+function hideSplash() {
+    const splash = document.querySelector(".splash-screen");
+    const loginContainer = document.getElementById("login-container");
+
+    if (!splash || !loginContainer) {
+        console.error("Splash screen or login container not found!");
+        return;
+    }
+    console.log("Splash clicked! Hiding splash screen...");
+    splash.classList.add("hidden");
+    setTimeout(() => {
+        splash.style.display = "none";
+        loginContainer.style.display = "flex";
+    }, 500);
+}
+setTimeout(() => {
+    hideSplash();
+}, 3000);
+
