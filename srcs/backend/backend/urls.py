@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include, re_path
 from . import views
@@ -22,17 +23,13 @@ from django.views.static import serve
 
 urlpatterns = [
     # serve media files under /media/
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-    
+    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     # admin url
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     # users app urls
-    path('users/', include('users.urls')),
-
+    path("users/", include("users.urls")),
     # tournaments app urls
-    path('tournaments/', include('tournaments.urls')),
-
+    path("tournaments/", include("tournaments.urls")),
     # backend path
-    path('', views.homepage),
+    path("", views.homepage),
 ]
