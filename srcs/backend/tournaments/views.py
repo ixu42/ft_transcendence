@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from .forms import TournamentCreationForm
 from .models import Tournament
 
+
 @csrf_exempt
 @require_POST
 @login_required
@@ -18,16 +19,20 @@ def create_tournament(request):
         if form.is_valid():
             tournament = form.save(user=request.user)
 
-            return JsonResponse({
-                'message': 'Tournament created',
-                'tournament_id': tournament.id,
-                'tournament_name': tournament.name
-            }, status=201)
-        return JsonResponse({'errors': form.errors}, status=400)
+            return JsonResponse(
+                {
+                    "message": "Tournament created",
+                    "tournament_id": tournament.id,
+                    "tournament_name": tournament.name,
+                },
+                status=201,
+            )
+        return JsonResponse({"errors": form.errors}, status=400)
     except json.JSONDecodeError:
-        return JsonResponse({'errors': 'Invalid JSON input.'}, status=400)
+        return JsonResponse({"errors": "Invalid JSON input."}, status=400)
     except Exception as e:
-        return JsonResponse({'errors': str(e)}, status=500)
+        return JsonResponse({"errors": str(e)}, status=500)
+
 
 @csrf_exempt
 @require_POST
@@ -37,24 +42,28 @@ def join_tournament(request, tournament_id):
         data = json.loads(request.body)
 
         tournament = Tournament.objects.get(id=tournament_id)
-        display_name = data.get('display_name')
+        display_name = data.get("display_name")
 
         try:
             tournament.add_player(request.user, display_name)
         except ValidationError as e:
-            return JsonResponse({'errors': str(e)}, status=400)
+            return JsonResponse({"errors": str(e)}, status=400)
 
-        return JsonResponse({
-            'message': f'{display_name} joined tournament',
-            'tournament_id': tournament.id,
-            'tournament_name': tournament.name
-        }, status=201)
+        return JsonResponse(
+            {
+                "message": f"{display_name} joined tournament",
+                "tournament_id": tournament.id,
+                "tournament_name": tournament.name,
+            },
+            status=201,
+        )
     except json.JSONDecodeError:
-        return JsonResponse({'errors': 'Invalid JSON input.'}, status=400)
+        return JsonResponse({"errors": "Invalid JSON input."}, status=400)
     except Tournament.DoesNotExist:
-        return JsonResponse({'errors': 'Tournament not found'}, status=404)
+        return JsonResponse({"errors": "Tournament not found"}, status=404)
     except Exception as e:
-        return JsonResponse({'errors': str(e)}, status=500)
+        return JsonResponse({"errors": str(e)}, status=500)
+
 
 @csrf_exempt
 @require_POST
@@ -66,14 +75,17 @@ def start_tournament(request, tournament_id):
         try:
             tournament.start(request.user)
         except ValidationError as e:
-            return JsonResponse({'errors': str(e)}, status=400)
+            return JsonResponse({"errors": str(e)}, status=400)
 
-        return JsonResponse({
-            'message': 'Tournament started',
-            'tournament_id': tournament.id,
-            'tournament_name': tournament.name
-        }, status=201)
+        return JsonResponse(
+            {
+                "message": "Tournament started",
+                "tournament_id": tournament.id,
+                "tournament_name": tournament.name,
+            },
+            status=201,
+        )
     except Tournament.DoesNotExist:
-        return JsonResponse({'errors': 'Tournament not found'}, status=404)
+        return JsonResponse({"errors": "Tournament not found"}, status=404)
     except Exception as e:
-        return JsonResponse({'errors': str(e)}, status=500)
+        return JsonResponse({"errors": str(e)}, status=500)
