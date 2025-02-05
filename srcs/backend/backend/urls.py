@@ -30,6 +30,9 @@ urlpatterns = [
     # users app urls
     path('users/', include('users.urls')),
 
+    # tournaments app urls
+    path('tournaments/', include('tournaments.urls')),
+
     # backend path
     path('', views.homepage),
 ]

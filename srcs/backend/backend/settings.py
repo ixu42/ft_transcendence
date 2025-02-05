@@ -33,10 +33,11 @@ ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     # My apps
     'users',
+    'tournaments',
 
     # Third-party apps
     'axes',
-    'rest_framework',
+   
 
     # Default Django apps
     'django.contrib.admin',
