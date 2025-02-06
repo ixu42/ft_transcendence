@@ -120,4 +120,4 @@ const drawWinner = (player, canvas) => {
     context.font = '30px Arial';
     context.fillStyle = '#fff';
     context.fillText(`Winner: ${player.name}`, canvas.width / 2 - 50, canvas.height / 2);
-}
+};
