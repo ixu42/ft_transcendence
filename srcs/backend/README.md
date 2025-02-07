@@ -23,6 +23,11 @@ http://localhost:8000/
     - **Method**: `POST`
     - **Description**: Authenticate a user and logs them in. If a user fails to log in with incorrect credentials 5 times in a row, their account will be temporarily locked for 15 minutes to prevent brute-force attacks.
 
+- **User Logout**
+    - **URL**: `/users/logout/`
+    - **Method**: `POST`
+    - **Description**: For the currently authenticated user to log out.
+
 ## Endpoints specifications
 
 ### `/users/register/`
@@ -38,7 +43,7 @@ http://localhost:8000/
     - **201**
         ```json
         {
-            "message": "User created"
+            "message": "User created."
         }
         ```
     - **400**
@@ -60,23 +65,46 @@ http://localhost:8000/
     - **200**
         ```json
         {
-            "message": "Login successful"
+            "message": "Login successful."
+        }
+        ```
+    - **400**
+        - When the user is already logged in
+        ```json
+        {
+            "errors": "User is already authenticated."
         }
         ```
     - **401**
         ```json
         {
-            "errors": "Invalid password"
+            "errors": "Invalid password."
         }
         ```
         ```json
         {
-            "errors": "Username does not exist"
+            "errors": "Username does not exist."
         }
         ```
         - When username and/or password are/is missing
         ```json
         {
             "errors": "Username and password are required."
+        }
+        ```
+
+### `/users/logout/`
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Logout successful."
+        }
+        ```
+    - **401**
+        When the user is not logged in
+        ```json
+        {
+            "errors": "User is not authenticated."
         }
         ```
