@@ -143,6 +143,7 @@ AXES_COOLOFF_TIME = timedelta(minutes=15)
 AXES_RESET_ON_SUCCESS = True
 AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
 AXES_LOCKOUT_PARAMETERS = ["username"]
+AXES_LOCKOUT_CALLABLE = "backend.views.lockout"
 
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",  # Django Axes backend

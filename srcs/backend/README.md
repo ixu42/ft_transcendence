@@ -92,6 +92,13 @@ http://localhost:8000/
             "errors": "Username and password are required."
         }
         ```
+    - **403**
+        - When the user fails to log in due to incorrect credentials 5 times in a row
+        ```json
+        {
+            "error": "Locked out due to too many login failures."
+        }
+        ```
 
 ### `/users/logout/`
 - **Response**
