@@ -18,6 +18,7 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    display: none;
 }
 
 .splash-screen img {
@@ -36,8 +37,10 @@
 
 #login-container {
     display: none;
+    z-index: 9999;
     text-align: center;
     padding: 20px;
+    
 }
 
 .login-title {
