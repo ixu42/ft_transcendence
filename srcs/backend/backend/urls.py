@@ -17,9 +17,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include, re_path
-from . import views
 from django.conf import settings
 from django.views.static import serve
+from . import views
+
+handler404 = "backend.views.custom_404"
+handler500 = "backend.views.custom_500"
 
 urlpatterns = [
     # serve media files under /media/
