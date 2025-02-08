@@ -137,6 +137,12 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Session settings
+SESSION_COOKIE_AGE = 7200  # 2 hours
+SESSION_SAVE_EVERY_REQUEST = (
+    True  # Automatic session refresh every time the user interacts with the server
+)
+
 # Axes settings
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(minutes=15)
