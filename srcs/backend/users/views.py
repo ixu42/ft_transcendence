@@ -1,6 +1,5 @@
 import json
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import authenticate, login, logout
 from functools import wraps
@@ -23,7 +22,6 @@ def login_required_json(view_func):
     return wrapper
 
 
-@csrf_exempt  # Remove in production, frontend should send CSRF token
 @require_POST
 def register_user(request):
     try:
@@ -42,7 +40,6 @@ def register_user(request):
         return JsonResponse({"errors": form.errors}, status=400)
 
 
-@csrf_exempt
 @require_POST
 def login_user(request):
     if request.user.is_authenticated:
@@ -75,7 +72,6 @@ def login_user(request):
         return JsonResponse({"errors": "Invalid password."}, status=401)
 
 
-@csrf_exempt
 @login_required_json
 @require_POST
 def logout_user(request):
@@ -83,7 +79,6 @@ def logout_user(request):
     return JsonResponse({"message": "Logout successful."}, status=200)
 
 
-@csrf_exempt
 @login_required_json
 @require_GET
 def get_profile(request):

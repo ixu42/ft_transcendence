@@ -1,6 +1,5 @@
 import json
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -8,7 +7,6 @@ from .forms import TournamentCreationForm
 from .models import Tournament
 
 
-@csrf_exempt
 @require_POST
 @login_required
 def create_tournament(request):
@@ -34,7 +32,6 @@ def create_tournament(request):
         return JsonResponse({"errors": str(e)}, status=500)
 
 
-@csrf_exempt
 @require_POST
 @login_required
 def join_tournament(request, tournament_id):
@@ -65,7 +62,6 @@ def join_tournament(request, tournament_id):
         return JsonResponse({"errors": str(e)}, status=500)
 
 
-@csrf_exempt
 @require_POST
 @login_required
 def start_tournament(request, tournament_id):
