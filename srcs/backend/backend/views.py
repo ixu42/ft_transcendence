@@ -6,4 +6,6 @@ def homepage(request):
 
 
 def lockout(request, credentials, *args, **kwargs):
-    return JsonResponse({"error": "Locked out due to too many login failures."}, status=403)
+    return JsonResponse(
+        {"error": "Locked out due to too many login failures."}, status=403
+    )
