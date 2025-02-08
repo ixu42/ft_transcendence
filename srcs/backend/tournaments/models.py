@@ -15,9 +15,11 @@ class Tournament(models.Model):
         CANCELED = "CANCELED", _("Canceled")
 
     name = models.CharField(max_length=50, blank=True)  # Name of the tournament
-    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    creator = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="created_tournaments"
+    )
     players = models.ManyToManyField(
-        CustomUser, through="TournamentPlayer", related_name="tournaments"
+        CustomUser, through="TournamentPlayer", related_name="participated_tournaments"
     )
     started_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
