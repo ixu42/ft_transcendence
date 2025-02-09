@@ -1,6 +1,7 @@
 from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 
-
+@ensure_csrf_cookie
 def homepage(request):
     return JsonResponse({"message": "hello from backend."})
 

@@ -31,13 +31,12 @@ ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
 # Application definition
 
 INSTALLED_APPS = [
-    # Other apps
-    'corsheaders',
     # My apps
     "users",
     "tournaments",
     # Third-party apps
     "axes",
+    "corsheaders",
     # Default Django apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -49,7 +48,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -174,4 +173,4 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
 ]
 
-CORS_ALLOW_CREDENTIALS = True 
+CORS_ALLOW_CREDENTIALS = True
