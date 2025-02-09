@@ -1,0 +1,58 @@
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #6191a4;
+    z-index: 99999;
+    transition: opacity 0.5s ease-in-out;
+    cursor: pointer;
+}
+
+.splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    display: none;
+}
+
+.splash-screen img {
+    width: 50%;
+    max-width: 300px;
+    height: auto;
+}
+
+.splash-title {
+    color: white;
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 20px;
+}
+
+
+#login-container {
+    display: none;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    
+}
+
+.login-title {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.login-options .btn {
+    width: 250px;
+    padding: 15px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    margin: 10px auto;
+}

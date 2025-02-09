@@ -16,3 +16,10 @@ const setupControls = (player, player2, game) => {
             key === 's' ? player.keyboardDown = false : null;
     });
 }
+
+const setupTournamentControls = (tournament) => {
+    document.addEventListener('keydown', function(event) {
+        const key = event.key.toLowerCase();
+        key === 'enter' ? tournament.keyboardEnter = true : null;
+    });
+}

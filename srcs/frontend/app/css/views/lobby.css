@@ -11,49 +11,69 @@
     padding: 20px;
 }
 
-#lobby-container h1 {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
-.waiting-text {
-    font-size: 1.25rem;
-    margin-bottom: 30px;
-    font-style: italic;
-    color: #a0a0a0;
+.modal {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #222;
+    color: white;
+    padding: 20px;
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    z-index: 1001;
 }
 
-.button-group {
+.modal h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.modal .btn-group {
     display: flex;
-    gap: 15px;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
 }
 
-.button-group .btn {
-    padding: 15px 25px;
-    font-size: 1.25rem;
+.modal .btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
     font-weight: bold;
-    border-radius: 8px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 6px;
+    background: #444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
 }
 
-.button-group .btn:hover {
+.modal .btn:hover {
+    background: #666;
     transform: scale(1.05);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
 }
 
-#lobby-container a.btn {
-    font-size: 1.2rem;
-    font-weight: bold;
-    padding: 12px 20px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
+.modal .close-btn {
+    background: red;
 }
 
-#lobby-container a.btn:hover {
-    background-color: #444;
-}
 
 @media (max-width: 768px) {
     #lobby-container h1 {

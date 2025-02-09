@@ -1,4 +1,14 @@
-<div id="login-container" class="d-flex flex-column align-items-center justify-content-center vh-100 bg-dark text-white">
+
+
+<!-- Splash Screen -->
+<div class="splash-screen" onclick="hideSplash()">
+    <img src="static/ping-pong.gif" alt="Pong Animation">
+    <h1 class="splash-title">Ready to Play Pong?</h1>
+    <p class="splash-subtitle">Click the screen to move forward</p>
+</div>
+
+<!-- Login Screen -->
+<div id="login-container" class="login-container d-flex flex-column align-items-center justify-content-center vh-100 bg-dark text-white" style="display: none;">
     <h1 class="login-title mb-4">Welcome to Poggers</h1>
     <p class="mb-4">Please log in to continue</p>
     <form id="login-form" class="text-center w-50">
@@ -8,8 +18,8 @@
         <div class="mb-3">
             <input type="password" id="login-password" class="form-control form-control-lg" placeholder="Password" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Login</button>
     </form>
+    <button type="button" id="login-btn" class="btn btn-primary btn-lg w-50 mb-3">Login</button>
     <p>Or</p>
     <button id="login-42" class="btn btn-success btn-lg w-50 mb-3">Login with 42</button>
     <a href="#register" class="btn btn-secondary btn-lg w-50 mb-3 text-white text-decoration-none">

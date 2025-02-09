@@ -22,34 +22,6 @@ html, body {
   flex-direction: column;
 }
 
-#navbar-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  background-color: #212529; /* Dark background */
-  color: #ffffff; /* White text */
-  padding: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-#footer-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  background-color: #212529; /* Dark background */
-  color: #ffffff; /* White text */
-  padding: 10px;
-  text-align: center;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
-}
-
-
-
-
  /* 404 Page */
 .not-found-container {
     text-align: center;
