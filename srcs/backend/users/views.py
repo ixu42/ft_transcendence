@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import authenticate, login, logout
 from functools import wraps
-from users.forms import CustomUserCreationForm
+from users.forms import CustomUserCreationForm, AvatarUpdateForm
 from users.models import CustomUser
 
 
@@ -97,7 +97,7 @@ def get_profile(request):
     return JsonResponse(
         {
             "username": request.user.username,
-            "profile_picture": request.user.profile_picture.url,
+            "avatar": request.user.avatar.url,
             "email": request.user.email,
             "first_name": request.user.first_name,
             "last_name": request.user.last_name,
@@ -108,3 +108,25 @@ def get_profile(request):
         },
         status=200,
     )
+
+
+@login_required_json
+@require_POST
+def update_avatar(request):
+    if "avatar" not in request.FILES:
+        return JsonResponse({"errors": "No file uploaded."}, status=400)
+
+    form = AvatarUpdateForm(request.POST, request.FILES, instance=request.user)
+
+    if form.is_valid():
+        form.save()
+        return JsonResponse(
+            {
+                "message": "Avatar updated.",
+                "username": request.user.username,
+                "avatar_url": request.user.avatar.url,
+            },
+            status=200,
+        )
+
+    return JsonResponse({"errors": form.errors}, status=400)
