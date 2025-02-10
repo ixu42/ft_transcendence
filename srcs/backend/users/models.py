@@ -2,6 +2,11 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
+import os
+
+
+def user_avatar_upload_path(instance, filename):
+    return os.path.join("avatars", str(instance.id), filename)
 
 
 def validate_file_size(value):
@@ -14,7 +19,7 @@ def validate_file_size(value):
 
 class CustomUser(AbstractUser):
     avatar = models.ImageField(
-        upload_to="avatars/",
+        upload_to=user_avatar_upload_path,
         blank=True,
         null=True,
         default="avatars/default.png",

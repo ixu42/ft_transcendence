@@ -64,15 +64,5 @@ function attachRegisterEvent(form) {
     });
 }
 
-async function getCSRFCookie() {
-    const name = 'csrftoken';
-    const value = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(name + '='))
-        ?.split('=')[1];
-    return value || '';
-}
-
-
 
 

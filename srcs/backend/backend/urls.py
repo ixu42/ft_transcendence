@@ -34,5 +34,6 @@ urlpatterns = [
     # tournaments app urls
     path("tournaments/", include("tournaments.urls")),
     # backend path
+    path("get-csrf-token/", views.get_csrf_token),
     path("", views.homepage),
 ]

@@ -29,13 +29,6 @@ const logout = async () => {
     }
 };
 
-function getCSRFCookie() {
-    const name = "csrftoken";
-    const cookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith(name + "="));
-    return cookie ? cookie.split("=")[1] : "";
-}
 
 const setupProfilePage = () => {
     console.log("⚡ setupProfilePage() called!");
