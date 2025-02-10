@@ -82,14 +82,21 @@ const handleLocation = async () => {
   const path = window.location.hash || "#";
   const route = routes[path] || routes[404];
 
+  const navbar = document.getElementById("navbar-container");
+  const footer = document.getElementById("footer-container");
+  const hideNavbarAndFooter = ["#login", "#register"].includes(path);
+
+  if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
+  if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
+
   if (protectedRoutes.includes(path) && !isUserLoggedIn()) {
-      redirectToLogin();
-      return;
+    redirectToLogin();
+    return;
   }
 
   try {
-      const html = await fetch(route).then((data) => data.text());
-      document.getElementById("app").innerHTML = html;
+    const html = await fetch(route).then((data) => data.text());
+    document.getElementById("app").innerHTML = html;
 
       if (path === "#game") {
           toggleNavFooterVisibility(false);
@@ -101,14 +108,21 @@ const handleLocation = async () => {
               bindLobbyEventListeners();
           }
       }
+    if (path === "#game") {
+      loadGameScripts();
+      setTimeout(() => initializeGame(), 100);
+    } else if (path === "#lobby") {
+      bindLobbyEventListeners();
+    }
   } catch (error) {
-      document.getElementById("app").innerHTML = "<h1>Error loading page</h1>";
-      console.error(`Failed to load route ${path}:`, error);
+    document.getElementById("app").innerHTML = "<h1>Error loading page</h1>";
+    console.error(`Failed to load route ${path}:`, error);
   }
 };
 
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
+
 
 
 

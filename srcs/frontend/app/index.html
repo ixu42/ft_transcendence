@@ -8,23 +8,31 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
 
-    <!-- Custom CSS -->
+    <!-- General Application CSS -->
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/credits.css">
-    <link rel="stylesheet" href="css/leaderboard.css">
-    <link rel="stylesheet" href="css/lobby.css">
-    <link rel="stylesheet" href="css/terms-privacy.css">
-    <link rel="stylesheet" href="css/game.css">
-    <link rel="stylesheet" href="css/login.css">
-    <link rel="stylesheet" href="css/register.css">
-    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/auth.css">
+
+    <!-- Page-Specific CSS -->
+    <link rel="stylesheet" href="css/views/menu.css">
+    <link rel="stylesheet" href="css/views/credits.css">
+    <link rel="stylesheet" href="css/views/leaderboard.css">
+    <link rel="stylesheet" href="css/views/lobby.css">
+    <link rel="stylesheet" href="css/views/terms-privacy.css">
+
+    <!-- Game-Specific CSS -->
+    <link rel="stylesheet" href="css/game/game.css">
+
 </head>
 
 <body>
-    <header id="navbar-container"></header>
+    <div id="navbar-container" class="navbar bg-light">
+        <a class="navbar-brand" href="#menu">Poggers</a>
+        <div class="auth-container">
+            <button id="auth-btn">Login / Register</button>
+        </div>
+    </div>
     <main id="app"></main>
-    <footer id="footer-container">
+    <footer id="footer-container" class="bg-dark text-white p-3 text-center">
         <p>&copy; 2025 My Website</p>
     </footer>
 
