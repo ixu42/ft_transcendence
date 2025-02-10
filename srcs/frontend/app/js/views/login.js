@@ -73,6 +73,7 @@ async function getCSRFCookie() {
         ?.split('=')[1];
     return value || '';
 }
+
 document.getElementById("register-btn").addEventListener("click", () => {
     window.location.hash = "#register";
 });

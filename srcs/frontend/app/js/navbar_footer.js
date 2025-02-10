@@ -1,18 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
     const authButton = document.getElementById("auth-btn");
-    const profileButton = document.getElementById("profile-btn");
 
-    if (profileButton) {
-        profileButton.style.display = "inline-block";
-        profileButton.addEventListener("click", () => {
-            window.location.hash = "#profile";
-        });
+    function updateNavbar() {
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+        if (authButton) {
+            if (isLoggedIn) {
+                authButton.textContent = "Profile";
+                authButton.onclick = () => (window.location.hash = "#profile");
+            } else {
+                authButton.textContent = "Login / Register";
+                authButton.onclick = () => (window.location.hash = "#login");
+            }
+        }
     }
 
-    if (authButton) {
-        authButton.addEventListener("click", () => {
-            const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-            window.location.hash = isLoggedIn ? "#profile" : "#login";
-        });
-    }
+    updateNavbar();
+
+    window.addEventListener("storage", updateNavbar);
 });

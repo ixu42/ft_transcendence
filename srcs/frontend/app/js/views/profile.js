@@ -1,21 +1,61 @@
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM fully loaded and parsed");
+document.addEventListener("DOMContentLoaded", setupProfilePage);
 
-    const logoutButton = document.getElementById("logout-btn");
+const logout = async () => {
+    console.log("Logout button clicked");
+
+    try {
+        const csrfToken = getCSRFCookie();
+        console.log("CSRF Token:", csrfToken);
+
+        const response = await fetch("http://localhost:8000/users/logout/", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+            },
+        });
+
+        if (response.ok) {
+            console.log("✅ Logout successful");
+            localStorage.setItem("isLoggedIn", "false");
+            window.location.hash = "#login";
+        } else {
+            const data = await response.json();
+            console.error("❌ Logout failed:", data.errors);
+        }
+    } catch (error) {
+        console.error("❌ Error during logout:", error);
+    }
+};
+
+function getCSRFCookie() {
+    const name = "csrftoken";
+    const cookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(name + "="));
+    return cookie ? cookie.split("=")[1] : "";
+}
+
+const setupProfilePage = () => {
+    console.log("⚡ setupProfilePage() called!");
+
+    const logoutButton = document.getElementById("profile-logout-btn");
     const menuButton = document.getElementById("profile-menu-btn");
 
     if (logoutButton) {
-        logoutButton.addEventListener("click", () => {
-            console.log("Logout button clicked");
-            localStorage.setItem("isLoggedIn", "false");
-            window.location.hash = "#login";
-        });
+        console.log("✅ Found logout button, adding event listener...");
+        logoutButton.addEventListener("click", logout);
+    } else {
+        console.warn("⚠️ Logout button not found.");
     }
 
     if (menuButton) {
         menuButton.addEventListener("click", () => {
-            console.log("Menu button clicked");
+            console.log("📌 Menu button clicked");
             window.location.hash = "#menu";
         });
+    } else {
+        console.warn("⚠️ Menu button not found.");
     }
-});
+};
