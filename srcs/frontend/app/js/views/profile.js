@@ -1,4 +1,3 @@
-document.addEventListener("DOMContentLoaded", setupProfilePage);
 
 const logout = async () => {
     console.log("Logout button clicked");
@@ -52,3 +51,5 @@ const setupProfilePage = () => {
         console.warn("⚠️ Menu button not found.");
     }
 };
+
+

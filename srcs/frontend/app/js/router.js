@@ -59,7 +59,7 @@ const handleLocation = async () => {
       app.innerHTML = html;
 
       if (routeHandlers[path]) {
-          setTimeout(routeHandlers[path], 100);
+          routeHandlers[path]();
       }
 
       console.log(`Loaded route content: ${path}`);

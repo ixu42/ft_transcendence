@@ -21,7 +21,7 @@ function waitForLoginForm() {
 
 async function getCSRFCookie() {
     try {
-        const response = await fetch("http://localhost:8000/get_csrf_token/", {
+        const response = await fetch("http://localhost:8000/get-csrf-token/", {
             method: "GET",
             credentials: "include",
         });
