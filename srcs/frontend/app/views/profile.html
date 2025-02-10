@@ -1,10 +1,16 @@
 <div id="profile-view" class="profile-container">
-    <img src="avatar.png" alt="Player Avatar" class="profile-avatar">
-    <h1>Player Profile</h1>
-    <p>Name: Alex Pyykönen</p>
-    <p>Games Played: 50</p>
-    <p>Wins: 30</p>
-    <p>Losses: 20</p>
+    <div class="avatar-container">
+        <img src="avatar.png" alt="Player Avatar" class="profile-avatar">
+        <label for="avatar-upload" class="avatar-upload-label">Upload</label>
+        <input type="file" id="avatar-upload" accept="image/jpeg, image/png" style="display: none;">
+    </div>
+    <h1 class="profile-username">Username</h1>
+    <p class="profile-email">Email</p>
+    <p class="profile-first-name">First Name</p>
+    <p class="profile-last-name">Last Name</p>
+    <div class="profile-tournaments">
+        <!-- Participated tournaments will be dynamically inserted here -->
+    </div>
     <button id="profile-menu-btn">Menu</button>
     <button id="profile-logout-btn">Logout</button>
 </div>
