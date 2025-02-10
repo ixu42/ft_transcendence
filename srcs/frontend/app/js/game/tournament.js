@@ -40,50 +40,50 @@ const initializeTournament = () => {
     
     let currentMatchIndex = 0;
 
-    const tournamentLoop = () => {
-        if (tournament.state === 'table') {
-            drawTable(tournament.players, canvas);
-            if (tournament.keyboardEnter) {
-                tournament.state = 'prepare';
-                tournament.keyboardEnter = false;
-            }
+    tournamentLoop(tournament, game, currentMatchIndex);
+};
+
+const tournamentLoop = (tournament, game, currentMatchIndex) => {
+    if (tournament.state === 'table') {
+        drawTable(tournament.players, game.canvas);
+        if (tournament.keyboardEnter) {
+            tournament.state = 'prepare';
+            tournament.keyboardEnter = false;
         }
-        if (tournament.state === 'prepare') {
-            drawMatch(tournament.players, canvas, currentMatchIndex);
-            if (tournament.keyboardEnter) {
-                tournament.state = 'playing';
-                tournament.keyboardEnter = false;
-            }
+    }
+    if (tournament.state === 'prepare') {
+        drawMatch(tournament.players, game.canvas, currentMatchIndex);
+        if (tournament.keyboardEnter) {
+            tournament.state = 'playing';
+            tournament.keyboardEnter = false;
         }
-        if (tournament.state === 'playing') {
-            updateGame(game);
-            drawGame(game);
-            if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
-                let winner, loser;
-                if (game.player.score > game.player2.score) {
-                    winner = tournament.players[currentMatchIndex];
-                    loser = tournament.players[currentMatchIndex + 1];
-                } else {
-                    winner = tournament.players[currentMatchIndex + 1];
-                    loser = tournament.players[currentMatchIndex];
-                }
-                winner.score++;
-                tournament.players = tournament.players.filter(player => player !== loser);
-                currentMatchIndex++;
-                if (currentMatchIndex >= tournament.players.length - 1)
-                    currentMatchIndex = 0;
-                if (tournament.players.length === 1) {
-                    drawWinner(tournament.players[0], canvas);
-                    return;
-                }
-                tournament.state = 'table';
-                resetGame(game);
+    }
+    if (tournament.state === 'playing') {
+        updateGame(game);
+        drawGame(game);
+        if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
+            let winner, loser;
+            if (game.player.score > game.player2.score) {
+                winner = tournament.players[currentMatchIndex];
+                loser = tournament.players[currentMatchIndex + 1];
+            } else {
+                winner = tournament.players[currentMatchIndex + 1];
+                loser = tournament.players[currentMatchIndex];
             }
+            winner.score++;
+            tournament.players = tournament.players.filter(player => player !== loser);
+            currentMatchIndex++;
+            if (currentMatchIndex >= tournament.players.length - 1)
+                currentMatchIndex = 0;
+            if (tournament.players.length === 1) {
+                drawWinner(tournament.players[0], game.canvas);
+                return;
+            }
+            tournament.state = 'table';
+            resetGame(game);
         }
-        requestAnimationFrame(tournamentLoop);
-    };
-    
-    tournamentLoop();
+    }
+    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex));
 };
 
 const drawTable = (players, canvas) => {
