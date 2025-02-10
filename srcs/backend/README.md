@@ -28,6 +28,11 @@ http://localhost:8000/
     - **Method**: `POST`
     - **Description**: For the currently authenticated user to log out.
 
+- **User Avatar Upload**
+    - **URL**: `/users/avatar/`
+    - **Method**: `POST`
+    - **Description**: Allow users to upload a new avatar image.
+
 ## Endpoints specifications
 
 ### `/users/register/`
@@ -113,5 +118,46 @@ http://localhost:8000/
         ```json
         {
             "errors": "User is not authenticated."
+        }
+        ```
+
+### `/users/avatar/`
+- **Expected Request Body**:
+    The request should be a `multipart/form-data` request with the following field:
+    `avatar: The avatar image file (JPG, JPEG, PNG) to be uploaded.`
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Avatar updated.",
+            "username": "<username>",
+            "avatar_url": "<avatar_url>"
+        }
+        ```
+    - **400**
+        When the file extension is not allowed
+        ```json
+        {
+            "errors": {
+                "avatar": [
+                    "File extension “gif” is not allowed. Allowed extensions are: jpg, jpeg, png."
+                ]
+            }
+        }
+        ```
+        When the file size exceeds the limit
+        ```json
+        {
+            "errors": {
+                "avatar": [
+                    "File size exceeds the limit <MAX_FILE_SIZE> MB."
+                ]
+            }
+        }
+        ```
+        When no file is uploaded
+        ```json
+        {
+            "errors": "No file uploaded."
         }
         ```

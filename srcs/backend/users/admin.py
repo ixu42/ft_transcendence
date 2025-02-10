@@ -6,15 +6,20 @@ from .models import CustomUser
 
 # register CustomUser model in the admin interface
 class CustomUserAdmin(UserAdmin):
-    list_display = ("username", "avatar", "is_staff", "is_active", "date_joined")
+    list_display = (
+        "username",
+        "avatar_preview",
+        "is_staff",
+        "is_active",
+        "date_joined",
+    )
 
-    def avatar(self, obj):
-        if obj.profile_picture:
-            return mark_safe(
-                f'<img src="{obj.profile_picture.url}" width="30" height="30" />'
-            )
+    def avatar_preview(self, obj):
+        if obj.avatar:
+            return mark_safe(f'<img src="{obj.avatar.url}" width="30" height="30" />')
         return "No picture"
 
+    avatar_preview.short_description = "Avatar"
     list_filter = ("is_staff", "is_active")
 
 
