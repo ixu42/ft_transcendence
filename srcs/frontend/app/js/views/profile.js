@@ -3,21 +3,28 @@ const logout = async () => {
     console.log("Logout button clicked");
 
     try {
-        const csrfToken = getCSRFCookie();
+        const csrfToken = await getCSRFCookie();
         console.log("CSRF Token:", csrfToken);
+
+        if (!csrfToken) {
+            console.error("❌ CSRF Token is missing.");
+            return;
+        }
 
         const response = await fetch("http://localhost:8000/users/logout/", {
             method: "POST",
-            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": csrfToken,
             },
+            credentials: "include", 
         });
 
         if (response.ok) {
             console.log("✅ Logout successful");
+            document.cookie = "csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             localStorage.setItem("isLoggedIn", "false");
+            updateNavbar();
             window.location.hash = "#login";
         } else {
             const data = await response.json();
