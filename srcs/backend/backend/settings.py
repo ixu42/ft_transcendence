@@ -174,3 +174,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+# CSRF Settings
+CSRF_COOKIE_NAME = 'csrftoken'          # This should match your cookie's name
+CSRF_COOKIE_HTTPONLY = False            # Allow access to the token via JS
+CSRF_COOKIE_SAMESITE = 'Lax'            # Set this depending on your needs
+CSRF_COOKIE_SECURE = False              # Set to True if using HTTPS
