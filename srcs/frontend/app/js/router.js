@@ -69,6 +69,7 @@ const handleLocation = async () => {
   }
 };
 
+
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
 

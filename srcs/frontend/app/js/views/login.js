@@ -79,6 +79,7 @@ function bindLoginButton(loginButton) {
             if (response.ok) {
                 alert("✅ Login successful!");
                 localStorage.setItem("isLoggedIn", "true");
+                updateNavbar();
                 window.location.hash = "#menu";
             } else {
                 alert(`❌ Error: ${data.errors || "Login failed"}`);
