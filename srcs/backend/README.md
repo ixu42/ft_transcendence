@@ -41,7 +41,7 @@ http://localhost:8000/
     {
         "username": "newuser",
         "password1": "securepassword123",
-        "password2": "securepassword123",
+        "password2": "securepassword123"
     }
     ```
 - **Response**
