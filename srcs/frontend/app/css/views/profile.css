@@ -35,7 +35,7 @@
 }
 
 /* Logout Button Styling */
-#profile-menu-btn, #logout-btn {
+#profile-menu-btn, #profile-logout-btn {
     background-color: var(--accent-color);
     color: var(--primary-text-color);
     border: none;
@@ -47,7 +47,7 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-#profile-menu-btn:hover, #logout-btn:hover {
+#profile-menu-btn:hover, #profile-logout-btn:hover {
     background-color: var(--link-hover-color);
     transform: scale(1.05);
 }

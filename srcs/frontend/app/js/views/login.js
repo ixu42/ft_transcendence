@@ -19,36 +19,62 @@ function waitForLoginForm() {
     }, checkInterval);
 }
 
+async function getCSRFCookie() {
+    try {
+        const response = await fetch("http://localhost:8000/get_csrf_token/", {
+            method: "GET",
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch CSRF token: ${response.status}`);
+        }
+
+        const csrfToken = document.cookie.split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+
+        if (!csrfToken) {
+            console.log("❌ CSRF Token not found.");
+            return "";
+        }
+
+        console.log("🔑 CSRF Token fetched:", csrfToken);
+        return csrfToken;
+    } catch (error) {
+        console.error("❌ CSRF Token fetch error:", error);
+        return "";
+    }
+}
+
 function bindLoginButton(loginButton) {
-    console.log("✅ Login button found, binding event listener...");
     loginButton.addEventListener("click", async () => {
-        console.log("🔥 Login button clicked!");
+        const username = document.getElementById("login-username-email").value.trim();
+        const password = document.getElementById("login-password").value.trim();
 
-        const userData = {
-            username: document.getElementById("login-username-email")?.value.trim(),
-            password: document.getElementById("login-password")?.value.trim(),
-        };
-
-        if (!userData.username || !userData.password) {
+        if (!username || !password) {
             alert("⚠️ Please fill in all required fields.");
             return;
         }
 
-        try {
-            const csrfToken = await getCSRFCookie();
+        const csrfToken = await getCSRFCookie();
+        if (!csrfToken) {
+            alert("❌ CSRF Token not available. Please try again.");
+            return;
+        }
 
-            console.log("🔄 Sending login request...");
+        try {
             const response = await fetch("http://localhost:8000/users/login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken, // Include CSRF token
+                    "X-CSRFToken": csrfToken,
                 },
-                body: JSON.stringify(userData),
+                body: JSON.stringify({ username, password }),
+                credentials: "include",
             });
 
             const data = await response.json();
-            console.log("📨 Response received:", data);
 
             if (response.ok) {
                 alert("✅ Login successful!");
@@ -64,29 +90,6 @@ function bindLoginButton(loginButton) {
     });
 }
 
-
-async function getCSRFCookie() {
-    const name = 'csrftoken';
-    const value = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(name + '='))
-        ?.split('=')[1];
-    return value || '';
-}
-document.getElementById("register-btn").addEventListener("click", () => {
-    window.location.hash = "#register";
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    const splashScreen = document.querySelector(".splash-screen");
-    
-    if (splashScreen) {
-        splashScreen.addEventListener("click", hideSplash);
-    }
-});
-
-
-
 function hideSplash() {
     const splash = document.querySelector(".splash-screen");
     const loginContainer = document.getElementById("login-container");
@@ -95,16 +98,27 @@ function hideSplash() {
         console.error("Splash screen or login container not found!");
         return;
     }
+    
     console.log("Splash clicked! Hiding splash screen...");
+    
     splash.classList.add("hidden");
     setTimeout(() => {
         splash.style.display = "none";
         loginContainer.style.display = "flex";
     }, 500);
 }
-setTimeout(() => {
-    hideSplash();
-}, 3000);
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const splashScreen = document.querySelector(".splash-screen");
+    
+    if (splashScreen) {
+        splashScreen.addEventListener("click", hideSplash);
+    }
+});
 
 
 

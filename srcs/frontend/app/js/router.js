@@ -25,7 +25,10 @@ const routeHandlers = {
   "#lobby": () => bindLobbyEventListeners(),
   "#menu": () => console.log("Menu loaded"),
   "#leaderboard": () => console.log("Leaderboard loaded"),
-  "#profile": () => console.log("Profile loaded"),
+  "#profile": () => {
+    console.log("📌 Profile page handler triggered");
+    setupProfilePage();
+  },
   "#terms": () => {},
   "#credits": () => {},
   "#register": () => {},
