@@ -20,6 +20,17 @@ const movePaddle = (paddle, canvas) => {
     }
 };
 
+const moveAIPaddle = (paddle, ball, canvas) => {
+    const speed = 1; // AI paddle speed
+    if (ball.y < paddle.y + paddle.height / 2) {
+        paddle.y -= speed;
+    } else if (ball.y > paddle.y + paddle.height / 2) {
+        paddle.y += speed;
+    }
+    // Ensure the paddle stays within the canvas
+    paddle.y = Math.max(Math.min(paddle.y, canvas.height - paddle.height), 0);
+};
+
 const drawPaddle = (context, paddle) => {
     context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 };

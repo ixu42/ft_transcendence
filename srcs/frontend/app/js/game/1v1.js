@@ -1,4 +1,4 @@
-const createGame = () => {
+const createGame = (isAI = false) => {
     const canvas = document.getElementById('pong');
     const player = createPaddle(0, canvas.height / 2 - 50);
     const player2 = createPaddle(canvas.width - 10, canvas.height / 2 - 50);
@@ -6,12 +6,12 @@ const createGame = () => {
     const context = canvas.getContext('2d');
     const pause = false;
 
-    return { player, player2, ball, canvas, context, pause };
+    return { player, player2, ball, canvas, context, pause, isAI };
 };
 
 const updateGame = (game) => {
     movePaddle(game.player, game.canvas);
-    movePaddle(game.player2, game.canvas);
+    game.isAI ? moveAIPaddle(game.player2, game.ball, game.canvas) : movePaddle(game.player2, game.canvas);
     !game.pause && moveBall(game.ball, game.player, game.player2, game.canvas);
 };
 
@@ -55,8 +55,21 @@ const initializeGame = () => {
             resolve([0, 0]);
             return;
         }
-        const game = createGame();
+        const game = createGame(false);
         setupControls(game.player, game.player2, game);
         console.log("Starting game loop");
         gameLoop(game);
+};
+
+const initializeAIGame = () => {
+    const canvas = document.getElementById('pong');
+    if (!canvas) {
+        console.error("Canvas element '#pong' not found.");
+        resolve([0, 0]);
+        return;
+    }
+    const game = createGame(true);
+    setupControls(game.player, game.player2, game);
+    console.log("Starting game loop");
+    gameLoop(game);
 };

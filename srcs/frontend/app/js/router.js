@@ -59,7 +59,7 @@ const handleLocation = async () => {
       app.innerHTML = html;
 
       if (routeHandlers[path]) {
-          setTimeout(routeHandlers[path], 100);
+          routeHandlers[path]();
       }
 
       console.log(`Loaded route content: ${path}`);
@@ -68,6 +68,7 @@ const handleLocation = async () => {
       console.error(`Failed to load route ${path}:`, error);
   }
 };
+
 
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
