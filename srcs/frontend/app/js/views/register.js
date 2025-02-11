@@ -19,23 +19,31 @@ function waitForRegisterForm() {
     }, checkInterval);
 }
 
-async function register({ username, password1, password2 }) {
+async function register({ username, email, password1, password2 }) {
     const csrfToken = await getCSRFCookie();
+    console.log("CSRF Token:", csrfToken);
+
     const response = await fetch("http://localhost:8000/users/register/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({ username, password1, password2 }),
+        body: JSON.stringify({ username, email, password1, password2 }),
+        credentials: "include",
     });
+
+    console.log("Sending request with body:", JSON.stringify({ username, email, password1, password2 }));
 
     if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.errors?.username?.[0] || "Registration failed");
+        console.error("❌ Full error response from backend:", errorData);
+        throw new Error(JSON.stringify(errorData));
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    console.log("✅ Registration successful:", responseData);
+    return responseData;
 }
 
 function attachRegisterEvent(form) {
@@ -49,16 +57,23 @@ function attachRegisterEvent(form) {
             password2: document.getElementById("register-password")?.value.trim(),
         };
 
-        if (!userData.username || !userData.email || !userData.password1) {
+        console.log("Collected user data:", userData);
+
+        if (!userData.username || !userData.email || !userData.password1 || !userData.password2) {
+            console.warn("⚠️ Missing required fields. User data:", userData);
             alert("⚠️ Please fill in all required fields.");
             return;
         }
 
         try {
             const response = await register(userData);
+            if (response.errors) {
+                console.error("❌ Registration failed:", response.errors);
+            }
             alert("✅ Registration successful! Redirecting to login.");
             window.location.href = "#login";
         } catch (error) {
+            console.error("❌ Registration error:", error);
             alert("Error: " + (error.message || "Something went wrong."));
         }
     });

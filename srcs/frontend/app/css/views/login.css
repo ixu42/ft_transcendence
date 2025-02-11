@@ -56,3 +56,9 @@
     text-transform: uppercase;
     margin: 10px auto;
 }
+
+input {
+    display: block !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
