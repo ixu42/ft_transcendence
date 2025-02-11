@@ -4,6 +4,8 @@ from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.core.files.storage import default_storage
+from django.templatetags.static import static
+from django.conf import settings
 
 
 def user_avatar_upload_path(instance, filename):
@@ -23,12 +25,26 @@ class CustomUser(AbstractUser):
         upload_to=user_avatar_upload_path,
         blank=True,
         null=True,
-        default="avatars/default.png",
         validators=[
             FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"]),
             validate_file_size,
         ],
     )
+
+    @property
+    def default_avatar(self):
+        return static("avatars/default.png")
+
+    def get_avatar(self):
+        """
+        Returns the URL of the user's avatar or the default avatar if the user
+        has not uploaded a new avatar, or the previously uploaded avatar is deleted.
+        """
+        if self.avatar and os.path.exists(
+            os.path.join(settings.MEDIA_ROOT, self.avatar.name)
+        ):
+            return self.avatar.url
+        return self.default_avatar
 
     def save(self, *args, **kwargs):
         try:
