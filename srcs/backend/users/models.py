@@ -1,8 +1,9 @@
+import os
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
-import os
+from django.core.files.storage import default_storage
 
 
 def user_avatar_upload_path(instance, filename):
@@ -28,6 +29,16 @@ class CustomUser(AbstractUser):
             validate_file_size,
         ],
     )
+
+    def save(self, *args, **kwargs):
+        try:
+            old_instance = CustomUser.objects.get(pk=self.pk)
+            if old_instance.avatar != self.avatar:
+                default_storage.delete(old_instance.avatar.path)
+        except CustomUser.DoesNotExist:
+            pass  # No previous instance, so no file to delete
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"'username': '{self.username}'"
