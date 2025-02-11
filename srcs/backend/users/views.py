@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from functools import wraps
 from users.forms import CustomUserCreationForm, AvatarUpdateForm
@@ -33,7 +33,12 @@ def register_user(request):
     if form.is_valid():
         try:
             form.save()
-            return JsonResponse({"message": "User created."}, status=201)
+            user_id = form.instance.id
+            username = form.cleaned_data.get("username")
+            return JsonResponse(
+                {"id": user_id, "username": username, "message": "User created."},
+                status=201,
+            )
         except Exception as e:
             return JsonResponse({"errors": str(e)}, status=500)
     else:
@@ -67,7 +72,10 @@ def login_user(request):
 
     if user is not None:
         login(request, user)
-        return JsonResponse({"message": "Login successful."}, status=200)
+        return JsonResponse(
+            {"id": user.id, "username": user.username, "message": "Login successful."},
+            status=200,
+        )
     else:
         return JsonResponse({"errors": "Invalid password."}, status=401)
 
@@ -75,8 +83,13 @@ def login_user(request):
 @login_required_json
 @require_POST
 def logout_user(request):
+    user_id = request.user.id
+    username = request.user.username
     logout(request)
-    return JsonResponse({"message": "Logout successful."}, status=200)
+    return JsonResponse(
+        {"id": user_id, "username": username, "message": "Logout successful."},
+        status=200,
+    )
 
 
 @login_required_json
@@ -96,6 +109,7 @@ def get_profile(request):
 
     return JsonResponse(
         {
+            "id": request.user.id,
             "username": request.user.username,
             "avatar": request.user.get_avatar(),
             "email": request.user.email,
@@ -111,20 +125,43 @@ def get_profile(request):
 
 
 @login_required_json
+@require_http_methods(["GET", "PATCH", "DELETE"])
+def user_profile(request, user_id):
+    if request.user.id != user_id:
+        return JsonResponse(
+            {"errors": "You do not have permission to access this user's profile."},
+            status=403,
+        )
+
+    if request.method == "GET":
+        return get_profile(request)
+    elif request.method == "PATCH":
+        # return update_profile(request)
+        return JsonResponse({"message": "update not yet implemented"}, status=200)
+    elif request.method == "DELETE":
+        # return delete_account(request)
+        return JsonResponse({"message": "delete not yet implemented"}, status=200)
+    else:
+        return JsonResponse({"errors": "Method not allowed."}, status=405)
+
+
+@login_required_json
 @require_POST
 def update_avatar(request):
     if "avatar" not in request.FILES:
         return JsonResponse({"errors": "No file uploaded."}, status=400)
 
+    old_file_path = request.user.avatar.name  # Store old file path for cleanup
     form = AvatarUpdateForm(request.POST, request.FILES, instance=request.user)
 
     if form.is_valid():
-        form.save()
+        request.user.update_avatar(form.cleaned_data.get("avatar"), old_file_path)
         return JsonResponse(
             {
-                "message": "Avatar updated.",
+                "id": request.user.id,
                 "username": request.user.username,
-                "avatar_url": request.user.avatar.url,
+                "message": "Avatar updated.",
+                "avatar_url": request.user.get_avatar(),
             },
             status=200,
         )

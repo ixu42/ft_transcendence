@@ -46,13 +46,23 @@ class CustomUser(AbstractUser):
             return self.avatar.url
         return self.default_avatar
 
+    def update_avatar(self, new_avatar, old_file_path):
+        """
+        Updates the user's avatar and handles file cleanup.
+        """
+        print(old_file_path)
+        print(self.default_avatar)
+        if old_file_path != self.default_avatar:
+            if default_storage.exists(old_file_path):
+                default_storage.delete(old_file_path)
+
+        self.avatar = new_avatar
+        self.save()
+
     def save(self, *args, **kwargs):
-        try:
-            old_instance = CustomUser.objects.get(pk=self.pk)
-            if old_instance.avatar != self.avatar:
-                default_storage.delete(old_instance.avatar.path)
-        except CustomUser.DoesNotExist:
-            pass  # No previous instance, so no file to delete
+        # Set default avatar if the instance is being created and no avatar is provided
+        if not self.pk and not self.avatar:
+            self.avatar = self.default_avatar
 
         super().save(*args, **kwargs)
 
