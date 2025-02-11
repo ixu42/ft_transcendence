@@ -9,6 +9,7 @@ const routes = {
   "#register": "/views/register.html",
   "#game": "/views/game.html",
   "#profile": "/views/profile.html",
+  '#chat': "/views/chat.html",
   404: "/views/404.html",
 };
 
@@ -33,6 +34,7 @@ const routeHandlers = {
   "#credits": () => {},
   "#register": () => {},
   "#login": () => {},
+  "#chat": () => {},
 };
 
 const handleLocation = async () => {
