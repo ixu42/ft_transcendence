@@ -58,7 +58,10 @@ const fetchProfileData = async () => {
 
 // Update profile UI elements
 const updateProfileUI = (data) => {
-    const avatarUrl = data.avatar ? `http://localhost:8000${data.avatar}` : "/path/to/default-avatar.png"; // IDK what the default avatar path is
+    const avatarUrl = data.avatar.startsWith("/") 
+        ? `http://localhost:8000${data.avatar}` 
+        : data.avatar;
+
     const elementsToUpdate = [
         { selector: ".profile-avatar", value: avatarUrl, type: "src" },
         { selector: ".profile-username", value: data.username || "Username", type: "text" },
@@ -66,6 +69,7 @@ const updateProfileUI = (data) => {
         { selector: ".profile-first-name", value: data.first_name || "First Name", type: "text" },
         { selector: ".profile-last-name", value: data.last_name || "Last Name", type: "text" }
     ];
+
     elementsToUpdate.forEach(({ selector, value, type }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -78,6 +82,7 @@ const updateProfileUI = (data) => {
     });
     updateTournamentsList(data.participated_tournaments);
 };
+
 
 // Update tournaments list
 const updateTournamentsList = (tournaments) => {
