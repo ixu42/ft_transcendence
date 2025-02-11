@@ -69,7 +69,6 @@ const updateProfileUI = (data) => {
         { selector: ".profile-first-name", value: data.first_name || "First Name", type: "text" },
         { selector: ".profile-last-name", value: data.last_name || "Last Name", type: "text" }
     ];
-
     elementsToUpdate.forEach(({ selector, value, type }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -82,7 +81,6 @@ const updateProfileUI = (data) => {
     });
     updateTournamentsList(data.participated_tournaments);
 };
-
 
 // Update tournaments list
 const updateTournamentsList = (tournaments) => {

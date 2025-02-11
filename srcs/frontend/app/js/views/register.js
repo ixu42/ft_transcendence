@@ -19,8 +19,7 @@ function waitForRegisterForm() {
     }, checkInterval);
 }
 
-async function register({ username, password1, password2 }) {
-
+async function register({ username, email, password1, password2 }) {
     const csrfToken = await getCSRFCookie();
     console.log("CSRF Token:", csrfToken);
 
@@ -30,17 +29,16 @@ async function register({ username, password1, password2 }) {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({ username, password1, password2 }),
+        body: JSON.stringify({ username, email, password1, password2 }),
         credentials: "include",
     });
 
-    console.log("Sending request with body:", JSON.stringify({ username, password1, password2 }));
+    console.log("Sending request with body:", JSON.stringify({ username, email, password1, password2 }));
 
     if (!response.ok) {
-        console.error("❌ Registration failed with status:", response.status);
         const errorData = await response.json();
-        console.error("❌ Error details:", errorData);
-        throw new Error(errorData.errors?.username?.[0] || "Registration failed");
+        console.error("❌ Full error response from backend:", errorData);
+        throw new Error(JSON.stringify(errorData));
     }
 
     const responseData = await response.json();
@@ -52,17 +50,16 @@ function attachRegisterEvent(form) {
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        // Collect user input data
         const userData = {
             username: document.getElementById("username")?.value.trim(),
+            email: document.getElementById("register-email")?.value.trim(),
             password1: document.getElementById("register-password")?.value.trim(),
             password2: document.getElementById("register-password")?.value.trim(),
         };
 
-        // Log the collected user data for verification
         console.log("Collected user data:", userData);
 
-        if (!userData.username || !userData.password1 || !userData.password2) {
+        if (!userData.username || !userData.email || !userData.password1 || !userData.password2) {
             console.warn("⚠️ Missing required fields. User data:", userData);
             alert("⚠️ Please fill in all required fields.");
             return;

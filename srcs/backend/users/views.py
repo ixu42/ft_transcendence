@@ -97,7 +97,7 @@ def get_profile(request):
     return JsonResponse(
         {
             "username": request.user.username,
-            "avatar": request.user.avatar.url,
+            "avatar": request.user.get_avatar(),
             "email": request.user.email,
             "first_name": request.user.first_name,
             "last_name": request.user.last_name,
