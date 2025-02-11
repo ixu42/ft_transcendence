@@ -48,6 +48,8 @@ http://localhost:8000/
     - **201**
         ```json
         {
+            "id": "<id>",
+            "username": "<username>",
             "message": "User created."
         }
         ```
@@ -70,6 +72,8 @@ http://localhost:8000/
     - **200**
         ```json
         {
+            "id": "<id>",
+            "username": "<username>",
             "message": "Login successful."
         }
         ```
@@ -110,6 +114,8 @@ http://localhost:8000/
     - **200**
         ```json
         {
+            "id": "<id>",
+            "username": "<username>",
             "message": "Logout successful."
         }
         ```
@@ -129,8 +135,9 @@ http://localhost:8000/
     - **200**
         ```json
         {
-            "message": "Avatar updated.",
+            "id": "<id>",
             "username": "<username>",
+            "message": "Avatar updated.",
             "avatar_url": "<avatar_url>"
         }
         ```
