@@ -2,6 +2,9 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate, login, logout
+from django.conf import settings
+import os
+import shutil
 from functools import wraps
 from users.forms import CustomUserCreationForm, AvatarUpdateForm
 from users.models import CustomUser
@@ -125,6 +128,47 @@ def get_profile(request):
 
 
 @login_required_json
+@require_http_methods(["PATCH"])
+def update_profile(request):
+    pass
+
+
+@login_required_json
+@require_http_methods(["PATCH"])
+def deactivate_user_account(request):
+    user_id = request.user.id
+    username = request.user.username
+    logout(request)
+    CustomUser.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
+
+    return JsonResponse(
+        {"id": user_id, "username": username, "message": "Account deactivated."},
+        status=200,
+    )
+
+
+@login_required_json
+@require_http_methods(["DELETE"])
+def delete_user_account(request):
+    user = request.user
+    user_id = user.id
+    username = user.username
+
+    # If user has avatar in media directory, delete user's avatar and its related directory
+    if user.avatar and user.avatar.name != user.default_avatar:
+        user_folder = os.path.join(settings.MEDIA_ROOT, "avatars", str(user_id))
+        if os.path.exists(user_folder):
+            shutil.rmtree(user_folder)
+
+    logout(request)
+    user.delete()  # Hard delete, remove the user instance and all related data from database
+
+    return JsonResponse(
+        {"id": user_id, "username": username, "message": "Account deleted."}, status=200
+    )
+
+
+@login_required_json
 @require_http_methods(["GET", "PATCH", "DELETE"])
 def user_profile(request, user_id):
     if request.user.id != user_id:
@@ -135,14 +179,20 @@ def user_profile(request, user_id):
 
     if request.method == "GET":
         return get_profile(request)
+
     elif request.method == "PATCH":
-        # return update_profile(request)
-        return JsonResponse({"message": "update not yet implemented"}, status=200)
+        try:
+            body = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"errors", "Invalid JSON input."}, status=400)
+
+        if body.get("deactivate") is True:
+            return deactivate_user_account(request)
+
+        return update_profile(request)
+
     elif request.method == "DELETE":
-        # return delete_account(request)
-        return JsonResponse({"message": "delete not yet implemented"}, status=200)
-    else:
-        return JsonResponse({"errors": "Method not allowed."}, status=405)
+        return delete_user_account(request)
 
 
 @login_required_json
