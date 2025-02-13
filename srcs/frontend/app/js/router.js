@@ -1,3 +1,5 @@
+import { showPopup as showRegisterPopup } from './views/popups.js';
+
 const routes = {
   "#": "/views/login.html",
   "#menu": "/views/menu.html",
@@ -12,13 +14,9 @@ const routes = {
   404: "/views/404.html",
 };
 
-const protectedRoutes = ["#leaderboard", "#lobby", "#game"];
-
-const isUserLoggedIn = () => true;
-
-const redirectToLogin = () => {
-  window.location.hash = "#login";
-};
+const protectedRoutes = ["#profile"];
+const isUserLoggedIn = () => localStorage.getItem("isLoggedIn") === "true";
+const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
   "#game": () => checkGameMode(),
@@ -39,7 +37,7 @@ const handleLocation = async () => {
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
-  const isLoggedIn = true;
+  const isLoggedIn = isUserLoggedIn();
   const hideNavbarAndFooter = ["#login", "#register", "", "#game"].includes(path) || window.location.hash === "";
 
   const navbar = document.getElementById("navbar-container");
@@ -50,27 +48,28 @@ const handleLocation = async () => {
   if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
 
   if (protectedRoutes.includes(path) && !isLoggedIn) {
-      redirectToLogin();
-      return;
+    console.warn(`🚨 Access denied: ${path} requires authentication.`);
+    showRegisterPopup();
+    routeToMenu();
+    return;
   }
 
   try {
-      const html = await fetch(route).then((data) => data.text());
-      app.innerHTML = html;
+    const html = await fetch(route).then((data) => data.text());
+    app.innerHTML = html;
 
-      if (routeHandlers[path]) {
-          routeHandlers[path]();
-      }
+    if (routeHandlers[path]) {
+      routeHandlers[path]();
+    }
 
-      console.log(`Loaded route content: ${path}`);
+    console.log(`✅ Loaded route content: ${path}`);
 
-      checkAndShowSplash();
+    checkAndShowSplash();
   } catch (error) {
-      app.innerHTML = "<h1>Error loading page</h1>";
-      console.error(`Failed to load route ${path}:`, error);
+    app.innerHTML = "<h1>Error loading page</h1>";
+    console.error(`❌ Failed to load route ${path}:`, error);
   }
 };
-
 
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
