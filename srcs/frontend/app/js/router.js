@@ -22,7 +22,10 @@ const routeHandlers = {
   "#game": () => checkGameMode(),
   "#lobby": () => bindLobbyEventListeners(),
   "#menu": () => console.log("Menu loaded"),
-  "#leaderboard": () => console.log("Leaderboard loaded"),
+  "#leaderboard": () => {
+    console.log("📌 Leaderboard page handler triggered");
+    setupLeaderboard();
+  },
   "#profile": () => {
     console.log("📌 Profile page handler triggered");
     setupProfilePage();
