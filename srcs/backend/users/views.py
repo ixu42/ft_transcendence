@@ -217,3 +217,32 @@ def update_avatar(request):
         )
 
     return JsonResponse({"errors": form.errors}, status=400)
+
+
+@require_GET
+def leaderboard(request):
+    users = CustomUser.objects.filter(is_staff=False, is_superuser=False).order_by(
+        "-score", "id"
+    )
+
+    data = []
+    current_rank = 0
+    prev_score = None
+
+    for user in users:
+        if user.score != prev_score:
+            current_rank += 1
+
+        data.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "avatar_url": user.avatar.name,
+                "score": user.score,
+                "rank": current_rank,
+                # games_played, win_rate?
+            }
+        )
+        prev_score = user.score
+
+    return JsonResponse(data, safe=False)

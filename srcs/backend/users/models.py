@@ -30,6 +30,7 @@ class CustomUser(AbstractUser):
             validate_file_size,
         ],
     )
+    score = models.IntegerField(default=0)
 
     @property
     def default_avatar(self):
