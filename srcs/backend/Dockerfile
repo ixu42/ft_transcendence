@@ -1,11 +1,24 @@
-FROM python:3.10-slim
+FROM python:3.13-slim
+
+# Force the stdout and stderr streams to be unbuffered
+ENV PYTHONUNBUFFERED=1
+# Python won’t try to write .pyc files on the import of source modules.
+ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-COPY . /app/
+COPY tools/requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && \
+    apt-get install -y \
+    libpq-dev \
+    gcc \
+    netcat-openbsd && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
-EXPOSE 8000
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    rm requirements.txt
 
-ENTRYPOINT [ "python3", "manage.py", "runserver", "0.0.0.0:8000" ]
+ENTRYPOINT [ "sh", "tools/entrypoint.sh" ]

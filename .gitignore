@@ -3,7 +3,7 @@
 !/srcs/backend/media/avatars/default.png
 
 db.sqlite3
-.env
+# .env
 .vscode/
 node_modules/
 dist/
