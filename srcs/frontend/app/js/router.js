@@ -63,6 +63,8 @@ const handleLocation = async () => {
       }
 
       console.log(`Loaded route content: ${path}`);
+
+      checkAndShowSplash();
   } catch (error) {
       app.innerHTML = "<h1>Error loading page</h1>";
       console.error(`Failed to load route ${path}:`, error);
