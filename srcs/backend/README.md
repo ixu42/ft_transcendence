@@ -48,14 +48,19 @@ http://localhost:8000/
     - **Method**: `DELETE`
     - **Description**: For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
 
+- [**Leaderboard**](#Leaderboard)
+    - **URL**: `users/leaderboard/`
+    - **Method**: `GET`
+    - **Description**: Get basic user info and game stats for all users.
+
 ## Endpoints specifications
 
 ### User registration
-#### `POST users/register/`
+#### POST users/register/
 - **Expected Request Body**:
     ```json
     {
-        "username": "newuser",
+        "username": "user1",
         "password1": "securepassword123",
         "password2": "securepassword123"
     }
@@ -64,8 +69,8 @@ http://localhost:8000/
     - **201**
         ```json
         {
-            "id": "<id>",
-            "username": "<username>",
+            "id": 1,
+            "username": "user1",
             "message": "User created."
         }
         ```
@@ -77,11 +82,11 @@ http://localhost:8000/
         ```
 
 ### User login
-#### `POST users/login/`
+#### POST users/login/
 - **Expected Request Body**:
     ```json
     {
-        "username": "existinguser",
+        "username": "user1",
         "password": "securepassword123"
     }
     ```
@@ -89,8 +94,8 @@ http://localhost:8000/
     - **200**
         ```json
         {
-            "id": "<id>",
-            "username": "<username>",
+            "id": 1,
+            "username": "user1",
             "message": "Login successful."
         }
         ```
@@ -127,13 +132,13 @@ http://localhost:8000/
         ```
 
 ### User logout
-#### `POST users/logout/`
+#### POST users/logout/
 - **Response**
     - **200**
         ```json
         {
-            "id": "<id>",
-            "username": "<username>",
+            "id": 1,
+            "username": "user1",
             "message": "Logout successful."
         }
         ```
@@ -146,7 +151,7 @@ http://localhost:8000/
         ```
 
 ### User avatar upload
-#### `POST users/avatar/`
+#### POST users/avatar/
 - **Expected Request Body**:
     The request should be a `multipart/form-data` request with the following field:
     `avatar: The avatar image file (JPG, JPEG, PNG) to be uploaded.`
@@ -154,10 +159,10 @@ http://localhost:8000/
     - **200**
         ```json
         {
-            "id": "<id>",
-            "username": "<username>",
+            "id": 1,
+            "username": "user1",
             "message": "Avatar updated.",
-            "avatar_url": "<avatar_url>"
+            "avatar_url": "/media/avatars/1/<filename>"
         }
         ```
     - **400**
@@ -189,18 +194,16 @@ http://localhost:8000/
         ```
 
 ### User profile info
-#### `GET users/<user_id>/`
+#### GET users/<user_id>/
 - **Response**
     - **200**
         ```json
         {
-            "id": 30,
-            "username": "testuser123",
-            "avatar": "/media/avatars/30/cat.png",
-            "email": "",
-            "first_name": "",
-            "last_name": "",
-            "participated_tournaments": []
+            "id": 1,
+            "username": "user1",
+            "avatar": "/media/avatars/1/<filename>",
+            "email": "<email>",
+            ...
         }
         ```
     - **403**
@@ -219,7 +222,7 @@ http://localhost:8000/
         ```
 
 ### User account deactivation
-#### `PATCH users/<user_id>/`
+#### PATCH users/<user_id>/
 - **Expected Request Body**:
     ```json
     {
@@ -230,8 +233,8 @@ http://localhost:8000/
     - **200**
         ```json
         {
-            "id": "<id>",
-            "username": "<username>",
+            "id": 1,
+            "username": "user1",
             "message": "Account deactivated."
         }
         ```
@@ -251,13 +254,13 @@ http://localhost:8000/
         ```
 
 ### User account deletion
-#### `DELETE users/<user_id>/`
+#### DELETE users/<user_id>/
 - **Response**
     - **200**
         ```json
         {
-            "id": "<id>",
-            "username": "<username>",
+            "id": 1,
+            "username": "user1",
             "message": "Account deleted."
         }
         ```
@@ -274,4 +277,30 @@ http://localhost:8000/
         {
             "errors": "User is not authenticated."
         }
+        ```
+
+### Leaderboard
+#### GET users/leaderboard/
+- **Response**
+    - **200**
+        ```json
+        [
+            {
+                "id": 1,
+                "username": "user1",
+                "avatar": "/media/avatars/1/<filename>",
+                "score": 100,
+                "rank": 1,
+                ...
+            }
+            {
+                "id": 2,
+                "username": "user2",
+                "avatar": "/media/avatars/2/<filename>",
+                "score": 80,
+                "rank": 2,
+                ...
+            }
+            ...
+        ]
         ```
