@@ -1,8 +1,3 @@
-document.addEventListener("view-changed", (event) => {
-    if (event.detail.path === "#lobby") {
-        setupLobby();
-    }
-});
 
 const setupLobby = () => {
     console.log("🏠 Lobby Loaded");
