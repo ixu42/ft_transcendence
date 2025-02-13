@@ -12,5 +12,7 @@ echo "PostgreSQL is ready..."
 python3 manage.py makemigrations
 python3 manage.py migrate
 
+python3 manage.py createsuperuser --no-input --username "$DJANGO_SUPERUSER_USERNAME" --email "$DJANGO_SUPERUSER_EMAIL" || true
+
 echo "Starting Django..."
 exec python3 manage.py runserver 0.0.0.0:$DJANGO_PORT
