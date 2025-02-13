@@ -76,7 +76,7 @@ const fetchProfileData = async () => {
 const updateProfileUI = (data) => {
     const avatarUrl = data.avatar.startsWith("/") 
         ? `http://localhost:8000${data.avatar}` 
-        : data.avatar;
+        : data.avatar || '/static/avatars/default.png';
 
     const elementsToUpdate = [
         { selector: ".profile-avatar", value: avatarUrl, type: "src" },
@@ -85,6 +85,7 @@ const updateProfileUI = (data) => {
         { selector: ".profile-first-name", value: data.first_name || "First Name", type: "text" },
         { selector: ".profile-last-name", value: data.last_name || "Last Name", type: "text" }
     ];
+
     elementsToUpdate.forEach(({ selector, value, type }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -97,6 +98,8 @@ const updateProfileUI = (data) => {
     });
     updateTournamentsList(data.participated_tournaments);
 };
+
+
 
 // Update tournaments list
 const updateTournamentsList = (tournaments) => {
@@ -137,13 +140,15 @@ const handleAvatarUpload = async (file) => {
 
         console.log("✅ Avatar updated:", data.message);
         const newAvatarUrl = `http://localhost:8000${data.avatar_url}`;
-        setElementSrc(".profile-avatar", newAvatarUrl);
+
+        document.querySelector(".profile-avatar").src = newAvatarUrl;
         localStorage.setItem("user_avatar", newAvatarUrl);
         fetchProfileData(); 
     } catch (error) {
         console.error("❌ Error updating avatar:", error);
     }
 };
+
 
 
 const setupAvatarUpload = () => {
@@ -156,13 +161,52 @@ const setupAvatarUpload = () => {
     }
 };
 
+
+// Function to handle account deletion
+const handleAccountDeletion = async () => {
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        alert("User not logged in.");
+        return;
+    }
+
+    // Show confirmation dialog
+    const isConfirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+
+    if (isConfirmed) {
+        try {
+            const csrfToken = await getCSRFCookie(); // If using CSRF protection
+            const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+                method: "DELETE",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                alert("❌ Failed to delete account: " + (data.errors || "Unknown error"));
+                return;
+            }
+
+            alert("✅ Account deleted successfully.");
+            localStorage.clear();
+            window.location.hash = "#login";
+        } catch (error) {
+            console.error("❌ Error deleting account:", error);
+            alert("❌ Error deleting account.");
+        }
+    }
+};
+
 const setupButtons = () => {
     [
         { selector: "#profile-logout-btn", callback: logout, message: "✅ Found logout button" },
         { selector: "#profile-menu-btn", callback: () => {
             console.log("📌 Menu button clicked");
             window.location.hash = "#menu";
-        }, message: "✅ Found menu button" }
+        }, message: "✅ Found menu button" },
+        { selector: "#delete-account-btn", callback: handleAccountDeletion, message: "✅ Found delete account button" }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -173,3 +217,4 @@ const setupButtons = () => {
         }
     });
 };
+

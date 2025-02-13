@@ -1,9 +1,9 @@
 <div id="profile-view" class="profile-container">
     <div class="avatar-container">
-        <img src="avatar.png" alt="Player Avatar" class="profile-avatar">
+        <img class="profile-avatar" alt="Player Avatar" onerror="this.src='/static/avatars/default.png'">
         <label for="avatar-upload" class="avatar-upload-label">Upload</label>
-        <input type="file" id="avatar-upload" accept="image/jpeg, image/png" style="display: none;">
-    </div>
+        <input type="file" id="avatar-upload" accept="image/jpeg, image/png">
+    </div>    
     <h1 class="profile-username">Username</h1>
     <p class="profile-email">Email</p>
     <p class="profile-first-name">First Name</p>
@@ -13,4 +13,9 @@
     </div>
     <button id="profile-menu-btn">Menu</button>
     <button id="profile-logout-btn">Logout</button>
+
+    <!-- Account Deletion Button -->
+    <button id="delete-account-btn" class="delete-account-btn">
+        <i class="fas fa-trash-alt"></i> Delete Account
+    </button>
 </div>
