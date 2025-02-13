@@ -11,6 +11,7 @@
     padding: 20px;
 }
 
+/* Modal Styling */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -22,9 +23,7 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-}
-
-.modal {
+}.modal {
     display: none;
     position: absolute;
     top: 50%;
@@ -38,21 +37,15 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     text-align: center;
     z-index: 1001;
-}
-
-.modal h2 {
+}.modal h2 {
     font-size: 1.3rem;
     margin-bottom: 10px;
-}
-
-.modal .btn-group {
+}.modal .btn-group {
     display: flex;
     flex-direction: column;
     gap: 10px;
     align-items: center;
-}
-
-.modal .btn {
+}.modal .btn {
     width: 100%;
     padding: 10px;
     font-size: 1rem;
@@ -63,16 +56,32 @@
     border: none;
     cursor: pointer;
     transition: 0.2s ease-in-out;
-}
-
-.modal .btn:hover {
+}.modal .btn:hover {
     background: #666;
     transform: scale(1.05);
-}
-
-.modal .close-btn {
+}.modal .close-btn {
     background: red;
 }
+
+
+.lobby-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.lobby-button-group .btn {
+    width: 250px;
+    padding: 12px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
 
 
 @media (max-width: 768px) {

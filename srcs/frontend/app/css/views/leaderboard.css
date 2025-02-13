@@ -1,3 +1,5 @@
+
+
 #leaderboard-container {
     position: absolute;
     top: 0;
@@ -11,15 +13,58 @@
     justify-content: center;
     align-items: center;
     z-index: 10;
+    padding: 20px;
 }
 
-#leaderboard {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    text-align: left;
+#leaderboard-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
 }
 
 #leaderboard ul {
     list-style: none;
     padding: 0;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
 }
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #fff;
+    margin: 10px 0;
+    font-size: 1.1rem;
+}
+
+.leaderboard-item img.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.leaderboard-item .username {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-right: 10px;
+    color: #fff;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leaderboard-item .score {
+    font-size: 1rem;
+    color: #f39c12;
+    font-weight: bold;
+}
+
+.leaderboard-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+}
+
