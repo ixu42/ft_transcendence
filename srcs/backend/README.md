@@ -8,34 +8,50 @@ http://localhost:8000/
 
 ## Endpoints Overview
 
-- **Admin Panel**
-    - **URL**: `/admin/`
+- **Admin panel**
+    - **URL**: `admin/`
     - **Method**: `GET`
     - **Description**: Access the Django Admin interface for managing the system and users.
 
-- **User Registration**
-    - **URL**: `/users/register/`
+- [**User registration**](#User-registration)
+    - **URL**: `users/register/`
     - **Method**: `POST`
     - **Description**: Register a new user in the system.
 
-- **User Login**
-    - **URL**: `/users/login/`
+- [**User login**](#User-login)
+    - **URL**: `users/login/`
     - **Method**: `POST`
     - **Description**: Authenticate a user and logs them in. If a user fails to log in with incorrect credentials 5 times in a row, their account will be temporarily locked for 15 minutes to prevent brute-force attacks.
 
-- **User Logout**
-    - **URL**: `/users/logout/`
+- [**User logout**](#User-logout)
+    - **URL**: `users/logout/`
     - **Method**: `POST`
     - **Description**: For the currently authenticated user to log out.
 
-- **User Avatar Upload**
-    - **URL**: `/users/avatar/`
+- [**User avatar upload**](#User-avatar-upload)
+    - **URL**: `users/avatar/`
     - **Method**: `POST`
     - **Description**: Allow users to upload a new avatar image.
 
+- [**User profile info**](#User-profile-info)
+    - **URL**: `users/<user_id>/`
+    - **Method**: `GET`
+    - **Description**: Get details of the authenticated user's profile.
+
+- [**User account deactivation**](#User-account-deactivation)
+    - **URL**: `users/<user_id>/`
+    - **Method**: `PATCH`
+    - **Description**: For the authenticated user to deactivate their account. Recommended by Django instead of deleting user account, as the related data to the user won't be affected.
+
+- [**User account deletion**](#User-account-deletion)
+    - **URL**: `users/<user_id>/`
+    - **Method**: `DELETE`
+    - **Description**: For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
+
 ## Endpoints specifications
 
-### `/users/register/`
+### User registration
+#### `POST users/register/`
 - **Expected Request Body**:
     ```json
     {
@@ -48,6 +64,8 @@ http://localhost:8000/
     - **201**
         ```json
         {
+            "id": "<id>",
+            "username": "<username>",
             "message": "User created."
         }
         ```
@@ -58,7 +76,8 @@ http://localhost:8000/
         }
         ```
 
-### `/users/login/`
+### User login
+#### `POST users/login/`
 - **Expected Request Body**:
     ```json
     {
@@ -70,6 +89,8 @@ http://localhost:8000/
     - **200**
         ```json
         {
+            "id": "<id>",
+            "username": "<username>",
             "message": "Login successful."
         }
         ```
@@ -105,23 +126,27 @@ http://localhost:8000/
         }
         ```
 
-### `/users/logout/`
+### User logout
+#### `POST users/logout/`
 - **Response**
     - **200**
         ```json
         {
+            "id": "<id>",
+            "username": "<username>",
             "message": "Logout successful."
         }
         ```
     - **401**
-        When the user is not logged in
+        - When the user is not logged in
         ```json
         {
             "errors": "User is not authenticated."
         }
         ```
 
-### `/users/avatar/`
+### User avatar upload
+#### `POST users/avatar/`
 - **Expected Request Body**:
     The request should be a `multipart/form-data` request with the following field:
     `avatar: The avatar image file (JPG, JPEG, PNG) to be uploaded.`
@@ -129,13 +154,14 @@ http://localhost:8000/
     - **200**
         ```json
         {
-            "message": "Avatar updated.",
+            "id": "<id>",
             "username": "<username>",
+            "message": "Avatar updated.",
             "avatar_url": "<avatar_url>"
         }
         ```
     - **400**
-        When the file extension is not allowed
+        - When the file extension is not allowed
         ```json
         {
             "errors": {
@@ -145,7 +171,7 @@ http://localhost:8000/
             }
         }
         ```
-        When the file size exceeds the limit
+        - When the file size exceeds the limit
         ```json
         {
             "errors": {
@@ -155,9 +181,97 @@ http://localhost:8000/
             }
         }
         ```
-        When no file is uploaded
+        - When no file is uploaded
         ```json
         {
             "errors": "No file uploaded."
+        }
+        ```
+
+### User profile info
+#### `GET users/<user_id>/`
+- **Response**
+    - **200**
+        ```json
+        {
+            "id": 30,
+            "username": "testuser123",
+            "avatar": "/media/avatars/30/cat.png",
+            "email": "",
+            "first_name": "",
+            "last_name": "",
+            "participated_tournaments": []
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+        ```json
+        {
+            "errors": "You do not have permission to access this user's profile."
+        }
+        ```
+    - **401**
+        - When the user is not authenticated
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+### User account deactivation
+#### `PATCH users/<user_id>/`
+- **Expected Request Body**:
+    ```json
+    {
+        "deactivate": true
+    }
+    ```
+- **Response**
+    - **200**
+        ```json
+        {
+            "id": "<id>",
+            "username": "<username>",
+            "message": "Account deactivated."
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+        ```json
+        {
+            "errors": "You do not have permission to access this user's profile."
+        }
+        ```
+    - **401**
+        - When the user is not authenticated
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+### User account deletion
+#### `DELETE users/<user_id>/`
+- **Response**
+    - **200**
+        ```json
+        {
+            "id": "<id>",
+            "username": "<username>",
+            "message": "Account deleted."
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+        ```json
+        {
+            "errors": "You do not have permission to access this user's profile."
+        }
+        ```
+    - **401**
+        - When the user is not authenticated
+        ```json
+        {
+            "errors": "User is not authenticated."
         }
         ```

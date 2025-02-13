@@ -1,6 +1,43 @@
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM loaded. Checking splash screen...");
+    checkAndShowSplash();
     waitForLoginForm();
 });
+
+function checkAndShowSplash() {
+    const splashScreen = document.querySelector(".splash-screen");
+    const loginContainer = document.getElementById("login-container");
+
+    console.log("Checking localStorage splashShown:", localStorage.getItem("splashShown"));
+
+    if (localStorage.getItem("splashShown") === "true") {
+        console.log("Splash already shown. Skipping...");
+        splashScreen?.classList.add("hidden");
+        loginContainer?.classList.remove("hidden");
+    } else {
+        console.log("Splash not shown yet. Displaying splash screen...");
+        splashScreen?.classList.remove("hidden");
+    }
+}
+
+function hideSplash() {
+    const splash = document.querySelector(".splash-screen");
+    const loginContainer = document.getElementById("login-container");
+
+    if (!splash || !loginContainer) {
+        console.error("Splash screen or login container not found!");
+        return;
+    }
+    console.log("Splash clicked! Hiding splash screen...");
+    splash.classList.add("hidden");
+    setTimeout(() => {
+        splash.style.display = "none";
+        loginContainer.style.display = "flex";
+    }, 500);
+
+    console.log("Setting splashShown to true in localStorage...");
+    localStorage.setItem("splashShown", "true");
+}
 
 function waitForLoginForm() {
     let attempts = 0;
@@ -78,6 +115,14 @@ function bindLoginButton(loginButton) {
 
             if (response.ok) {
                 alert("✅ Login successful!");
+                
+                // ✅ Store user ID in localStorage
+                if (data.id) {
+                    localStorage.setItem("user_id", data.id);
+                } else {
+                    console.error("❌ No user ID in response!");
+                }
+
                 localStorage.setItem("isLoggedIn", "true");
                 updateNavbar();
                 window.location.hash = "#menu";
@@ -90,40 +135,6 @@ function bindLoginButton(loginButton) {
         }
     });
 }
-
-function hideSplash() {
-    const splash = document.querySelector(".splash-screen");
-    const loginContainer = document.getElementById("login-container");
-
-    if (!splash || !loginContainer) {
-        console.error("Splash screen or login container not found!");
-        return;
-    }
-    
-    console.log("Splash clicked! Hiding splash screen...");
-    
-    splash.classList.add("hidden");
-    setTimeout(() => {
-        splash.style.display = "none";
-        loginContainer.style.display = "flex";
-    }, 500);
-}
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    const splashScreen = document.querySelector(".splash-screen");
-    
-    if (splashScreen) {
-        splashScreen.addEventListener("click", hideSplash);
-    }
-});
-
-
-
-
 
 
 

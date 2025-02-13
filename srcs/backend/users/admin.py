@@ -7,6 +7,7 @@ from .models import CustomUser
 # register CustomUser model in the admin interface
 class CustomUserAdmin(UserAdmin):
     list_display = (
+        "id",
         "username",
         "avatar_preview",
         "is_staff",

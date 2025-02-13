@@ -10,6 +10,7 @@
 }.avatar-container {
     position: relative;
     display: inline-block;
+    margin-bottom: 25px;
 }.avatar-upload-label {
     position: absolute;
     top: 50%;
@@ -27,6 +28,8 @@
     opacity: 1;
 }.avatar-container:hover .profile-avatar {
     opacity: 0.8;
+}#avatar-upload {
+    display: none;
 }
 
 /* Profile Container */
@@ -82,18 +85,39 @@
 }
 
 
-/* Button Styling */
-#profile-menu-btn, #profile-logout-btn {
-    background-color: var(--accent-color);
-    color: var(--primary-text-color);
-    border: none;
+/* Button Styling  standard button styling */
+#profile-menu-btn,
+#profile-logout-btn,
+.delete-account-btn {
+    width: 200px;
+    height: 50px;
     padding: 10px 20px;
-    border-radius: 5px;
     font-size: 1rem;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
     transition: background-color 0.3s ease, transform 0.2s ease;
-}#profile-menu-btn:hover, #profile-logout-btn:hover {
-    background-color: var(--link-hover-color);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}#profile-menu-btn:hover,
+#profile-logout-btn:hover,
+.delete-account-btn:hover {
     transform: scale(1.05);
+}#profile-menu-btn,
+#profile-logout-btn {
+    background-color: var(--accent-color);
+    color: var(--primary-text-color);
+}#profile-menu-btn:hover,
+#profile-logout-btn:hover {
+    background-color: var(--link-hover-color);
+}.delete-account-btn {
+    background-color: #f44336;
+    color: white;
+}.delete-account-btn:hover {
+    background-color: #d32f2f;
+}.delete-account-btn i {
+    margin-right: 8px;
 }
