@@ -115,6 +115,14 @@ function bindLoginButton(loginButton) {
 
             if (response.ok) {
                 alert("✅ Login successful!");
+                
+                // ✅ Store user ID in localStorage
+                if (data.id) {
+                    localStorage.setItem("user_id", data.id);
+                } else {
+                    console.error("❌ No user ID in response!");
+                }
+
                 localStorage.setItem("isLoggedIn", "true");
                 updateNavbar();
                 window.location.hash = "#menu";
@@ -127,6 +135,7 @@ function bindLoginButton(loginButton) {
         }
     });
 }
+
 
 
 

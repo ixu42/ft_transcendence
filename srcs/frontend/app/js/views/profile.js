@@ -36,25 +36,41 @@ const setupProfilePage = () => {
 };
 
 const fetchProfileData = async () => {
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        console.error("❌ User ID not found in localStorage. Redirecting to login...");
+        window.location.hash = "#login";
+        return;
+    }
+
     try {
-        const response = await fetch("http://localhost:8000/users/profile/", {
+        const response = await fetch(`http://localhost:8000/users/${userId}/`, {
             method: "GET",
             credentials: "include",
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            console.error("❌ Failed to fetch profile data:", response.status);
+            console.error("❌ Failed to fetch profile data:", data.errors || response.status);
+            
+            if (response.status === 403 || response.status === 401) {
+                alert("❌ You are not authorized. Redirecting to login.");
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("isLoggedIn");
+                window.location.hash = "#login";
+            }
             return;
         }
 
-        const data = await response.json();
         console.log("✅ Profile data fetched:", data);
-
         updateProfileUI(data);
     } catch (error) {
         console.error("❌ Error fetching profile data:", error);
     }
 };
+
 
 // Update profile UI elements
 const updateProfileUI = (data) => {
@@ -112,17 +128,18 @@ const handleAvatarUpload = async (file) => {
             credentials: "include",
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const data = await response.json();
             console.error("❌ Failed to update avatar:", data.errors);
             return;
         }
 
-        const data = await response.json();
         console.log("✅ Avatar updated:", data.message);
-
-        setElementSrc(".profile-avatar", `http://localhost:8000${data.avatar_url}`);
-        fetchProfileData(); // Refresh profile data
+        const newAvatarUrl = `http://localhost:8000${data.avatar_url}`;
+        setElementSrc(".profile-avatar", newAvatarUrl);
+        localStorage.setItem("user_avatar", newAvatarUrl);
+        fetchProfileData(); 
     } catch (error) {
         console.error("❌ Error updating avatar:", error);
     }
