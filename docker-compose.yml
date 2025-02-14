@@ -1,8 +1,8 @@
 services:
-  transcendence_django:
+  tr_back:
     build: srcs/backend
-    image: transcendence_django
-    container_name: transcendence_django
+    image: tr_back
+    container_name: tr_back
     volumes:
         - ./srcs/backend:/app
     environment:
@@ -16,14 +16,14 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
-      - ft_transcendence-network
+      - tr_network
     ports:
         - "${DJANGO_PORT}:${DJANGO_PORT}"
     depends_on:
-      - transcendence_db
-  transcendence_db:
-    image: postgres
-    container_name: transcendence_db
+      - tr_db
+  tr_db:
+    image: postgres:17.3-alpine3.21
+    container_name: tr_db
     volumes:
       - db_volume:/var/lib/postgresql/data
     environment:
@@ -31,7 +31,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
-      - ft_transcendence-network
+      - tr_network
     expose:
       - ${POSTGRES_PORT}
     restart: always
@@ -40,7 +40,7 @@ volumes:
   db_volume:
 
 networks:
-  ft_transcendence-network:
+  tr_network:
     driver: bridge
 
 
