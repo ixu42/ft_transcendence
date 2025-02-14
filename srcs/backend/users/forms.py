@@ -1,5 +1,6 @@
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, SetPasswordForm
 from django import forms
+from django.contrib.auth.hashers import check_password
 from users.models import CustomUser
 
 
@@ -16,6 +17,7 @@ class AvatarUpdateForm(forms.ModelForm):
 
 
 class ProfileUpdateForm(UserChangeForm):
+    password = None
     username = forms.CharField(max_length=50, required=False)
     email = forms.EmailField(required=False)
     first_name = forms.CharField(max_length=50, required=False)
@@ -24,3 +26,19 @@ class ProfileUpdateForm(UserChangeForm):
     class Meta:
         model = CustomUser
         fields = ("username", "email", "first_name", "last_name")
+
+
+class PasswordUpdateForm(SetPasswordForm):
+    class Meta:
+        model = CustomUser
+        fields = ["new_password1", "new_password2"]
+
+    def clean_new_password1(self):
+        new_password = self.cleaned_data.get("new_password1")
+
+        if check_password(new_password, self.user.password):
+            raise forms.ValidationError(
+                "New password cannot be the same as the old one."
+            )
+
+        return new_password

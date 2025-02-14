@@ -8,7 +8,12 @@ from django.db.models.functions import Rank
 import os
 import shutil
 from functools import wraps
-from users.forms import CustomUserCreationForm, AvatarUpdateForm, ProfileUpdateForm
+from users.forms import (
+    CustomUserCreationForm,
+    AvatarUpdateForm,
+    ProfileUpdateForm,
+    PasswordUpdateForm,
+)
 from users.models import CustomUser
 
 
@@ -148,7 +153,7 @@ def update_profile(request):
             {
                 "id": user.id,
                 "username": user.username,
-                "message": "User Profile updated.",
+                "message": "User profile updated.",
             },
             status=200,
         )
@@ -216,6 +221,37 @@ def user_profile(request, user_id):
 
     elif request.method == "DELETE":
         return delete_user_account(request)
+
+
+@login_required_json
+@require_POST
+def update_password(request, user_id):
+    if request.user.id != user_id:
+        return JsonResponse(
+            {"errors": "You do not have permission to update password of this user."},
+            status=403,
+        )
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"errors": "Invalid JSON input."}, status=400)
+
+    user = request.user
+    form = PasswordUpdateForm(user, data)
+    if form.is_valid():
+        form.save()
+        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+        return JsonResponse(
+            {
+                "id": user.id,
+                "username": user.username,
+                "message": "User password updated.",
+            },
+            status=200,
+        )
+    else:
+        return JsonResponse({"errors": form.errors}, status=400)
 
 
 @login_required_json

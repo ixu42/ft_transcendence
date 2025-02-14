@@ -10,7 +10,7 @@ urlpatterns = [
     path("logout/", views.logout_user, name="logout_user"),
     # Profile routes
     path("<int:user_id>/", views.user_profile, name="user_profile"),
-    # Avatar routes
+    path("<int:user_id>/password/", views.update_password, name="update_password"),
     path("avatar/", views.update_avatar, name="update_avatar"),
     # Leaderboard route (all users info: basic user info + game stats)
     path("leaderboard/", views.leaderboard, name="leaderboard"),

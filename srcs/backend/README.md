@@ -38,10 +38,15 @@ http://localhost:8000/
     - **Method**: `GET`
     - **Description**: Get details of the authenticated user's profile.
 
-- [**User profile Update**](#User-profile-update)
+- [**User profile update**](#User-profile-update)
     - **URL**: `users/<user_id>/`
     - **Method**: `PATCH`
     - **Description**: Update details of the authenticated user's profile, include username, email, first_name, last_name.
+
+- [**User password update**](#User-password-update)
+    - **URL**: `users/<user_id>/password/`
+    - **Method**: `POST`
+    - **Description**: Update the password of the authenticated user.
 
 - [**User account deactivation**](#User-account-deactivation)
     - **URL**: `users/<user_id>/`
@@ -242,7 +247,7 @@ http://localhost:8000/
         {
             "id": 1,
             "username": "test_update",
-            "message": "User Profile updated."
+            "message": "User profile updated."
         }
         ```
     - **403**
@@ -250,6 +255,57 @@ http://localhost:8000/
         ```json
         {
             "errors": "You do not have permission to access this user's profile."
+        }
+        ```
+    - **401**
+        - When the user is not authenticated
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+### User password update
+#### POST users/<user_id>/password/
+- **Expected Request Body**:
+    ```json
+    {
+        "new_password1": "securepassword456",
+        "new_password2": "securepassword456"
+    }
+- **Response**
+    - **200**
+        ```json
+        {
+            "id": 1,
+            "username": "user1",
+            "message": "User password updated."
+        }
+        ```
+    - **400**
+        ```json
+        {
+            "errors": {
+                "new_password2": [
+                    "The two password fields didn’t match."
+                ]
+            }
+        }
+        ```
+        ```json
+        {
+            "errors": {
+                "new_password1": [
+                    "New password cannot be the same as the old one."
+                ]
+            }
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+        ```json
+        {
+            "errors": "You do not have permission to update password of this user."
         }
         ```
     - **401**
