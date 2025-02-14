@@ -8,7 +8,7 @@ from django.db.models.functions import Rank
 import os
 import shutil
 from functools import wraps
-from users.forms import CustomUserCreationForm, AvatarUpdateForm
+from users.forms import CustomUserCreationForm, AvatarUpdateForm, ProfileUpdateForm
 from users.models import CustomUser
 
 
@@ -132,7 +132,28 @@ def get_profile(request):
 @login_required_json
 @require_http_methods(["PATCH"])
 def update_profile(request):
-    pass
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"errors": "Invalid JSON input."}, status=400)
+
+    user = request.user
+    form = ProfileUpdateForm(data, instance=user)
+
+    if form.is_valid():
+        form.save()
+        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+        return JsonResponse(
+            {
+                "id": user.id,
+                "username": user.username,
+                "message": "User Profile updated.",
+            },
+            status=200,
+        )
+    else:
+        return JsonResponse({"errors": form.errors}, status=400)
 
 
 @login_required_json
