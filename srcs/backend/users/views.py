@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
+from django.db.models import Window, F
+from django.db.models.functions import Rank
 import os
 import shutil
 from functools import wraps
@@ -221,28 +223,12 @@ def update_avatar(request):
 
 @require_GET
 def leaderboard(request):
-    users = CustomUser.objects.filter(is_staff=False, is_superuser=False).order_by(
-        "-score", "id"
-    )
+    users = CustomUser.objects.annotate(
+        rank=Window(expression=Rank(), order_by=F("score").desc())
+    ).order_by("-score", "id")
 
-    data = []
-    current_rank = 0
-    prev_score = None
-
-    for user in users:
-        if user.score != prev_score:
-            current_rank += 1
-
-        data.append(
-            {
-                "id": user.id,
-                "username": user.username,
-                "avatar_url": user.avatar.name,
-                "score": user.score,
-                "rank": current_rank,
-                # games_played, win_rate?
-            }
-        )
-        prev_score = user.score
+    data = list(
+        users.values("id", "username", "avatar", "score", "rank")
+    )  # games_played, win_rate?
 
     return JsonResponse(data, safe=False)
