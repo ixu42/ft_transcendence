@@ -38,6 +38,11 @@ http://localhost:8000/
     - **Method**: `GET`
     - **Description**: Get details of the authenticated user's profile.
 
+- [**User profile Update**](#User-profile-update)
+    - **URL**: `users/<user_id>/`
+    - **Method**: `PATCH`
+    - **Description**: Update details of the authenticated user's profile, include username, email, first_name, last_name.
+
 - [**User account deactivation**](#User-account-deactivation)
     - **URL**: `users/<user_id>/`
     - **Method**: `PATCH`
@@ -204,6 +209,40 @@ http://localhost:8000/
             "avatar": "/media/avatars/1/<filename>",
             "email": "<email>",
             ...
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+        ```json
+        {
+            "errors": "You do not have permission to access this user's profile."
+        }
+        ```
+    - **401**
+        - When the user is not authenticated
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+### User profile Update
+#### PATCH user/<user_id>
+- **Expected Request Body**:
+    ```json
+    {
+        "username": "test_update",
+        "email": "test_update@email.com",
+        "first_name": "test_update",
+        "last_name": "test_update"
+    }
+- **Response**
+    - **200**
+        ```json
+        {
+            "id": 1,
+            "username": "test_update",
+            "message": "User Profile updated."
         }
         ```
     - **403**
