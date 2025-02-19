@@ -7,11 +7,15 @@ class Game(models.Model):
         settings.AUTH_USER_MODEL,
         related_name="games_as_player1",
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     player2 = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="games_as_player2",
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     winner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -25,6 +29,8 @@ class Game(models.Model):
     player2_score = models.IntegerField(default=0)
 
     def __str__(self):
+        player1_name = self.player1.username if self.player1 else "AI"
+        player2_name = self.player2.username if self.player2 else "AI"
         return (
-            f"{self.player1.username} vs {self.player2.username} on {self.date_played}"
+            f"{player1_name} vs {player2_name} on {self.date_played}"
         )
