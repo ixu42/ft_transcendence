@@ -287,13 +287,15 @@ def match_history(request, user_id):
     user = request.user
     if user.id != user_id:
         return JsonResponse(
-            {"errors": "You do not have permission to view match history of this user."},
+            {
+                "errors": "You do not have permission to view match history of this user."
+            },
             status=403,
         )
 
-    games = Game.objects.filter(
-        Q(player1=user) | Q(player2=user)
-    ).order_by("-date_played")
+    games = Game.objects.filter(Q(player1=user) | Q(player2=user)).order_by(
+        "-date_played"
+    )
 
     game_data = [
         {
@@ -317,8 +319,6 @@ def leaderboard(request):
         rank=Window(expression=Rank(), order_by=F("score").desc())
     ).order_by("-score", "id")
 
-    data = list(
-        users.values("id", "username", "avatar", "score", "rank")
-    )  # games_played, win_rate?
+    data = list(users.values("id", "username", "avatar", "score", "rank"))
 
     return JsonResponse(data, safe=False)

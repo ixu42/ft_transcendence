@@ -31,6 +31,4 @@ class Game(models.Model):
     def __str__(self):
         player1_name = self.player1.username if self.player1 else "AI"
         player2_name = self.player2.username if self.player2 else "AI"
-        return (
-            f"{player1_name} vs {player2_name} on {self.date_played}"
-        )
+        return f"{player1_name} vs {player2_name} on {self.date_played}"

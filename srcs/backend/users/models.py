@@ -50,7 +50,7 @@ class CustomUser(AbstractUser):
     @property
     def total_losses(self):
         return self.total_games - self.total_wins
-    
+
     @property
     def win_rate(self):
         if self.total_games == 0:
