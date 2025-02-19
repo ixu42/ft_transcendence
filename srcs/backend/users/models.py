@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.files.storage import default_storage
 from django.templatetags.static import static
 from django.conf import settings
+from games.models import Game
 
 
 def user_avatar_upload_path(instance, filename):
@@ -35,6 +36,26 @@ class CustomUser(AbstractUser):
     @property
     def default_avatar(self):
         return static("avatars/default.png")
+
+    @property
+    def total_games(self):
+        return Game.objects.filter(
+            models.Q(player1=self) | models.Q(player2=self)
+        ).count()
+
+    @property
+    def total_wins(self):
+        return Game.objects.filter(winner=self).count()
+
+    @property
+    def total_losses(self):
+        return self.total_games - self.total_wins
+    
+    @property
+    def win_rate(self):
+        if self.total_games == 0:
+            return 0
+        return f"{self.total_wins / self.total_games * 100} %"
 
     def get_avatar(self):
         """

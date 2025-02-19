@@ -12,6 +12,8 @@ urlpatterns = [
     path("<int:user_id>/", views.user_profile, name="user_profile"),
     path("<int:user_id>/password/", views.update_password, name="update_password"),
     path("avatar/", views.update_avatar, name="update_avatar"),
+    # Match history
+    path("<int:user_id>/match-history/", views.match_history, name="match_history"),
     # Leaderboard route (all users info: basic user info + game stats)
     path("leaderboard/", views.leaderboard, name="leaderboard"),
 ]

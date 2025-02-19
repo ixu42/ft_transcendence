@@ -27,13 +27,9 @@ handler500 = "backend.views.custom_500"
 urlpatterns = [
     # serve media files under /media/
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
-    # admin url
     path("admin/", admin.site.urls),
-    # users app urls
     path("users/", include("users.urls")),
-    # tournaments app urls
     path("tournaments/", include("tournaments.urls")),
-    # backend path
     path("get-csrf-token/", views.get_csrf_token),
     path("", views.homepage),
 ]

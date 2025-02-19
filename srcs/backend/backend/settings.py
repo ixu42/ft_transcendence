@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     # My apps
     "users",
     "tournaments",
+    "games",
     # Third-party apps
     "axes",
     "corsheaders",

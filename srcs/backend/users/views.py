@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
-from django.db.models import Window, F
+from django.db.models import Window, F, Q
 from django.db.models.functions import Rank
 import os
 import shutil
@@ -15,6 +15,7 @@ from users.forms import (
     PasswordUpdateForm,
 )
 from users.models import CustomUser
+from games.models import Game
 
 
 def login_required_json(view_func):
@@ -105,7 +106,9 @@ def logout_user(request):
 @login_required_json
 @require_GET
 def get_profile(request):
-    participated_tournaments = request.user.created_tournaments.all()
+    user = request.user
+
+    participated_tournaments = user.participated_tournaments.all()
 
     tournament_data = [
         {
@@ -119,16 +122,16 @@ def get_profile(request):
 
     return JsonResponse(
         {
-            "id": request.user.id,
-            "username": request.user.username,
-            "avatar": request.user.get_avatar(),
-            "email": request.user.email,
-            "first_name": request.user.first_name,
-            "last_name": request.user.last_name,
+            "id": user.id,
+            "username": user.username,
+            "avatar": user.get_avatar(),
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "total_wins": user.total_wins,
+            "total_losses": user.total_losses,
             "participated_tournaments": tournament_data,
-            # wins and losses
             # friends
-            # match history including 1v1 games, dates, and relevant details
         },
         status=200,
     )
@@ -276,6 +279,36 @@ def update_avatar(request):
         )
 
     return JsonResponse({"errors": form.errors}, status=400)
+
+
+@login_required_json
+@require_GET
+def match_history(request, user_id):
+    user = request.user
+    if user.id != user_id:
+        return JsonResponse(
+            {"errors": "You do not have permission to view match history of this user."},
+            status=403,
+        )
+
+    games = Game.objects.filter(
+        Q(player1=user) | Q(player2=user)
+    ).order_by("-date_played")
+
+    game_data = [
+        {
+            "game_id": game.id,
+            "date_played": game.date_played,
+            "player1:": game.player1.username,
+            "player2": game.player2.username,
+            "winner": game.winner.username,
+            "player1_score": game.player1_score,
+            "player2_score": game.player2_score,
+        }
+        for game in games
+    ]
+
+    return JsonResponse({"match_history": game_data})
 
 
 @require_GET

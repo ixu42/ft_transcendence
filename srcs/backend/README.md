@@ -58,6 +58,11 @@ http://localhost:8000/
     - **Method**: `DELETE`
     - **Description**: For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
 
+- [**Match history**](#Match-history)
+    - **URL**: `users/<user_id>/match-history/`
+    - **Method**: `GET`
+    - **Description**: For the authenticated user to view their match history including date, winner, players and their scores.
+
 - [**Leaderboard**](#Leaderboard)
     - **URL**: `users/leaderboard/`
     - **Method**: `GET`
@@ -364,6 +369,49 @@ http://localhost:8000/
         ```json
         {
             "errors": "You do not have permission to access this user's profile."
+        }
+        ```
+    - **401**
+        - When the user is not authenticated
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+### Match history
+#### GET users/<user_id>/match-history/
+- **Response**
+    - **200**
+        ```json
+        {
+            "match_history": [
+                {
+                    "game_id": 2,
+                    "date_played": "2025-02-19T13:36:15.206Z",
+                    "player1:": "user1",
+                    "player2": "user2",
+                    "winner": "user2",
+                    "player1_score": 7,
+                    "player2_score": 10
+                },
+                {
+                    "game_id": 1,
+                    "date_played": "2025-02-19T13:33:44.228Z",
+                    "player1:": "user1",
+                    "player2": "user2",
+                    "winner": "user1",
+                    "player1_score": 10,
+                    "player2_score": 8
+                }
+            ]
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+        ```json
+        {
+            "errors": "You do not have permission to view match history of this user."
         }
         ```
     - **401**
