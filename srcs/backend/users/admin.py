@@ -14,12 +14,12 @@ class CustomUserAdmin(UserAdmin):
         "is_active",
         "date_joined",
     )
+    list_filter = ("is_staff", "is_active")
 
     def avatar_preview(self, obj):
         return mark_safe(f'<img src="{obj.get_avatar()}" width="30" height="30" />')
 
     avatar_preview.short_description = "Avatar"
-    list_filter = ("is_staff", "is_active")
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
