@@ -34,6 +34,7 @@
 
 /* Profile Container */
 .profile-container {
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -57,38 +58,125 @@
     color: var(--secondary-text-color);
 }
 
-/* Tournament List Styling */
-.profile-tournaments {
-    margin-top: 20px;
-    width: 100%;
+/* Match History Container */
+.profile-match-history {
+    width: 80%;
     max-width: 600px;
-}.tournament-item {
-    background-color: var(--secondary-bg-color);
-    border: 1px solid var(--accent-color);
-    border-radius: 10px;
+    margin-top: 20px;
+    background: var(--secondary-bg-color);
     padding: 15px;
-    margin-bottom: 10px;
-    text-align: left;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}.tournament-item:hover {
-    transform: translateY(-2px);
+    border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}.tournament-item strong {
-    display: block;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
+    text-align: left;
+}.profile-match-history h3 {
+    text-align: center;
+    margin-bottom: 10px;
     color: var(--primary-text-color);
-}.tournament-item span {
-    display: block;
+}.profile-match-entry {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--primary-bg-color);
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}.profile-match-entry:hover {
+    transform: scale(1.02);
+}.profile-match-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+}.profile-match-date {
     font-size: 0.9rem;
     color: var(--secondary-text-color);
 }
+.profile-match-winner {
+    font-weight: bold;
+    color: var(--accent-color);
+}.profile-match-score {
+    font-weight: bold;
+}.profile-no-match {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    background: var(--secondary-bg-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}.profile-no-match p {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--secondary-text-color);
+    margin: 10px 0;
+    padding: 5px 15px;
+}
 
 
-/* Button Styling  standard button styling */
+
+
+/* Profile Edit Modal Styles */
+.profile-edit-modal-hidden {
+    display: none;
+}.profile-edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}.profile-edit-modal-content {
+    background: var(--primary-bg-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+}.profile-edit-modal-content label {
+    font-weight: bold;
+    margin-top: 5px;
+}.profile-edit-modal-content input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--secondary-text-color);
+}#save-profile-btn {
+    background-color: var(--accent-color);
+    color: white;
+}#close-profile-modal {
+    background-color: var(--secondary-bg-color);
+    color: var(--primary-text-color);
+}.profile-edit-modal-visible {
+    opacity: 1;
+}.profile-edit-modal {
+    opacity: 0;
+    pointer-events: none;
+}.profile-edit-modal.profile-edit-modal-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+
+/* Standard Button Styling */
 #profile-menu-btn,
 #profile-logout-btn,
-.delete-account-btn {
+.delete-account-btn,
+#edit-profile-btn,
+#save-profile-btn,
+#close-profile-modal {
     width: 200px;
     height: 50px;
     padding: 10px 20px;
@@ -102,22 +190,54 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}#profile-menu-btn:hover,
+}
+
+#profile-menu-btn:hover,
 #profile-logout-btn:hover,
-.delete-account-btn:hover {
+.delete-account-btn:hover,
+#edit-profile-btn:hover,
+#save-profile-btn:hover,
+#close-profile-modal:hover {
     transform: scale(1.05);
-}#profile-menu-btn,
+}
+
+#profile-menu-btn,
 #profile-logout-btn {
     background-color: var(--accent-color);
     color: var(--primary-text-color);
-}#profile-menu-btn:hover,
+}
+
+#profile-menu-btn:hover,
 #profile-logout-btn:hover {
     background-color: var(--link-hover-color);
-}.delete-account-btn {
+}
+
+.delete-account-btn {
     background-color: #f44336;
     color: white;
-}.delete-account-btn:hover {
+}
+
+.delete-account-btn:hover {
     background-color: #d32f2f;
-}.delete-account-btn i {
+}
+
+#edit-profile-btn {
+    background-color: var(--accent-color);
+    color: var(--primary-text-color);
+}
+
+.delete-account-btn i {
     margin-right: 8px;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#edit-profile-btn:active,
+#save-profile-btn:active,
+#close-profile-modal:active {
+    transform: translateY(0);
 }
