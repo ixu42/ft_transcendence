@@ -110,20 +110,26 @@ const setupMatchHistoryModal = () => {
     const matchHistoryModal = document.getElementById("profile-match-history-modal");
     const closeMatchHistoryModalButton = document.getElementById("close-match-history-modal");
     const matchHistoryContainer = document.querySelector(".profile-match-history");
+    const tournamentsContainer = document.querySelector(".profile-tournaments");
     const viewMatchHistoryButton = document.getElementById("profile-view-match-history-btn");
 
     viewMatchHistoryButton.addEventListener("click", async () => {
+        const profileEditModal = document.getElementById("profile-edit-modal");
+        profileEditModal.classList.remove("profile-edit-modal-visible");
         matchHistoryContainer.innerHTML = "<p>Loading match history...</p>";
+        tournamentsContainer.innerHTML = "<p>Loading tournament data...</p>";
         matchHistoryModal.classList.add("profile-match-history-modal-visible");
         matchHistoryModal.classList.remove("profile-match-history-modal-hidden");
         
         await fetchMatchHistory();
+        await fetchTournaments();
     });
 
     closeMatchHistoryModalButton.addEventListener("click", () => {
         matchHistoryModal.classList.remove("profile-match-history-modal-visible");
         matchHistoryModal.classList.add("profile-match-history-modal-hidden");
         matchHistoryContainer.innerHTML = "";
+        tournamentsContainer.innerHTML = "";
     });
 
     matchHistoryModal.addEventListener("click", (event) => {
@@ -131,6 +137,7 @@ const setupMatchHistoryModal = () => {
             matchHistoryModal.classList.remove("profile-match-history-modal-visible");
             matchHistoryModal.classList.add("profile-match-history-modal-hidden");
             matchHistoryContainer.innerHTML = "";
+            tournamentsContainer.innerHTML = "";
         }
     });
 
@@ -167,6 +174,39 @@ const setupMatchHistoryModal = () => {
         }
     };
 
+    const fetchTournaments = async () => {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            console.error("❌ User ID not found in localStorage.");
+            return;
+        }
+
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`http://localhost:8000/users/${userId}/tournaments/`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Error fetching tournaments:", errorData.errors);
+                tournamentsContainer.innerHTML = `<p class="error-message">${errorData.errors}</p>`;
+                return;
+            }
+
+            const data = await response.json();
+            displayTournaments(data.participated_tournaments);
+        } catch (error) {
+            console.error("Network error fetching tournaments:", error);
+            tournamentsContainer.innerHTML = `<p class="error-message">Failed to load tournament data. Please try again.</p>`;
+        }
+    };
+
     const displayMatchHistory = (matches) => {
         if (matches.length === 0) {
             matchHistoryContainer.innerHTML = "<p>No match history found.</p>";
@@ -180,6 +220,23 @@ const setupMatchHistoryModal = () => {
                 <p><strong>Players:</strong> ${match.player1} vs ${match.player2}</p>
                 <p><strong>Winner:</strong> ${match.winner}</p>
                 <p><strong>Score:</strong> ${match.player1_score} - ${match.player2_score}</p>
+            </div>
+        `).join("");
+    };
+
+    const displayTournaments = (tournaments) => {
+        if (tournaments.length === 0) {
+            tournamentsContainer.innerHTML = "<p>No tournament data found.</p>";
+            return;
+        }
+
+        tournamentsContainer.innerHTML = tournaments.map(tournament => `
+            <div class="tournament-item">
+                <p><strong>Tournament ID:</strong> ${tournament.id}</p>
+                <p><strong>Name:</strong> ${tournament.name}</p>
+                <p><strong>Status:</strong> ${tournament.status}</p>
+                <p><strong>Started At:</strong> ${tournament.started_at ? new Date(tournament.started_at).toLocaleString() : 'Not started'}</p>
+                <p><strong>Players:</strong> ${tournament.players.join(", ")}</p>
             </div>
         `).join("");
     };
@@ -234,13 +291,7 @@ const setupButtons = () => {
         { selector: "#edit-profile-btn", callback: () => {
             console.log("📌 Edit Profile button clicked");
             document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
-        }, message: "✅ Found edit profile button" },
-        { selector: "#profile-view-match-history-btn", callback: () => {
-            console.log("📌 View Match History button clicked");
-            const matchHistoryModal = document.querySelector("#profile-match-history-modal");
-            matchHistoryModal.classList.add("profile-match-history-modal-visible");
-            matchHistoryModal.classList.remove("profile-match-history-modal-hidden");
-        }, message: "✅ Found match history button" }
+        }, message: "✅ Found edit profile button" }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -263,21 +314,28 @@ const setupEditProfile = () => {
     const saveProfileBtn = document.getElementById("save-profile-btn");
 
     editProfileBtn.addEventListener("click", () => {
+        const matchHistoryModal = document.getElementById("profile-match-history-modal");
+        matchHistoryModal.classList.remove("profile-match-history-modal-visible");
+        matchHistoryModal.classList.add("profile-match-history-modal-hidden");
+
         document.getElementById("edit-username").value = document.querySelector(".profile-username").textContent;
         document.getElementById("edit-email").value = document.querySelector(".profile-email").textContent;
         document.getElementById("edit-first-name").value = document.querySelector(".profile-first-name").textContent;
         document.getElementById("edit-last-name").value = document.querySelector(".profile-last-name").textContent;
 
-        profileEditModal.classList.add("profile-edit-modal-visible"); // Show modal with animation
+        profileEditModal.classList.add("profile-edit-modal-visible");
     });
+
     closeProfileModal.addEventListener("click", () => {
-        profileEditModal.classList.remove("profile-edit-modal-visible"); // Hide modal with animation
+        profileEditModal.classList.remove("profile-edit-modal-visible");
     });
+
     profileEditModal.addEventListener("click", (event) => {
-        if (event.target === profileEditModal) { // Only close when clicking outside the modal content
+        if (event.target === profileEditModal) {
             profileEditModal.classList.remove("profile-edit-modal-visible");
         }
     });
+
     saveProfileBtn.addEventListener("click", async () => {
         const userId = localStorage.getItem("user_id");
         if (!userId) {
@@ -322,7 +380,6 @@ const setupEditProfile = () => {
         }
     });
 };
-
 
 // Function to handle avatar upload
 const setupAvatarUpload = () => {
