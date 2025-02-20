@@ -30,10 +30,16 @@ const logout = async () => {
 const setupProfilePage = () => {
     console.log("⚡ setupProfilePage() called!");
 
-    fetchProfileData();
-    setupAvatarUpload();
-    setupButtons();
+    try {
+        fetchProfileData(); // Ensure this does not overwrite the whole page
+        setupAvatarUpload();
+        setupButtons();
+        setupEditProfile();
+    } catch (error) {
+        console.error("❌ Error in setupProfilePage:", error);
+    }
 };
+
 
 const fetchProfileData = async () => {
     const userId = localStorage.getItem("user_id");
@@ -96,26 +102,34 @@ const updateProfileUI = (data) => {
             }
         }
     });
-    updateTournamentsList(data.participated_tournaments);
+
+    updateMatchHistoryList(data.match_history); // Correct function call
 };
 
+// Update match history list
+const updateMatchHistoryList = (matchHistory) => {
+    const matchHistoryElement = document.querySelector(".profile-match-history");
 
+    if (!matchHistoryElement) return;
 
-// Update tournaments list
-const updateTournamentsList = (tournaments) => {
-    const tournamentsElement = document.querySelector(".profile-tournaments");
-    if (!tournamentsElement) return;
-
-    tournamentsElement.innerHTML = (tournaments && tournaments.length > 0)
-        ? tournaments.map(tournament => `
-            <div class="tournament-item">
-                <strong>${tournament.name}</strong>
-                <span>Status: ${tournament.status}</span>
-                <span>Started at: ${new Date(tournament.started_at).toLocaleDateString()}</span>
+    matchHistoryElement.innerHTML = (matchHistory && matchHistory.length > 0)
+        ? matchHistory.map(match => `
+            <div class="profile-match-entry">
+                <div class="profile-match-details">
+                    <p class="profile-match-date"><strong>Date:</strong> ${new Date(match.date_played).toLocaleDateString()}</p>
+                    <p><strong>Match ID:</strong> ${match.game_id}</p>
+                    <p><strong>Player 1:</strong> ${match.player1} <span class="profile-match-score">(${match.player1_score})</span></p>
+                    <p><strong>Player 2:</strong> ${match.player2} <span class="profile-match-score">(${match.player2_score})</span></p>
+                    <p class="profile-match-winner"><strong>Winner:</strong> ${match.winner}</p>
+                </div>
             </div>
         `).join("")
-        : "<p>No tournaments participated yet.</p>";
+        : `<div class="profile-no-match">
+              <p>No matches played yet.</p>
+              <p>Start playing to see your match history here!</p>
+           </div>`;
 };
+
 
 
 const handleAvatarUpload = async (file) => {
@@ -206,7 +220,11 @@ const setupButtons = () => {
             console.log("📌 Menu button clicked");
             window.location.hash = "#menu";
         }, message: "✅ Found menu button" },
-        { selector: "#delete-account-btn", callback: handleAccountDeletion, message: "✅ Found delete account button" }
+        { selector: "#delete-account-btn", callback: handleAccountDeletion, message: "✅ Found delete account button" },
+        { selector: "#edit-profile-btn", callback: () => {
+            console.log("📌 Edit Profile button clicked");
+            document.getElementById("profile-edit-modal").classList.remove("profile-edit-modal-hidden"); // Show modal
+        }, message: "✅ Found edit profile button" }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -214,6 +232,75 @@ const setupButtons = () => {
             element.addEventListener("click", callback);
         } else {
             console.warn(`⚠️ ${selector} not found.`);
+        }
+    });
+};
+
+
+// Setup for edit profile modal
+const setupEditProfile = () => {
+    const editProfileBtn = document.getElementById("edit-profile-btn");
+    const profileEditModal = document.getElementById("profile-edit-modal");
+    const closeProfileModal = document.getElementById("close-profile-modal");
+    const saveProfileBtn = document.getElementById("save-profile-btn");
+
+    editProfileBtn.addEventListener("click", () => {
+        document.getElementById("edit-username").value = document.querySelector(".profile-username").textContent;
+        document.getElementById("edit-email").value = document.querySelector(".profile-email").textContent;
+        document.getElementById("edit-first-name").value = document.querySelector(".profile-first-name").textContent;
+        document.getElementById("edit-last-name").value = document.querySelector(".profile-last-name").textContent;
+
+        profileEditModal.classList.add("profile-edit-modal-visible"); // Show modal with animation
+    });
+    closeProfileModal.addEventListener("click", () => {
+        profileEditModal.classList.remove("profile-edit-modal-visible"); // Hide modal with animation
+    });
+    profileEditModal.addEventListener("click", (event) => {
+        if (event.target === profileEditModal) { // Only close when clicking outside the modal content
+            profileEditModal.classList.remove("profile-edit-modal-visible");
+        }
+    });
+    saveProfileBtn.addEventListener("click", async () => {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            alert("User ID not found. Please log in again.");
+            return;
+        }
+
+        const updatedData = {
+            username: document.getElementById("edit-username").value,
+            email: document.getElementById("edit-email").value,
+            first_name: document.getElementById("edit-first-name").value,
+            last_name: document.getElementById("edit-last-name").value,
+        };
+
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify(updatedData),
+                credentials: "include",
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("❌ Failed to update profile:", data.errors);
+                alert("❌ Failed to update profile: " + (data.errors || "Unknown error"));
+                return;
+            }
+
+            console.log("✅ Profile updated successfully:", data);
+            alert("✅ Profile updated successfully!");
+            fetchProfileData();
+            profileEditModal.classList.remove("profile-edit-modal-visible");
+        } catch (error) {
+            console.error("❌ Error updating profile:", error);
+            alert("❌ Error updating profile.");
         }
     });
 };

@@ -3,19 +3,46 @@
         <img class="profile-avatar" alt="Player Avatar" onerror="this.src='/static/avatars/default.png'">
         <label for="avatar-upload" class="avatar-upload-label">Upload</label>
         <input type="file" id="avatar-upload" accept="image/jpeg, image/png">
-    </div>    
+    </div>
+
     <h1 class="profile-username">Username</h1>
     <p class="profile-email">Email</p>
     <p class="profile-first-name">First Name</p>
     <p class="profile-last-name">Last Name</p>
-    <div class="profile-tournaments">
-        <!-- Participated tournaments will be dynamically inserted here -->
-    </div>
-    <button id="profile-menu-btn">Menu</button>
-    <button id="profile-logout-btn">Logout</button>
 
-    <!-- Account Deletion Button -->
-    <button id="delete-account-btn" class="delete-account-btn">
-        <i class="fas fa-trash-alt"></i> Delete Account
-    </button>
+    <div class="profile-match-history">
+        <h3>Match History</h3>
+    </div>
+
+    <div class="button-container">
+        <button id="profile-menu-btn">Menu</button>
+        <button id="edit-profile-btn" class="edit-profile-btn">Edit Profile</button>
+        <button id="profile-logout-btn">Logout</button>
+        <button id="delete-account-btn" class="delete-account-btn">
+            <i class="fas fa-trash-alt"></i> Delete Account
+        </button>
+    </div>
+</div>
+
+
+
+<!-- Edit Profile Modal -->
+<div id="profile-edit-modal" class="profile-edit-modal profile-edit-modal-hidden">
+    <div class="profile-edit-modal-content">
+        <h2>Edit Profile</h2>
+        <label for="edit-username">Username:</label>
+        <input type="text" id="edit-username">
+
+        <label for="edit-email">Email:</label>
+        <input type="email" id="edit-email">
+
+        <label for="edit-first-name">First Name:</label>
+        <input type="text" id="edit-first-name">
+
+        <label for="edit-last-name">Last Name:</label>
+        <input type="text" id="edit-last-name">
+
+        <button id="save-profile-btn">Save Changes</button>
+        <button id="close-profile-modal">Cancel</button>
+    </div>
 </div>
