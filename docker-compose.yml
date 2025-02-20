@@ -1,43 +1,56 @@
 services:
-  tr_back:
-    build: srcs/backend
-    image: tr_back
-    container_name: tr_back
+  tr_front:
+    build: srcs/frontend
+    image: tr_front
+    container_name: tr_front
     volumes:
-        - ./srcs/backend:/app
+        - ./srcs/frontend:/app
     environment:
-      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
-      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
-      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
-      - DJANGO_PORT=${DJANGO_PORT}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - NGINX_PORT=${NGINX_PORT}
     networks:
       - tr_network
     ports:
-        - "${DJANGO_PORT}:${DJANGO_PORT}"
-    depends_on:
-      - tr_db
-  tr_db:
-    image: postgres:17.3-alpine3.21
-    container_name: tr_db
-    volumes:
-      - db_volume:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    networks:
-      - tr_network
-    expose:
-      - ${POSTGRES_PORT}
-    restart: always
+      - "8443:8443"
 
-volumes:
-  db_volume:
+#   tr_back:
+#     build: srcs/backend
+#     image: tr_back
+#     container_name: tr_back
+#     volumes:
+#         - ./srcs/backend:/app
+#     environment:
+#       - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+#       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+#       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+#       - DJANGO_PORT=${DJANGO_PORT}
+#       - POSTGRES_HOST=${POSTGRES_HOST}
+#       - POSTGRES_PORT=${POSTGRES_PORT}
+#       - POSTGRES_DB=${POSTGRES_DB}
+#       - POSTGRES_USER=${POSTGRES_USER}
+#       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+#     networks:
+#       - tr_network
+#     ports:
+#         - "${DJANGO_PORT}:${DJANGO_PORT}"
+#     depends_on:
+#       - tr_db
+#   tr_db:
+#     image: postgres:17.3-alpine3.21
+#     container_name: tr_db
+#     volumes:
+#       - db_volume:/var/lib/postgresql/data
+#     environment:
+#       - POSTGRES_DB=${POSTGRES_DB}
+#       - POSTGRES_USER=${POSTGRES_USER}
+#       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+#     networks:
+#       - tr_network
+#     expose:
+#       - ${POSTGRES_PORT}
+#     restart: always
+
+# volumes:
+#   db_volume:
 
 networks:
   tr_network:
