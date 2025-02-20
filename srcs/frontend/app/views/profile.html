@@ -1,4 +1,6 @@
+<!-- Profile View -->
 <div id="profile-view" class="profile-container">
+    <!-- Existing profile content -->
     <div class="avatar-container">
         <img class="profile-avatar" alt="Player Avatar" onerror="this.src='/static/avatars/default.png'">
         <label for="avatar-upload" class="avatar-upload-label">Upload</label>
@@ -10,19 +12,29 @@
     <p class="profile-first-name">First Name</p>
     <p class="profile-last-name">Last Name</p>
 
-    <div class="profile-match-history">
-        <h3>Match History</h3>
-    </div>
-
+    <!-- Match History Button (Opens Modal) -->
     <div class="button-container">
-        <button id="profile-menu-btn">Menu</button>
+        <button id="profile-view-match-history-btn">View Match History</button>
         <button id="edit-profile-btn" class="edit-profile-btn">Edit Profile</button>
+        <button id="profile-menu-btn">Menu</button>
         <button id="profile-logout-btn">Logout</button>
         <button id="delete-account-btn" class="delete-account-btn">
             <i class="fas fa-trash-alt"></i> Delete Account
         </button>
     </div>
 </div>
+
+<!-- Modal for Match History -->
+<div id="profile-match-history-modal" class="profile-match-history-modal profile-match-history-modal-hidden">
+    <div class="modal-content">
+        <h2>Match History</h2>
+        <div class="profile-match-history">
+            <!-- Match history will be dynamically injected here -->
+        </div>
+        <button id="close-match-history-modal">Close</button>
+    </div>
+</div>
+
 
 
 

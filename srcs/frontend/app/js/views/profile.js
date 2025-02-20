@@ -35,6 +35,7 @@ const setupProfilePage = () => {
         setupAvatarUpload();
         setupButtons();
         setupEditProfile();
+        setupMatchHistoryModal();
     } catch (error) {
         console.error("❌ Error in setupProfilePage:", error);
     }
@@ -102,79 +103,87 @@ const updateProfileUI = (data) => {
             }
         }
     });
-
-    updateMatchHistoryList(data.match_history); // Correct function call
-};
-
-// Update match history list
-const updateMatchHistoryList = (matchHistory) => {
-    const matchHistoryElement = document.querySelector(".profile-match-history");
-
-    if (!matchHistoryElement) return;
-
-    matchHistoryElement.innerHTML = (matchHistory && matchHistory.length > 0)
-        ? matchHistory.map(match => `
-            <div class="profile-match-entry">
-                <div class="profile-match-details">
-                    <p class="profile-match-date"><strong>Date:</strong> ${new Date(match.date_played).toLocaleDateString()}</p>
-                    <p><strong>Match ID:</strong> ${match.game_id}</p>
-                    <p><strong>Player 1:</strong> ${match.player1} <span class="profile-match-score">(${match.player1_score})</span></p>
-                    <p><strong>Player 2:</strong> ${match.player2} <span class="profile-match-score">(${match.player2_score})</span></p>
-                    <p class="profile-match-winner"><strong>Winner:</strong> ${match.winner}</p>
-                </div>
-            </div>
-        `).join("")
-        : `<div class="profile-no-match">
-              <p>No matches played yet.</p>
-              <p>Start playing to see your match history here!</p>
-           </div>`;
 };
 
 
+const setupMatchHistoryModal = () => {
+    const matchHistoryModal = document.getElementById("profile-match-history-modal");
+    const closeMatchHistoryModalButton = document.getElementById("close-match-history-modal");
+    const matchHistoryContainer = document.querySelector(".profile-match-history");
+    const viewMatchHistoryButton = document.getElementById("profile-view-match-history-btn");
 
-const handleAvatarUpload = async (file) => {
-    const formData = new FormData();
-    formData.append("avatar", file);
+    viewMatchHistoryButton.addEventListener("click", async () => {
+        matchHistoryContainer.innerHTML = "<p>Loading match history...</p>";
+        matchHistoryModal.classList.add("profile-match-history-modal-visible");
+        matchHistoryModal.classList.remove("profile-match-history-modal-hidden");
+        
+        await fetchMatchHistory();
+    });
 
-    try {
-        const csrfToken = await getCSRFCookie();
-        const response = await fetch("http://localhost:8000/users/avatar/", {
-            method: "POST",
-            headers: { "X-CSRFToken": csrfToken },
-            body: formData,
-            credentials: "include",
-        });
+    closeMatchHistoryModalButton.addEventListener("click", () => {
+        matchHistoryModal.classList.remove("profile-match-history-modal-visible");
+        matchHistoryModal.classList.add("profile-match-history-modal-hidden");
+        matchHistoryContainer.innerHTML = "";
+    });
 
-        const data = await response.json();
+    matchHistoryModal.addEventListener("click", (event) => {
+        if (event.target === matchHistoryModal) {
+            matchHistoryModal.classList.remove("profile-match-history-modal-visible");
+            matchHistoryModal.classList.add("profile-match-history-modal-hidden");
+            matchHistoryContainer.innerHTML = "";
+        }
+    });
 
-        if (!response.ok) {
-            console.error("❌ Failed to update avatar:", data.errors);
+    const fetchMatchHistory = async () => {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            console.error("❌ User ID not found in localStorage.");
             return;
         }
 
-        console.log("✅ Avatar updated:", data.message);
-        const newAvatarUrl = `http://localhost:8000${data.avatar_url}`;
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`http://localhost:8000/users/${userId}/match-history/`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include"
+            });
 
-        document.querySelector(".profile-avatar").src = newAvatarUrl;
-        localStorage.setItem("user_avatar", newAvatarUrl);
-        fetchProfileData(); 
-    } catch (error) {
-        console.error("❌ Error updating avatar:", error);
-    }
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Error fetching match history:", errorData.errors);
+                matchHistoryContainer.innerHTML = `<p class="error-message">${errorData.errors}</p>`;
+                return;
+            }
+
+            const data = await response.json();
+            displayMatchHistory(data.match_history);
+        } catch (error) {
+            console.error("Network error fetching match history:", error);
+            matchHistoryContainer.innerHTML = `<p class="error-message">Failed to load match history. Please try again.</p>`;
+        }
+    };
+
+    const displayMatchHistory = (matches) => {
+        if (matches.length === 0) {
+            matchHistoryContainer.innerHTML = "<p>No match history found.</p>";
+            return;
+        }
+
+        matchHistoryContainer.innerHTML = matches.map(match => `
+            <div class="match-history-item">
+                <p><strong>Game ID:</strong> ${match.game_id}</p>
+                <p><strong>Date:</strong> ${new Date(match.date_played).toLocaleString()}</p>
+                <p><strong>Players:</strong> ${match.player1} vs ${match.player2}</p>
+                <p><strong>Winner:</strong> ${match.winner}</p>
+                <p><strong>Score:</strong> ${match.player1_score} - ${match.player2_score}</p>
+            </div>
+        `).join("");
+    };
 };
-
-
-
-const setupAvatarUpload = () => {
-    const avatarUpload = document.getElementById("avatar-upload");
-    if (avatarUpload) {
-        avatarUpload.addEventListener("change", (event) => {
-            const file = event.target.files[0];
-            if (file) handleAvatarUpload(file);
-        });
-    }
-};
-
 
 // Function to handle account deletion
 const handleAccountDeletion = async () => {
@@ -213,6 +222,7 @@ const handleAccountDeletion = async () => {
     }
 };
 
+// Button callbacks for profile page
 const setupButtons = () => {
     [
         { selector: "#profile-logout-btn", callback: logout, message: "✅ Found logout button" },
@@ -223,8 +233,14 @@ const setupButtons = () => {
         { selector: "#delete-account-btn", callback: handleAccountDeletion, message: "✅ Found delete account button" },
         { selector: "#edit-profile-btn", callback: () => {
             console.log("📌 Edit Profile button clicked");
-            document.getElementById("profile-edit-modal").classList.remove("profile-edit-modal-hidden"); // Show modal
-        }, message: "✅ Found edit profile button" }
+            document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
+        }, message: "✅ Found edit profile button" },
+        { selector: "#profile-view-match-history-btn", callback: () => {
+            console.log("📌 View Match History button clicked");
+            const matchHistoryModal = document.querySelector("#profile-match-history-modal");
+            matchHistoryModal.classList.add("profile-match-history-modal-visible");
+            matchHistoryModal.classList.remove("profile-match-history-modal-hidden");
+        }, message: "✅ Found match history button" }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -235,6 +251,8 @@ const setupButtons = () => {
         }
     });
 };
+
+
 
 
 // Setup for edit profile modal
@@ -303,5 +321,49 @@ const setupEditProfile = () => {
             alert("❌ Error updating profile.");
         }
     });
+};
+
+
+// Function to handle avatar upload
+const setupAvatarUpload = () => {
+
+    const handleAvatarUpload = async (file) => {
+        const formData = new FormData();
+        formData.append("avatar", file);
+    
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch("http://localhost:8000/users/avatar/", {
+                method: "POST",
+                headers: { "X-CSRFToken": csrfToken },
+                body: formData,
+                credentials: "include",
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                console.error("❌ Failed to update avatar:", data.errors);
+                return;
+            }
+    
+            console.log("✅ Avatar updated:", data.message);
+            const newAvatarUrl = `http://localhost:8000${data.avatar_url}`;
+    
+            document.querySelector(".profile-avatar").src = newAvatarUrl;
+            localStorage.setItem("user_avatar", newAvatarUrl);
+            fetchProfileData(); 
+        } catch (error) {
+            console.error("❌ Error updating avatar:", error);
+        }
+    };
+
+    const avatarUpload = document.getElementById("avatar-upload");
+    if (avatarUpload) {
+        avatarUpload.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) handleAvatarUpload(file);
+        });
+    }
 };
 
