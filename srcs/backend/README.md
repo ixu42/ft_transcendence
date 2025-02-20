@@ -58,6 +58,11 @@ http://localhost:8000/
     - **Method**: `DELETE`
     - **Description**: For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
 
+- [**Participated tournaments**](#Participated-tournaments)
+    - **URL**: `users/<user_id>/tournaments/`
+    - **Method**: `GET`
+    - **Description**: For the authenticated user to view their participated tournaments related info, including id, name, status, started_at, players.
+
 - [**Match history**](#Match-history)
     - **URL**: `users/<user_id>/match-history/`
     - **Method**: `GET`
@@ -369,6 +374,43 @@ http://localhost:8000/
         ```json
         {
             "errors": "You do not have permission to access this user's profile."
+        }
+        ```
+    - **401**
+        - When the user is not authenticated
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+### Participated tournaments
+#### GET users/<user_id>/tournaments/
+- **Response** 
+    - **200**
+        ```json
+        {
+            "id": 1,
+            "username": "user1",
+            "participated_tournaments": [
+                {
+                    "id": 1,
+                    "name": "Player1's game",
+                    "status": "PENDING",
+                    "started_at": null,
+                    "players": [
+                        "user1",
+                        "user2",
+                        "user3"
+                    ]
+                }
+            ]
+        }
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+        ```json
+        {
+            "errors": "You do not have permission to view participated tournaments of this user."
         }
         ```
     - **401**
