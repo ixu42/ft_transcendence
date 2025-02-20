@@ -108,18 +108,6 @@ def logout_user(request):
 def get_profile(request):
     user = request.user
 
-    participated_tournaments = user.participated_tournaments.all()
-
-    tournament_data = [
-        {
-            "id": tournament.id,
-            "name": tournament.name,
-            "status": tournament.status,
-            "started_at": tournament.started_at,
-        }
-        for tournament in participated_tournaments
-    ]
-
     return JsonResponse(
         {
             "id": user.id,
@@ -130,7 +118,6 @@ def get_profile(request):
             "last_name": user.last_name,
             "total_wins": user.total_wins,
             "total_losses": user.total_losses,
-            "participated_tournaments": tournament_data,
             # friends
         },
         status=200,
@@ -279,6 +266,41 @@ def update_avatar(request):
         )
 
     return JsonResponse({"errors": form.errors}, status=400)
+
+
+@login_required_json
+@require_GET
+def participated_tournaments(request, user_id):
+    user = request.user
+    if user.id != user_id:
+        return JsonResponse(
+            {
+                "errors": "You do not have permission to view participated tournaments of this user."
+            },
+            status=403,
+        )
+
+    participated_tournaments = user.participated_tournaments.all()
+
+    tournament_data = [
+        {
+            "id": tournament.id,
+            "name": tournament.name,
+            "status": tournament.status,
+            "started_at": tournament.started_at,
+            "players": tournament.get_players
+        }
+        for tournament in participated_tournaments
+    ]
+
+    return JsonResponse(
+        {
+            "id": user_id,
+            "username": user.username,
+            "participated_tournaments": tournament_data,
+        },
+        status=200,
+    )
 
 
 @login_required_json

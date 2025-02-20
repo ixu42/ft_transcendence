@@ -28,6 +28,10 @@ class Tournament(models.Model):
         default=TournamentStatus.PENDING,
     )
 
+    @property
+    def get_players(self):
+        return [player.username for player in self.players.all()]
+
     def check_status(self):
         if self.status == Tournament.TournamentStatus.ACTIVE:
             raise ValidationError("Tournament has already started")
