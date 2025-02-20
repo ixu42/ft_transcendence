@@ -1,6 +1,9 @@
-#Ignore all but not default avatar
+# Ignore all but not default avatar
 /srcs/backend/media/avatars/*
 !/srcs/backend/media/avatars/default.png
+
+# Ignore ssl certificate and key
+srcs/frontend/tools/ssl
 
 db.sqlite3
 # .env
@@ -12,3 +15,5 @@ build/
 .venv
 __pycache__
 venv/
+
+

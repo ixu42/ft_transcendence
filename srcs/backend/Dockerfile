@@ -7,8 +7,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-COPY tools/requirements.txt .
-
 RUN apt-get update && \
     apt-get install -y \
     libpq-dev \
@@ -16,6 +14,8 @@ RUN apt-get update && \
     netcat-openbsd && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
+
+COPY tools/requirements.txt .
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
