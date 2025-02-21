@@ -34,7 +34,6 @@
 
 /* Profile Container */
 .profile-container {
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -58,61 +57,54 @@
     color: var(--secondary-text-color);
 }
 
-/* Match History Container */
-.profile-match-history {
+/* Match History Modal Styles */
+.profile-match-history-modal-hidden {
+    display: none;
+}.profile-match-history-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}.profile-match-history-modal-visible {
+    opacity: 1;
+    pointer-events: auto;
+}.profile-match-history-modal .modal-content {
+    background: var(--primary-bg-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
     width: 80%;
     max-width: 600px;
-    margin-top: 20px;
-    background: var(--secondary-bg-color);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: left;
-}.profile-match-history h3 {
-    text-align: center;
-    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1001;
+    justify-content: space-between;
+}.profile-match-history-modal .modal-content h2 {
+    margin-bottom: 15px;
     color: var(--primary-text-color);
-}.profile-match-entry {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: var(--primary-bg-color);
-    margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
-}.profile-match-entry:hover {
-    transform: scale(1.02);
-}.profile-match-details p {
-    margin: 5px 0;
-    font-size: 1rem;
-}.profile-match-date {
-    font-size: 0.9rem;
-    color: var(--secondary-text-color);
-}
-.profile-match-winner {
-    font-weight: bold;
-    color: var(--accent-color);
-}.profile-match-score {
-    font-weight: bold;
-}.profile-no-match {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-    padding: 20px;
-    margin-top: 20px;
-    background: var(--secondary-bg-color);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}.profile-no-match p {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: var(--secondary-text-color);
-    margin: 10px 0;
-    padding: 5px 15px;
+}.profile-match-history-modal .modal-content button {
+    background-color: var(--secondary-bg-color);
+    color: var(--primary-text-color);
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}.profile-match-history-modal .modal-content button:hover {
+    background-color: var(--accent-color);
+    color: white;
 }
 
 
@@ -171,13 +163,24 @@
 
 
 /* Standard Button Styling */
+
+.button-container {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
 #profile-menu-btn,
+#profile-view-match-history-btn,
 #profile-logout-btn,
 .delete-account-btn,
 #edit-profile-btn,
 #save-profile-btn,
 #close-profile-modal {
-    width: 200px;
+    width: 100%; /* Ensures the button takes up full width */
+    max-width: 200px; /* Limit to 200px width */
     height: 50px;
     padding: 10px 20px;
     font-size: 1rem;
@@ -185,28 +188,35 @@
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    text-align: center;
-    display: flex;
-    align-items: center;
+    text-align: center; /* Center text inside the button */
+    display: inline-flex; /* Makes sure the button's content is aligned properly */
     justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+/* Hover Effects */
+#profile-view-match-history-btn:hover,
 #profile-menu-btn:hover,
 #profile-logout-btn:hover,
 .delete-account-btn:hover,
 #edit-profile-btn:hover,
 #save-profile-btn:hover,
 #close-profile-modal:hover {
-    transform: scale(1.05);
+    transform: scale(1.05); /* Slightly scale up on hover */
 }
 
+/* Button Color Styling */
+#edit-profile-btn,
+#profile-view-match-history-btn,        
 #profile-menu-btn,
 #profile-logout-btn {
     background-color: var(--accent-color);
     color: var(--primary-text-color);
 }
 
+#profile-view-match-history-btn:hover,
+#edit-profile-btn:hover,
 #profile-menu-btn:hover,
 #profile-logout-btn:hover {
     background-color: var(--link-hover-color);
@@ -221,22 +231,11 @@
     background-color: #d32f2f;
 }
 
-#edit-profile-btn {
-    background-color: var(--accent-color);
-    color: var(--primary-text-color);
-}
-
+/* Adjust icon margin for delete account */
 .delete-account-btn i {
     margin-right: 8px;
 }
 
-.button-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#edit-profile-btn:active,
 #save-profile-btn:active,
 #close-profile-modal:active {
     transform: translateY(0);

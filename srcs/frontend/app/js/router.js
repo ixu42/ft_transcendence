@@ -41,7 +41,7 @@ const handleLocation = async () => {
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
   const isLoggedIn = isUserLoggedIn();
-  const hideNavbarAndFooter = ["#login", "#register", "", "#game"].includes(path) || window.location.hash === "";
+  const hideNavbarAndFooter = ["#login", "#register", "", "#game", "#profile"].includes(path) || window.location.hash === "";
 
   const navbar = document.getElementById("navbar-container");
   const footer = document.getElementById("footer-container");
