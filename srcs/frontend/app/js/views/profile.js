@@ -8,11 +8,11 @@ const logout = async () => {
     }
     const response = await fetch("http://localhost:8000/users/logout/", {
         method: "POST",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
         },
-        credentials: "include",
     });
 
     if (response.ok) {
@@ -55,6 +55,9 @@ const fetchProfileData = async () => {
         const response = await fetch(`http://localhost:8000/users/${userId}/`, {
             method: "GET",
             credentials: "include",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+            },
         });
 
         const data = await response.json();
@@ -77,6 +80,7 @@ const fetchProfileData = async () => {
         console.error("❌ Error fetching profile data:", error);
     }
 };
+
 
 
 // Update profile UI elements

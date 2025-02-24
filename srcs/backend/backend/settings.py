@@ -174,12 +174,23 @@ CSRF_TRUSTED_ORIGINS = [
     "http://0.0.0.0:8080",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://tr_front:8443",
+    "https://tr_front:8443",
+    "https://localhost:8443"
 ]
+
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = False  # If True, JS cannot read the cookie
+CSRF_COOKIE_SAMESITE = "None"  # Required for cross-origin authentication
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://0.0.0.0:8080",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://tr_front:8443",
+    "https://tr_front:8443",
+    "https://localhost:8443"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
