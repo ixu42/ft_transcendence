@@ -6,7 +6,7 @@ const logout = async () => {
     if (!csrfToken) {
         return console.error("❌ CSRF Token is missing.");
     }
-    const response = await fetch("http://localhost:8000/users/logout/", {
+    const response = await fetch("api/users/logout/", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -52,11 +52,11 @@ const fetchProfileData = async () => {
     }
 
     try {
-        const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+        const response = await fetch(`api/users/${userId}/`, {
             method: "GET",
             credentials: "include",
             headers: {
-                "X-CSRFToken": getCSRFToken(),
+                "X-CSRFToken": await getCSRFCookie(),
             },
         });
 
@@ -86,7 +86,7 @@ const fetchProfileData = async () => {
 // Update profile UI elements
 const updateProfileUI = (data) => {
     const avatarUrl = data.avatar.startsWith("/") 
-        ? `http://localhost:8000${data.avatar}` 
+        ? `api/${data.avatar}` 
         : data.avatar || '/static/avatars/default.png';
 
     const elementsToUpdate = [
@@ -154,7 +154,7 @@ const setupMatchHistoryModal = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`http://localhost:8000/users/${userId}/match-history/`, {
+            const response = await fetch(`api/users/${userId}/match-history/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -187,7 +187,7 @@ const setupMatchHistoryModal = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`http://localhost:8000/users/${userId}/tournaments/`, {
+            const response = await fetch(`api/users/${userId}/tournaments/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -261,7 +261,7 @@ const handleAccountDeletion = async () => {
     if (isConfirmed) {
         try {
             const csrfToken = await getCSRFCookie(); // If using CSRF protection
-            const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+            const response = await fetch(`api/users/${userId}/`, {
                 method: "DELETE",
                 headers: { "X-CSRFToken": csrfToken },
                 credentials: "include",
@@ -356,7 +356,7 @@ const setupEditProfile = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+            const response = await fetch(`api/users/${userId}/`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -394,7 +394,7 @@ const setupAvatarUpload = () => {
     
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch("http://localhost:8000/users/avatar/", {
+            const response = await fetch("api/users/avatar/", {
                 method: "POST",
                 headers: { "X-CSRFToken": csrfToken },
                 body: formData,
@@ -409,7 +409,7 @@ const setupAvatarUpload = () => {
             }
     
             console.log("✅ Avatar updated:", data.message);
-            const newAvatarUrl = `http://localhost:8000${data.avatar_url}`;
+            const newAvatarUrl = `api/${data.avatar_url}`;
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
