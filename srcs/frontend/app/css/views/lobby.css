@@ -11,24 +11,20 @@
     padding: 20px;
 }
 
-/* Modal Styling */
-.modal-overlay {
-    display: none;
+/** Modal Styling */
+.game-mode-modal-overlay {
+    display: none; /* Hidden by default */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
     z-index: 1000;
-}.modal {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+}.game-mode-modal-content {
+    position: relative;
     background: #222;
     color: white;
     padding: 20px;
@@ -37,17 +33,17 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     text-align: center;
     z-index: 1001;
-}.modal h2 {
+}.game-mode-modal-content h2 {
     font-size: 1.3rem;
     margin-bottom: 10px;
-}.modal .btn-group {
+}.game-mode-modal-content .btn-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     align-items: center;
-}.modal .btn {
+}.game-mode-modal-content .btn {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     font-size: 1rem;
     font-weight: bold;
     border-radius: 6px;
@@ -56,14 +52,14 @@
     border: none;
     cursor: pointer;
     transition: 0.2s ease-in-out;
-}.modal .btn:hover {
+}.game-mode-modal-content .btn:hover {
     background: #666;
     transform: scale(1.05);
-}.modal .close-btn {
+}.game-mode-modal-content .close-btn {
     background: red;
 }
 
-
+/* Main Lobby Button Group */
 .lobby-button-group {
     display: flex;
     flex-direction: column;
@@ -71,9 +67,7 @@
     align-items: center;
     width: 100%;
     margin-top: 20px;
-}
-
-.lobby-button-group .btn {
+}.lobby-button-group .btn {
     width: 250px;
     padding: 12px;
     text-align: center;
@@ -82,15 +76,27 @@
     border-radius: 6px;
 }
 
-
-
+/* Media Queries for smaller screens */
 @media (max-width: 768px) {
     #lobby-container h1 {
         font-size: 2.5rem;
     }
 
-    .button-group .btn {
+    .lobby-button-group .btn {
         padding: 10px 20px;
         font-size: 1rem;
+    }
+
+    .game-mode-modal-content {
+        width: 80%;
+        padding: 15px;
+    }
+
+    .game-mode-modal-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .game-mode-modal-content .btn {
+        font-size: 0.9rem;
     }
 }
