@@ -32,7 +32,6 @@ const renderLeaderboard = (playersData, currentPage) => {
     leaderboardList.innerHTML = `
         <li class="leaderboard-header">
             <span class="rank-header">Rank</span>
-            <span class="id-header">ID</span>
             <span class="score-header">Score</span>
         </li>
         ${playersToShow.map(player => `
