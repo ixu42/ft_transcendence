@@ -52,11 +52,12 @@ const fetchProfileData = async () => {
     }
 
     try {
-        const response = await fetch(`api/users/${userId}/`, {
+        const response = await fetch(`/api/users/${userId}/`, {
             method: "GET",
             credentials: "include",
             headers: {
                 "X-CSRFToken": await getCSRFCookie(),
+                "Content-Type": "application/json",
             },
         });
 
@@ -80,7 +81,6 @@ const fetchProfileData = async () => {
         console.error("❌ Error fetching profile data:", error);
     }
 };
-
 
 
 // Update profile UI elements

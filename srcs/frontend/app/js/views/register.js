@@ -25,12 +25,12 @@ async function register({ username, email, password1, password2 }) {
 
     const response = await fetch("api/users/register/", {
         method: "POST",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
         },
         body: JSON.stringify({ username, email, password1, password2 }),
-        credentials: "include",
     });
 
     console.log("Sending request with body:", JSON.stringify({ username, email, password1, password2 }));

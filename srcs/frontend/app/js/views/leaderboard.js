@@ -1,6 +1,6 @@
 const setupLeaderboard = async () => {
     try {
-        const response = await fetch('http://localhost:8000/users/', {
+        const response = await fetch('/api/users/leaderboard/', {
             method: 'GET',
             credentials: 'include',
         });
