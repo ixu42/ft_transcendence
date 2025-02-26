@@ -22,8 +22,8 @@ const setupLeaderboard = async () => {
 const renderLeaderboard = (playersData, currentPage) => {
     const playersPerPage = 5;
     const leaderboardList = document.getElementById('leaderboard-list');
-    const prevButton = document.getElementById('prev-button');
-    const nextButton = document.getElementById('next-button');
+    const prevButton = document.getElementById('leaderboard-prev-btn');
+    const nextButton = document.getElementById('leaderboard-next-btn');
 
     const sortedPlayers = playersData.sort((a, b) => b.score - a.score || a.rank - b.rank);
     const start = (currentPage - 1) * playersPerPage;
@@ -32,12 +32,14 @@ const renderLeaderboard = (playersData, currentPage) => {
     leaderboardList.innerHTML = `
         <li class="leaderboard-header">
             <span class="rank-header">Rank</span>
+            <span class="id-header">ID</span>
             <span class="score-header">Score</span>
         </li>
         ${playersToShow.map(player => `
             <li class="leaderboard-item">
                 <span class="rank">${player.score > 0 ? `#${player.rank}` : '?'}</span>
-                <img src="${player.avatar}" alt="${player.username}'s avatar" class="avatar">
+                <span class="player-id">ID: ${player.id}</span>
+                <img src="${fixAvatarURL(player.avatar)}" alt="${player.username}'s avatar" class="avatar">
                 <span class="username">${player.username}</span>
                 <span class="score">${player.score} points</span>
             </li>
@@ -47,13 +49,19 @@ const renderLeaderboard = (playersData, currentPage) => {
     prevButton.disabled = currentPage === 1;
     nextButton.disabled = start + playersPerPage >= sortedPlayers.length;
 
-    // Show prev button only if user has pressed next
-    if (currentPage > 1) {
-        prevButton.style.display = "inline-block"; 
-    } else {
-        prevButton.style.display = "none"; 
-    }
+    prevButton.style.display = currentPage > 1 ? "inline-block" : "none";
 
     prevButton.onclick = () => renderLeaderboard(playersData, currentPage - 1);
     nextButton.onclick = () => renderLeaderboard(playersData, currentPage + 1);
+};
+
+const fixAvatarURL = (avatarPath) => {
+
+    if (avatarPath.startsWith("avatars/")){
+        return `api/media/${avatarPath}`;
+    }
+    else if (avatarPath.startsWith("/static/")) {
+        return `/api/${avatarPath}`;
+    }
+    return avatarPath;
 };
