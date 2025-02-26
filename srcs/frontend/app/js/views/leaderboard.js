@@ -13,44 +13,47 @@ const setupLeaderboard = async () => {
         }
 
         console.log("✅ Leaderboard data fetched:", data);
-        renderLeaderboard(data);
+        renderLeaderboard(data, 1);
     } catch (error) {
         console.error("❌ Error fetching leaderboard data:", error);
     }
 };
 
-const renderLeaderboard = (players) => {
-    const leaderboardContainer = document.getElementById('leaderboard-container');
-    const leaderboardList = leaderboardContainer.querySelector('ul');
+const renderLeaderboard = (playersData, currentPage) => {
+    const playersPerPage = 5;
+    const leaderboardList = document.getElementById('leaderboard-list');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
 
-    leaderboardList.innerHTML = '';
+    const sortedPlayers = playersData.sort((a, b) => b.score - a.score || a.rank - b.rank);
+    const start = (currentPage - 1) * playersPerPage;
+    const playersToShow = sortedPlayers.slice(start, start + playersPerPage);
 
-    players.forEach(player => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('leaderboard-item');
+    leaderboardList.innerHTML = `
+        <li class="leaderboard-header">
+            <span class="rank-header">Rank</span>
+            <span class="score-header">Score</span>
+        </li>
+        ${playersToShow.map(player => `
+            <li class="leaderboard-item">
+                <span class="rank">${player.score > 0 ? `#${player.rank}` : '?'}</span>
+                <img src="${player.avatar}" alt="${player.username}'s avatar" class="avatar">
+                <span class="username">${player.username}</span>
+                <span class="score">${player.score} points</span>
+            </li>
+        `).join('')}
+    `;
 
-        // Player Avatar
-        const playerAvatar = document.createElement('img');
-        playerAvatar.src = player.avatar_url;
-        playerAvatar.alt = `${player.username}'s avatar`;
-        playerAvatar.classList.add('avatar');
-        
-        // Player Username
-        const playerName = document.createElement('span');
-        playerName.classList.add('username');
-        playerName.textContent = player.username; // Display username without a colon for clarity
+    prevButton.disabled = currentPage === 1;
+    nextButton.disabled = start + playersPerPage >= sortedPlayers.length;
 
-        // Player Score
-        const playerScore = document.createElement('span');
-        playerScore.classList.add('score');
-        playerScore.textContent = `${player.score} points`; // Display the score from matches
+    // Show prev button only if user has pressed next
+    if (currentPage > 1) {
+        prevButton.style.display = "inline-block"; 
+    } else {
+        prevButton.style.display = "none"; 
+    }
 
-        // Append the elements to the list item
-        listItem.appendChild(playerAvatar);
-        listItem.appendChild(playerName);
-        listItem.appendChild(playerScore);
-
-        // Append the list item to the leaderboard list
-        leaderboardList.appendChild(listItem);
-    });
+    prevButton.onclick = () => renderLeaderboard(playersData, currentPage - 1);
+    nextButton.onclick = () => renderLeaderboard(playersData, currentPage + 1);
 };

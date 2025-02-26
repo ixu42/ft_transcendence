@@ -1,5 +1,3 @@
-
-
 #leaderboard-container {
     position: absolute;
     top: 0;
@@ -17,7 +15,7 @@
 }
 
 #leaderboard-container h2 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     margin-bottom: 20px;
 }
 
@@ -25,46 +23,125 @@
     list-style: none;
     padding: 0;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
+}
+
+/* Leaderboard Header */
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 3px solid #fff;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
 .leaderboard-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #fff;
-    margin: 10px 0;
-    font-size: 1.1rem;
+    padding: 15px 0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    margin: 12px 0;
+    font-size: 1.2rem;
+}
+
+.leaderboard-item .rank {
+    width: 70px; /* Adjusted */
+    text-align: center;
+    font-weight: bold;
+    color: #f39c12;
 }
 
 .leaderboard-item img.avatar {
-    width: 40px;
-    height: 40px;
+    width: 50px; /* Increased */
+    height: 50px; /* Increased */
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 15px;
 }
 
 .leaderboard-item .username {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
-    margin-right: 10px;
+    margin-right: 15px;
     color: #fff;
-    max-width: 120px;
+    max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .leaderboard-item .score {
-    font-size: 1rem;
+    width: 110px; /* Adjusted */
+    text-align: right;
+    font-size: 1.1rem;
     color: #f39c12;
     font-weight: bold;
 }
 
-.leaderboard-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    cursor: pointer;
+/* Pagination Buttons */
+.leaderboard-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+/* Pagination Buttons */
+.leaderboard-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
 }
 
+/* Leaderboard Pagination Buttons */
+.leaderboard-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.leaderboard-pagination-btn {
+    background-color: #f39c12;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    padding: 12px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
+}
+
+.leaderboard-pagination-btn:hover {
+    background-color: #e67e22;
+}
+
+.leaderboard-pagination-btn:disabled {
+    background-color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+}
+
+/* Initially hide the Prev button */
+#leaderboard-prev-btn {
+    display: none;
+}
+
+/* Leaderboard Menu Button */
+.leaderboard-menu-btn {
+    display: inline-block;
+    margin-top: 20px; /* Added margin */
+    padding: 10px 15px;
+    background-color: #555;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
+}
+
+.leaderboard-menu-btn:hover {
+    background-color: #777;
+}
