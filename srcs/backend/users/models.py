@@ -32,6 +32,7 @@ class CustomUser(AbstractUser):
         ],
     )
     score = models.IntegerField(default=0)
+    friends = models.ManyToManyField("self", symmetrical=True, blank=True)
 
     @property
     def default_avatar(self):
