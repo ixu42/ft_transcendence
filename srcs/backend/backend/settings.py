@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "users",
     "tournaments",
     "games",
+    "friends",
     # Third-party apps
     "axes",
     "corsheaders",

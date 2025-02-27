@@ -30,6 +30,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", include("users.urls")),
     path("tournaments/", include("tournaments.urls")),
+    path("friends/", include("friends.urls")),
     path("get-csrf-token/", views.get_csrf_token),
     path("", views.homepage),
 ]
