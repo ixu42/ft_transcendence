@@ -38,13 +38,15 @@
 
 /* Profile Container */
 .profile-container {
+    overflow-y: auto; /* Enable vertical scrolling */
     display: flex;
     position: relative;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    height: 100vh;
+    height: auto;
+    min-height: 100vh;
     background-color: var(--primary-bg-color);
     color: var(--primary-text-color);
     padding: 20px;
@@ -202,6 +204,7 @@
 #profile-view-match-history-btn,
 #profile-logout-btn,
 .delete-account-btn,
+.deactivate-account-btn,
 #edit-profile-btn,
 #save-profile-btn,
 #save-password-btn,
@@ -227,6 +230,7 @@
 #profile-menu-btn:hover,
 #profile-logout-btn:hover,
 .delete-account-btn:hover,
+.deactivate-account-btn:hover,
 #edit-profile-btn:hover,
 #save-profile-btn:hover,
 #save-password-btn:hover,
@@ -254,18 +258,15 @@
     background-color: var(--link-hover-color);
 }
 
+.deactivate-account-btn,
 .delete-account-btn {
     background-color: #f44336;
     color: white;
 }
 
+.deactivate-account-btn:hover,
 .delete-account-btn:hover {
     background-color: #d32f2f;
-}
-
-/* Adjust icon margin for delete account */
-.delete-account-btn i {
-    margin-right: 8px;
 }
 
 #close-profile-modal:active {

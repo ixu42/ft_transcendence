@@ -283,6 +283,42 @@ const handleAccountDeletion = async () => {
     }
 };
 
+
+const handleAccountDeactivation = async () => {
+    const userId = localStorage.getItem("user_id");
+    if (!userId) {
+        console.error("⚠️ User ID not found.");
+        alert("Error: Unable to deactivate account.");
+        return;
+    }
+
+    const confirmation = confirm("Are you sure you want to deactivate your account?");
+    if (!confirmation) return;
+
+    try {
+        const response = await fetch(`api/users/${userId}/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "X-CSRFToken": await getCSRFCookie(), },
+            body: JSON.stringify({ deactivate: true })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(`✅ ${data.message}`);
+            localStorage.clear();
+            window.location.hash = "#login";
+        } else {
+            const errorData = await response.json();
+            alert(`❌ Error: ${errorData.errors || "Failed to deactivate account."}`);
+        }
+    } catch (error) {
+        console.error("⚠️ Network or server error:", error);
+        alert("An error occurred while deactivating your account.");
+    }
+};
+
+
 // Button callbacks for profile page
 const setupButtons = () => {
     [
@@ -295,7 +331,8 @@ const setupButtons = () => {
         { selector: "#edit-profile-btn", callback: () => {
             console.log("📌 Edit Profile button clicked");
             document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
-        }, message: "✅ Found edit profile button" }
+        }, message: "✅ Found edit profile button" },
+        { selector: "#deactivate-account-btn", callback: handleAccountDeactivation, message: "✅ Found deactivate account button" }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -306,6 +343,8 @@ const setupButtons = () => {
         }
     });
 };
+
+
 
 
 
