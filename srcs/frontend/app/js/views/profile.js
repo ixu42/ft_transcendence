@@ -316,7 +316,10 @@ const setupEditProfile = () => {
     const profileEditModal = document.getElementById("profile-edit-modal");
     const closeProfileModal = document.getElementById("close-profile-modal");
     const saveProfileBtn = document.getElementById("save-profile-btn");
+    const savePasswordBtn = document.getElementById("save-password-btn");
 
+
+    // Button to open edit profile modal --
     editProfileBtn.addEventListener("click", () => {
         const matchHistoryModal = document.getElementById("profile-match-history-modal");
         matchHistoryModal.classList.remove("profile-match-history-modal-visible");
@@ -340,6 +343,61 @@ const setupEditProfile = () => {
         }
     });
 
+    // Save password button --
+    savePasswordBtn.addEventListener("click", async () => {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            alert("User ID not found. Please log in again.");
+            return;
+        }
+    
+        const newPassword1 = document.getElementById("new-password1").value;
+        const newPassword2 = document.getElementById("new-password2").value;
+        const errorMessage = document.getElementById("password-error-message");
+    
+        if (!newPassword1 || !newPassword2) {
+            errorMessage.textContent = "⚠️ Both password fields are required.";
+            errorMessage.style.display = "block";
+            return;
+        }
+    
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`api/users/${userId}/password/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify({
+                    new_password1: newPassword1,
+                    new_password2: newPassword2,
+                }),
+                credentials: "include",
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                console.error("❌ Failed to update password:", data.errors);
+                const errorMsg = data.errors?.new_password2?.[0] || data.errors?.new_password1?.[0] || data.errors || "Unknown error";
+                errorMessage.textContent = `❌ ${errorMsg}`;
+                errorMessage.style.display = "block";
+                return;
+            }
+    
+            alert("✅ Password updated successfully!");
+            errorMessage.style.display = "none";
+            document.getElementById("new-password1").value = "";
+            document.getElementById("new-password2").value = "";
+        } catch (error) {
+            console.error("❌ Error updating password:", error);
+            alert("❌ Error updating password. Please try again.");
+        }
+    });
+    
+
+    // Save profile button --
     saveProfileBtn.addEventListener("click", async () => {
         const userId = localStorage.getItem("user_id");
         if (!userId) {
@@ -377,7 +435,6 @@ const setupEditProfile = () => {
             console.log("✅ Profile updated successfully:", data);
             alert("✅ Profile updated successfully!");
             fetchProfileData();
-            profileEditModal.classList.remove("profile-edit-modal-visible");
         } catch (error) {
             console.error("❌ Error updating profile:", error);
             alert("❌ Error updating profile.");

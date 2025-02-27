@@ -148,9 +148,6 @@
     padding: 8px;
     border-radius: 5px;
     border: 1px solid var(--secondary-text-color);
-}#save-profile-btn {
-    background-color: var(--accent-color);
-    color: white;
 }#close-profile-modal {
     background-color: var(--secondary-bg-color);
     color: var(--primary-text-color);
@@ -164,6 +161,25 @@
 }.profile-edit-modal.profile-edit-modal-visible {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* Input Group */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 4px;
+}.input-group label {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--secondary-text-color);
+    margin-left: 4px;
+}.input-group input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--secondary-text-color);
+    background-color: var(--input-bg-color);
+    font-size: 14px;
 }
 
 
@@ -184,6 +200,7 @@
 .delete-account-btn,
 #edit-profile-btn,
 #save-profile-btn,
+#save-password-btn,
 #close-profile-modal {
     width: 100%; /* Ensures the button takes up full width */
     max-width: 200px; /* Limit to 200px width */
@@ -208,6 +225,7 @@
 .delete-account-btn:hover,
 #edit-profile-btn:hover,
 #save-profile-btn:hover,
+#save-password-btn:hover,
 #close-profile-modal:hover {
     transform: scale(1.05); /* Slightly scale up on hover */
 }
@@ -216,6 +234,8 @@
 #edit-profile-btn,
 #profile-view-match-history-btn,        
 #profile-menu-btn,
+#save-profile-btn,
+#save-password-btn,
 #profile-logout-btn {
     background-color: var(--accent-color);
     color: var(--primary-text-color);
@@ -224,6 +244,8 @@
 #profile-view-match-history-btn:hover,
 #edit-profile-btn:hover,
 #profile-menu-btn:hover,
+#save-profile-btn:hover,
+#save-password-btn:hover,
 #profile-logout-btn:hover {
     background-color: var(--link-hover-color);
 }
@@ -242,7 +264,6 @@
     margin-right: 8px;
 }
 
-#save-profile-btn:active,
 #close-profile-modal:active {
     transform: translateY(0);
 }
