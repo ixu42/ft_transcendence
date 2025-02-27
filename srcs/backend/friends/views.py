@@ -102,3 +102,27 @@ def handle_friend_request(request, user_id, request_id):
     else:
         friend_request.reject()
         return JsonResponse({"message": "Friend request rejected."})
+
+
+# Remove a Friend
+@login_required_json
+@require_http_methods(["DELETE"])
+def remove_friend(request, user_id, friend_id):
+    user = request.user
+    friend = CustomUser.objects.filter(id=friend_id)
+
+    if not friend:
+        return JsonResponse(
+            {"errors": f"friend user(id={friend_id}) not found"}, status=404
+        )
+
+    friend = friend.first()  # queryset -> object
+
+    if not user.friends.filter(id=friend_id).exists():
+        return JsonResponse(
+            {"errors": f"Not friends with this user(id={friend_id})."}, status=400
+        )
+
+    user.friends.remove(friend)
+    friend.friends.remove(user)
+    return JsonResponse(status=204)  # Friend removed successfully
