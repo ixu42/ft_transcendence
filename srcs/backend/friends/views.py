@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from users.views import login_required_json
+import json
 from friends.models import FriendRequest
 from users.models import CustomUser
 
@@ -56,7 +57,10 @@ def list_friend_requests(request, user_id):
 
     if user.id != user_id:
         return JsonResponse(
-            {"errors": "You cannot view other users' friend requests."}, status=403
+            {
+                "errors": "You do not have permission to view another user's friend requests."
+            },
+            status=403,
         )
 
     requests = FriendRequest.objects.filter(receiver=user, status="pending")
@@ -66,3 +70,35 @@ def list_friend_requests(request, user_id):
     ]
 
     return JsonResponse({"friend_requests": request_list}, safe=False)
+
+
+@login_required_json
+@require_POST
+def handle_friend_request(request, user_id, request_id):
+    user = request.user
+
+    if user.id != user_id:
+        return JsonResponse(
+            {
+                "errors": "You do not have permission to handle another user's friend request."
+            },
+            status=403,
+        )
+
+    req = FriendRequest.objects.filter(id=request_id, status="pending")
+    if not req:
+        return JsonResponse({"errors": "friend request not found"}, status=404)
+
+    friend_request = req.first()
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"errors": "Invalid JSON input."}, status=400)
+
+    if data.get("accepted"):
+        friend_request.accept()
+        return JsonResponse({"message": "Friend request accepted."})
+    else:
+        friend_request.reject()
+        return JsonResponse({"message": "Friend request rejected."})

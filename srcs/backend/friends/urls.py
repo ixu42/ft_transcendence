@@ -12,4 +12,10 @@ urlpatterns = [
         views.list_friend_requests,
         name="list_friend_requests",
     ),
+    # Accept or reject a friend request
+    path(
+        "requests/<int:request_id>/",
+        views.handle_friend_request,
+        name="handle_friend_request",
+    ),
 ]
