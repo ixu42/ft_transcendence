@@ -418,8 +418,6 @@ For the authenticated user to view their participated tournaments related info, 
     - **200**
         ```json
         {
-            "id": 1,
-            "username": "user1",
             "participated_tournaments": [
                 {
                     "id": 1,
