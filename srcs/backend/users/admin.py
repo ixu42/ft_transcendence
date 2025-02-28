@@ -11,6 +11,7 @@ class CustomUserAdmin(UserAdmin):
         "id",
         "username",
         "avatar_preview",
+        "friends_usernames",
         "is_staff",
         "is_active",
         "date_joined",
@@ -20,6 +21,12 @@ class CustomUserAdmin(UserAdmin):
     def avatar_preview(self, obj):
         return mark_safe(f'<img src="{obj.get_avatar()}" width="30" height="30" />')
 
+    def friends_usernames(self, obj):
+        friends = obj.friends.all()
+        usernames = [friend.username for friend in friends]
+        return ", ".join(usernames) if usernames else "No friends"
+
+    friends_usernames.short_description = "Friends"
     avatar_preview.short_description = "Avatar"
 
 

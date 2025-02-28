@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = "users"
@@ -22,4 +22,6 @@ urlpatterns = [
     path("<int:user_id>/match-history/", views.match_history, name="match_history"),
     # Leaderboard route (all users info: basic user info + game stats)
     path("leaderboard/", views.leaderboard, name="leaderboard"),
+    # Friends
+    path("<int:user_id>/friends/", include("friends.urls")),
 ]
