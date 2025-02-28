@@ -39,6 +39,43 @@ async function updateNavbar() {
                     const friends = await fetchFriends(userId);
                     console.log("Fetched friends:", friends);
                     populateFriendsDropdown(friendsDropdownContent, friends);
+
+                    // Add event listener for the "Send Friend Request" button
+                    const sendFriendRequestBtn = document.getElementById("send-friend-request-btn");
+                    if (sendFriendRequestBtn) {
+                        sendFriendRequestBtn.addEventListener("click", async () => {
+                            const userIdInput = document.getElementById("friend-id-input");
+                            const friendId = userIdInput.value.trim();
+
+                            if (!friendId) {
+                                alert("Please enter a valid User ID.");
+                                return;
+                            }
+
+                            try {
+                                const response = await fetch(`/api/users/${friendId}/friends/`, {
+                                    method: "POST",
+                                    credentials: "include",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRFToken": await getCSRFCookie(),
+                                    },
+                                });
+
+                                if (!response.ok) {
+                                    const errorData = await response.json();
+                                    throw new Error(errorData.errors || "Failed to send friend request.");
+                                }
+
+                                const data = await response.json();
+                                alert(data.message || "Friend request sent successfully!");
+                                userIdInput.value = ""; // Clear the input field
+                            } catch (error) {
+                                console.error("Error sending friend request:", error);
+                                alert(error.message);
+                            }
+                        });
+                    }
                 }
             });
         } else {
@@ -76,13 +113,20 @@ async function fetchFriends(userId) {
 
 function populateFriendsDropdown(container, friends) {
     if (!container) return;
-    container.innerHTML = "";
 
+    let friendListContainer = container.querySelector('.friend-list-container');
+
+    if (!friendListContainer) {
+        friendListContainer = document.createElement('div');
+        friendListContainer.className = 'friend-list-container';
+        container.appendChild(friendListContainer);
+    }
+    friendListContainer.innerHTML = "";
     if (friends.length === 0) {
         const noFriendsMessage = document.createElement("div");
         noFriendsMessage.className = "friend-item";
         noFriendsMessage.textContent = "No friends found.";
-        container.appendChild(noFriendsMessage);
+        friendListContainer.appendChild(noFriendsMessage);
     } else {
         friends.forEach(friend => {
             const friendItem = document.createElement("div");
@@ -91,15 +135,7 @@ function populateFriendsDropdown(container, friends) {
                 <img src="${friend.avatar}" alt="${friend.username}" class="friend-avatar">
                 <span>${friend.username}</span>
             `;
-            container.appendChild(friendItem);
+            friendListContainer.appendChild(friendItem);
         });
     }
-    const addFriendButton = document.createElement("button");
-    addFriendButton.className = "add-friend-btn";
-    addFriendButton.textContent = "Add Friends";
-    addFriendButton.onclick = () => {
-        console.log("Add Friends button clicked");
-        window.location.hash = "#add-friends";
-    };
-    container.appendChild(addFriendButton);
 }

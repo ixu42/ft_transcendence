@@ -47,21 +47,29 @@
             <button class="tr-nav-btn" id="tr-home-btn">
                 <img src="static/icons/home30x30.svg" alt="Home" class="tr-navbar-icon"> Home
             </button>
+
             <!-- Friends Dropdown -->
             <div class="friends-dropdown" id="friends-dropdown" style="display: none;">
                 <button class="tr-nav-btn" id="tr-friends-btn">
                     <img src="static/icons/friends50x50.png" alt="Friends" class="tr-navbar-icon"> Friends
                 </button>
                 <div class="friends-dropdown-content" id="friends-dropdown-content">
+                    <!-- Add Friends Bar -->
+                    <div class="add-friend-bar">
+                        <input type="text" id="friend-id-input" placeholder="Enter User ID">
+                        <button id="send-friend-request-btn">
+                            <img src="static/icons/add-friend.png" alt="Add Friend" class="add-friend-icon">
+                        </button>                        
+                    </div>
                     <!-- Friend list will be dynamically populated here -->
                 </div>
             </div>
+
             <button class="tr-nav-btn" id="tr-auth-btn">
                 <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
             </button>
         </div>
     </div>
-
 
     <!-- Main Content -->
     <main id="app"></main>

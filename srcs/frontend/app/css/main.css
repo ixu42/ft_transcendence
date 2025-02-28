@@ -42,17 +42,13 @@ html, body {
   color: var(--text-color);
   padding: 10px 20px;
   display: flex;
-  justify-content: space-between; /* Ensures space between header and menu */
-  align-items: center; /* Vertically centers items */
+  justify-content: space-between;
+  align-items: center;
   box-sizing: border-box;
-}
-
-.tr-navbar-header {
+}.tr-navbar-header {
   display: flex;
   align-items: center;
-}
-
-.tr-navbar-brand {
+}.tr-navbar-brand {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--text-color);
@@ -87,6 +83,7 @@ html, body {
 }
 
 /* NAVBAR DROPDOWN  FRIENDS*/
+/* NAVBAR DROPDOWN FRIENDS*/
 .friends-dropdown {
   position: relative;
   display: inline-block;
@@ -96,15 +93,17 @@ html, body {
   display: none;
   position: absolute;
   top: 100%;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: var(--primary-color);
   border: 1px solid var(--accent-color);
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  min-width: 200px; /* Adjust width as needed */
-  max-height: 300px; /* Limit height and add scroll if needed */
-  overflow-y: auto; /* Add scroll for overflow */
+  min-width: 250px;
+  min-height: 350px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .friends-dropdown-content .friend-item {
@@ -113,7 +112,7 @@ html, body {
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 10px; /* Space between avatar and username */
+  gap: 10px;
   transition: background-color 0.3s ease;
 }
 
@@ -122,20 +121,18 @@ html, body {
 }
 
 .friend-avatar {
-  width: 24px; /* Adjust avatar size */
+  width: 24px;
   height: 24px;
-  border-radius: 50%; /* Make avatars circular */
-  object-fit: cover; /* Ensure the avatar fits within the dimensions */
+  border-radius: 50%;
+  object-fit: cover;
 }
 
-/* "No friends found" message */
 .friends-dropdown-content .friend-item.no-friends {
-  justify-content: center; /* Center the text */
-  font-style: italic; /* Italicize the text */
+  justify-content: center;
+  font-style: italic;
   color: var(--text-color);
 }
 
-/* "Add Friends" button */
 .add-friend-btn {
   width: 100%;
   padding: 10px;
@@ -152,7 +149,35 @@ html, body {
   background-color: var(--link-hover-color);
 }
 
-/* Show dropdown on hover */
 .friends-dropdown:hover .friends-dropdown-content {
   display: block;
+}
+
+.add-friend-bar {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  padding: 10px;
+}#friend-id-input {
+  flex-grow: 1;
+  height: 30px;
+  padding: 4px;
+  font-size: 0.85rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}#send-friend-request-btn {
+  height: 30px;
+  width: 30px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}.add-friend-icon {
+  width: 24px;
+  height: 24px;
+}#send-friend-request-btn:hover {
+  background-color: var(--link-hover-color);
 }
