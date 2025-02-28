@@ -3,7 +3,7 @@ import { showPopup as showRegisterPopup } from './views/popups.js';
 const routes = {
   "#": "/views/login.html",
   "#menu": "/views/menu.html",
-  "#credits": "/views/credits.html",
+  "#credits": "/views/about.html",
   "#leaderboard": "/views/leaderboard.html",
   "#lobby": "/views/lobby.html",
   "#terms": "/views/terms-privacy.html",
@@ -32,7 +32,7 @@ const routeHandlers = {
     setupProfilePage();
   },
   "#terms": () => {},
-  "#credits": () => {},
+  "#about": () => {},
   "#register": () => {},
   "#login": () => {},
   "#chat": () => {},
@@ -45,8 +45,8 @@ const handleLocation = async () => {
   const isLoggedIn = isUserLoggedIn();
   const hideNavbarAndFooter = ["#login", "#register", "", "#game", "#profile"].includes(path) || window.location.hash === "";
 
-  const navbar = document.getElementById("navbar-container");
-  const footer = document.getElementById("footer-container");
+  const navbar = document.getElementById("tr-navbar-container");
+  const footer = document.getElementById("tr-footer-container");
   const app = document.getElementById("app");
 
   if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
@@ -68,8 +68,11 @@ const handleLocation = async () => {
     }
 
     console.log(`✅ Loaded route content: ${path}`);
-
+    
+    // Update the navbar and show the splash screen
+    updateNavbar(); 
     checkAndShowSplash();
+
   } catch (error) {
     app.innerHTML = "<h1>Error loading page</h1>";
     console.error(`❌ Failed to load route ${path}:`, error);
