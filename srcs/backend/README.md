@@ -1,4 +1,4 @@
-# Backend API Endpoints
+# API Documentation
 
 A brief description of the API and example responses.
 
@@ -6,77 +6,23 @@ A brief description of the API and example responses.
 
 http://localhost:8000/
 
-## Endpoints Overview
+## Endpoints
 
-- **Admin panel**
-    - **URL**: `admin/`
-    - **Method**: `GET`
-    - **Description**: Access the Django Admin interface for managing the system and users.
+### Admin panel
 
-- [**User registration**](#User-registration)
-    - **URL**: `users/register/`
-    - **Method**: `POST`
-    - **Description**: Register a new user in the system.
+Access the Django Admin interface for managing the system and users.
 
-- [**User login**](#User-login)
-    - **URL**: `users/login/`
-    - **Method**: `POST`
-    - **Description**: Authenticate a user and logs them in. If a user fails to log in with incorrect credentials 5 times in a row, their account will be temporarily locked for 15 minutes to prevent brute-force attacks.
+<code>GET</code><code><b>admin/</b></code>
 
-- [**User logout**](#User-logout)
-    - **URL**: `users/logout/`
-    - **Method**: `POST`
-    - **Description**: For the currently authenticated user to log out.
-
-- [**User avatar upload**](#User-avatar-upload)
-    - **URL**: `users/avatar/`
-    - **Method**: `POST`
-    - **Description**: Allow users to upload a new avatar image.
-
-- [**User profile info**](#User-profile-info)
-    - **URL**: `users/<user_id>/`
-    - **Method**: `GET`
-    - **Description**: Get details of the authenticated user's profile.
-
-- [**User profile update**](#User-profile-update)
-    - **URL**: `users/<user_id>/`
-    - **Method**: `PATCH`
-    - **Description**: Update details of the authenticated user's profile, include username, email, first_name, last_name.
-
-- [**User password update**](#User-password-update)
-    - **URL**: `users/<user_id>/password/`
-    - **Method**: `POST`
-    - **Description**: Update the password of the authenticated user.
-
-- [**User account deactivation**](#User-account-deactivation)
-    - **URL**: `users/<user_id>/`
-    - **Method**: `PATCH`
-    - **Description**: For the authenticated user to deactivate their account. Recommended by Django instead of deleting user account, as the related data to the user won't be affected.
-
-- [**User account deletion**](#User-account-deletion)
-    - **URL**: `users/<user_id>/`
-    - **Method**: `DELETE`
-    - **Description**: For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
-
-- [**Participated tournaments**](#Participated-tournaments)
-    - **URL**: `users/<user_id>/tournaments/`
-    - **Method**: `GET`
-    - **Description**: For the authenticated user to view their participated tournaments related info, including id, name, status, started_at, players.
-
-- [**Match history**](#Match-history)
-    - **URL**: `users/<user_id>/match-history/`
-    - **Method**: `GET`
-    - **Description**: For the authenticated user to view their match history including date, winner, players and their scores.
-
-- [**Leaderboard**](#Leaderboard)
-    - **URL**: `users/leaderboard/`
-    - **Method**: `GET`
-    - **Description**: Get basic user info and game stats for all users.
-
-## Endpoints specifications
+---
 
 ### User registration
-#### POST users/register/
+
+Register a new user in the system.
+
+<details>
+    <summary><code>POST</code><code><b>users/register/</b></code></summary>
+
 - **Expected Request Body**:
     ```json
     {
@@ -101,8 +47,17 @@ http://localhost:8000/
         }
         ```
 
+</details>
+
+---
+
 ### User login
-#### POST users/login/
+
+Authenticate a user and logs them in. If a user fails to log in with incorrect credentials 5 times in a row, their account will be temporarily locked for 15 minutes to prevent brute-force attacks.
+
+<details>
+    <summary><code>POST</code><code><b>users/login/</b></code></summary>
+
 - **Expected Request Body**:
     ```json
     {
@@ -121,38 +76,47 @@ http://localhost:8000/
         ```
     - **400**
         - When the user is already logged in
-        ```json
-        {
-            "errors": "User is already authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is already authenticated."
+            }
+            ```
     - **401**
-        ```json
-        {
-            "errors": "Invalid password."
-        }
-        ```
-        ```json
-        {
-            "errors": "Username does not exist."
-        }
-        ```
+            ```json
+            {
+                "errors": "Invalid password."
+            }
+            ```
+            ```json
+            {
+                "errors": "Username does not exist."
+            }
+            ```
         - When username and/or password are/is missing
-        ```json
-        {
-            "errors": "Username and password are required."
-        }
-        ```
+            ```json
+            {
+                "errors": "Username and password are required."
+            }
+            ```
     - **403**
         - When the user fails to log in due to incorrect credentials 5 times in a row
-        ```json
-        {
-            "error": "Locked out due to too many login failures."
-        }
-        ```
+            ```json
+            {
+                "error": "Locked out due to too many login failures."
+            }
+            ```
+
+</details>
+
+---
 
 ### User logout
-#### POST users/logout/
+
+For the currently authenticated user to log out.
+
+<details>
+    <summary><code>POST</code><code><b>users/logout/</b></code></summary>
+
 - **Response**
     - **200**
         ```json
@@ -164,14 +128,23 @@ http://localhost:8000/
         ```
     - **401**
         - When the user is not logged in
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
 
 ### User avatar upload
-#### POST users/avatar/
+
+Allow users to upload a new avatar image.
+
+<details>
+    <summary><code>POST</code><code><b>users/avatar/</b></code></summary>
+
 - **Expected Request Body**:
     The request should be a `multipart/form-data` request with the following field:
     `avatar: The avatar image file (JPG, JPEG, PNG) to be uploaded.`
@@ -187,34 +160,43 @@ http://localhost:8000/
         ```
     - **400**
         - When the file extension is not allowed
-        ```json
-        {
-            "errors": {
-                "avatar": [
-                    "File extension “gif” is not allowed. Allowed extensions are: jpg, jpeg, png."
-                ]
+            ```json
+            {
+                "errors": {
+                    "avatar": [
+                        "File extension “gif” is not allowed. Allowed extensions are: jpg, jpeg, png."
+                    ]
+                }
             }
-        }
-        ```
+            ```
         - When the file size exceeds the limit
-        ```json
-        {
-            "errors": {
-                "avatar": [
-                    "File size exceeds the limit <MAX_FILE_SIZE> MB."
-                ]
+            ```json
+            {
+                "errors": {
+                    "avatar": [
+                        "File size exceeds the limit <MAX_FILE_SIZE> MB."
+                    ]
+                }
             }
-        }
-        ```
+            ```
         - When no file is uploaded
-        ```json
-        {
-            "errors": "No file uploaded."
-        }
-        ```
+            ```json
+            {
+                "errors": "No file uploaded."
+            }
+            ```
+
+</details>
+
+---
 
 ### User profile info
-#### GET users/<user_id>/
+
+Get details of the authenticated user's profile.
+
+<details>
+    <summary><code>GET</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+
 - **Response**
     - **200**
         ```json
@@ -223,26 +205,36 @@ http://localhost:8000/
             "username": "user1",
             "avatar": "/media/avatars/1/<filename>",
             "email": "<email>",
-            ...
+            "extra_fields": "..."
         }
         ```
     - **403**
         - When the user_id in url does not match the authenticated user's id
-        ```json
-        {
-            "errors": "You do not have permission to access this user's profile."
-        }
-        ```
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
+            }
+            ```
     - **401**
         - When the user is not authenticated
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
 
-### User profile Update
-#### PATCH user/<user_id>
+</details>
+
+---
+
+### User profile update
+
+Update details of the authenticated user's profile, include username, email, first_name, last_name.
+
+
+<details>
+    <summary><code>PATCH</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+
 - **Expected Request Body**:
     ```json
     {
@@ -262,21 +254,30 @@ http://localhost:8000/
         ```
     - **403**
         - When the user_id in url does not match the authenticated user's id
-        ```json
-        {
-            "errors": "You do not have permission to access this user's profile."
-        }
-        ```
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
+            }
+            ```
     - **401**
         - When the user is not authenticated
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
 
 ### User password update
-#### POST users/<user_id>/password/
+
+Update the password of the authenticated user.
+
+<details>
+    <summary><code>POST</code><code><b>users/&lt;user_id&gt;/password/</b></code></summary>
+
 - **Expected Request Body**:
     ```json
     {
@@ -313,21 +314,30 @@ http://localhost:8000/
         ```
     - **403**
         - When the user_id in url does not match the authenticated user's id
-        ```json
-        {
-            "errors": "You do not have permission to update password of this user."
-        }
-        ```
+            ```json
+            {
+                "errors": "You do not have permission to update password of this user."
+            }
+            ```
     - **401**
         - When the user is not authenticated
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
 
 ### User account deactivation
-#### PATCH users/<user_id>/
+
+For the authenticated user to deactivate their account. Recommended by Django instead of deleting user account, as the related data to the user won't be affected.
+
+<details>
+    <summary><code>PATCH</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+
 - **Expected Request Body**:
     ```json
     {
@@ -345,21 +355,30 @@ http://localhost:8000/
         ```
     - **403**
         - When the user_id in url does not match the authenticated user's id
-        ```json
-        {
-            "errors": "You do not have permission to access this user's profile."
-        }
-        ```
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
+            }
+            ```
     - **401**
         - When the user is not authenticated
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
 
 ### User account deletion
-#### DELETE users/<user_id>/
+
+For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
+
+<details>
+    <summary><code>DELETE</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+
 - **Response**
     - **200**
         ```json
@@ -371,27 +390,34 @@ http://localhost:8000/
         ```
     - **403**
         - When the user_id in url does not match the authenticated user's id
-        ```json
-        {
-            "errors": "You do not have permission to access this user's profile."
-        }
-        ```
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
+            }
+            ```
     - **401**
         - When the user is not authenticated
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
 
 ### Participated tournaments
-#### GET users/<user_id>/tournaments/
+
+For the authenticated user to view their participated tournaments related info, including id, name, status, started_at, players.
+
+<details>
+    <summary><code>GET</code><code><b>users/&lt;user_id&gt;/tournaments/</b></code></summary>
+
 - **Response** 
     - **200**
         ```json
         {
-            "id": 1,
-            "username": "user1",
             "participated_tournaments": [
                 {
                     "id": 1,
@@ -404,25 +430,35 @@ http://localhost:8000/
                         "user3"
                     ]
                 }
+                "... more items ..."
             ]
         }
     - **403**
         - When the user_id in url does not match the authenticated user's id
-        ```json
-        {
-            "errors": "You do not have permission to view participated tournaments of this user."
-        }
-        ```
+            ```json
+            {
+                "errors": "You do not have permission to view participated tournaments of this user."
+            }
+            ```
     - **401**
         - When the user is not authenticated
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
 
 ### Match history
-#### GET users/<user_id>/match-history/
+
+For the authenticated user to view their match history including date, winner, players and their scores.
+
+<details>
+    <summary><code>GET</code><code><b>users/&lt;user_id&gt;/match-history/</b></code></summary>
+
 - **Response**
     - **200**
         ```json
@@ -430,7 +466,7 @@ http://localhost:8000/
             "match_history": [
                 {
                     "game_id": 2,
-                    "date_played": "2025-02-19T13:36:15.206Z",
+                    "date_played": "YYYY-MM-DDTHH:MM:SS.sssZ",
                     "player1:": "user1",
                     "player2": "user2",
                     "winner": "user2",
@@ -439,34 +475,44 @@ http://localhost:8000/
                 },
                 {
                     "game_id": 1,
-                    "date_played": "2025-02-19T13:33:44.228Z",
+                    "date_played": "YYYY-MM-DDTHH:MM:SS.sssZ",
                     "player1:": "user1",
                     "player2": "user2",
                     "winner": "user1",
                     "player1_score": 10,
                     "player2_score": 8
                 }
+                "... more items ..."
             ]
         }
         ```
     - **403**
         - When the user_id in url does not match the authenticated user's id
-        ```json
-        {
-            "errors": "You do not have permission to view match history of this user."
-        }
-        ```
+            ```json
+            {
+                "errors": "You do not have permission to view match history of this user."
+            }
+            ```
     - **401**
         - When the user is not authenticated
-        ```json
-        {
-            "errors": "User is not authenticated."
-        }
-        ```
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
 
 ### Leaderboard
-#### GET users/leaderboard/
-- **Response**
+
+Get basic user info and game stats for all users.
+
+<details>
+    <summary><code>GET</code><code><b>users/leaderboard/</b></code></summary>
+
+- Response
     - **200**
         ```json
         [
@@ -476,16 +522,227 @@ http://localhost:8000/
                 "avatar": "/media/avatars/1/<filename>",
                 "score": 100,
                 "rank": 1,
-                ...
-            }
+                "extra_fields": "..."
+            },
             {
                 "id": 2,
                 "username": "user2",
                 "avatar": "/media/avatars/2/<filename>",
                 "score": 80,
                 "rank": 2,
-                ...
+                "extra_fields": "..."
             }
-            ...
+            "... more items ..."
         ]
         ```
+
+</details>
+
+---
+
+### Listing friends
+
+List all the friends of currently authenticated user.
+
+<details>
+    <summary>
+        <code>GET</code>
+        <code><b>users/&lt;user_id&gt;/friends/</b></code>
+    </summary>
+
+- Response
+    - **200**
+        ```json
+        {
+            "friends": [
+                {
+                    "id": 2,
+                    "username": "user2",
+                    "avatar": "/media/avatars/2/<filename>"
+                }
+                "... more items ..."
+            ]
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to view friends of this user."
+            }
+            ```
+    - **401**
+        - When the user is not authenticated
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
+
+### Friend request
+
+Send a friend request to another user. Note that the user_id in url is the id of the recipient of this friend request.
+
+<details>
+    <summary>
+        <code>POST</code>
+        <code><b>users/&lt;user_id&gt;/friends/</b></code>
+    </summary>
+
+- Response
+    - **201**
+        ```json
+        {
+            "message": "Friend request sent."
+        }
+        ```
+    - **400**
+        - When the user_id in url matches the authenticated user's id
+            ```json
+            {
+                "errors": "You cannot send a friend request to yourself."
+            }
+            ```
+    - **401**
+        - When the user is not authenticated
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+    - **404**
+        - When the recipient's id does not exist in database
+            ```json
+            {
+                "errors": "Recipient of the friend request not found."
+            }
+            ```
+
+</details>
+
+---
+
+### Listing friend requests
+
+List all the pending friend requests received by the authenticated user.
+
+<details>
+    <summary>
+        <code>GET</code>
+        <code><b>users/&lt;user_id&gt;/friends/requests/</b></code>
+    </summary>
+
+- Response
+    - **200**
+        ```json
+        {
+            "friend_requests": [
+                {
+                    "id": 1,
+                    "sender": "user1",
+                    "sent at": "YYYY-MM-DDTHH:MM:SS.sssZ"
+                }
+                "... more items ..."
+            ]
+        }
+        ```
+    - **403**
+        ```json
+        {
+            "errors": "You do not have permission to view another user's friend requests."
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+</details>
+
+---
+
+### Friend request handling
+
+Accept or reject a friend request.
+
+<details>
+    <summary>
+        <code>POST</code>
+        <code><b>users/&lt;user_id&gt;/friends/requests/&lt;request_id&gt;/</b></code>
+    </summary>
+
+- **Expected Request Body**:
+    ```json
+    {
+        "accepted": true
+    }
+    ```
+    - `accepted` (**boolean**): Can be **true** or **false** depending on whether the user accepts or rejects.
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Friend request accepted/rejected."
+        }
+        ```
+    - **404**
+        ```json
+        {
+            "errors": "friend request not found"
+        }
+        ```
+    - **403**
+        ```json
+        {
+            "errors": "You do not have permission to handle another user's friend request."
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+</details>
+
+---
+
+### Friend removal
+
+Unfriend someone.
+
+<details>
+    <summary>
+        <code>DELETE</code>
+        <code><b>users/&lt;user_id&gt;/friends/requests/&lt;request_id&gt;/</b></code>
+    </summary>
+
+- Response
+    - **204**
+    - **400**
+        ```json
+        {
+            "errors": "Not friends with this user(id=5)."
+        }
+        ```
+    - **403**
+        ```json
+        {
+            "errors": "You do not have permission to remove any friend of this user."
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+</details>

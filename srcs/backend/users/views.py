@@ -295,8 +295,6 @@ def participated_tournaments(request, user_id):
 
     return JsonResponse(
         {
-            "id": user_id,
-            "username": user.username,
             "participated_tournaments": tournament_data,
         },
         status=200,
