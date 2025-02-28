@@ -3,7 +3,7 @@ import { showPopup as showRegisterPopup } from './views/popups.js';
 const routes = {
   "#": "/views/login.html",
   "#menu": "/views/menu.html",
-  "#credits": "/views/about.html",
+  "#about": "/views/about.html",
   "#leaderboard": "/views/leaderboard.html",
   "#lobby": "/views/lobby.html",
   "#terms": "/views/terms-privacy.html",
