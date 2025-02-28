@@ -6,13 +6,13 @@ const logout = async () => {
     if (!csrfToken) {
         return console.error("❌ CSRF Token is missing.");
     }
-    const response = await fetch("http://localhost:8000/users/logout/", {
+    const response = await fetch("api/users/logout/", {
         method: "POST",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
         },
-        credentials: "include",
     });
 
     if (response.ok) {
@@ -52,9 +52,13 @@ const fetchProfileData = async () => {
     }
 
     try {
-        const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+        const response = await fetch(`/api/users/${userId}/`, {
             method: "GET",
             credentials: "include",
+            headers: {
+                "X-CSRFToken": await getCSRFCookie(),
+                "Content-Type": "application/json",
+            },
         });
 
         const data = await response.json();
@@ -82,7 +86,7 @@ const fetchProfileData = async () => {
 // Update profile UI elements
 const updateProfileUI = (data) => {
     const avatarUrl = data.avatar.startsWith("/") 
-        ? `http://localhost:8000${data.avatar}` 
+        ? `api/${data.avatar}` 
         : data.avatar || '/static/avatars/default.png';
 
     const elementsToUpdate = [
@@ -150,7 +154,7 @@ const setupMatchHistoryModal = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`http://localhost:8000/users/${userId}/match-history/`, {
+            const response = await fetch(`api/users/${userId}/match-history/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -183,7 +187,7 @@ const setupMatchHistoryModal = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`http://localhost:8000/users/${userId}/tournaments/`, {
+            const response = await fetch(`api/users/${userId}/tournaments/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -257,7 +261,7 @@ const handleAccountDeletion = async () => {
     if (isConfirmed) {
         try {
             const csrfToken = await getCSRFCookie(); // If using CSRF protection
-            const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+            const response = await fetch(`api/users/${userId}/`, {
                 method: "DELETE",
                 headers: { "X-CSRFToken": csrfToken },
                 credentials: "include",
@@ -279,6 +283,42 @@ const handleAccountDeletion = async () => {
     }
 };
 
+
+const handleAccountDeactivation = async () => {
+    const userId = localStorage.getItem("user_id");
+    if (!userId) {
+        console.error("⚠️ User ID not found.");
+        alert("Error: Unable to deactivate account.");
+        return;
+    }
+
+    const confirmation = confirm("Are you sure you want to deactivate your account?");
+    if (!confirmation) return;
+
+    try {
+        const response = await fetch(`api/users/${userId}/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "X-CSRFToken": await getCSRFCookie(), },
+            body: JSON.stringify({ deactivate: true })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(`✅ ${data.message}`);
+            localStorage.clear();
+            window.location.hash = "#login";
+        } else {
+            const errorData = await response.json();
+            alert(`❌ Error: ${errorData.errors || "Failed to deactivate account."}`);
+        }
+    } catch (error) {
+        console.error("⚠️ Network or server error:", error);
+        alert("An error occurred while deactivating your account.");
+    }
+};
+
+
 // Button callbacks for profile page
 const setupButtons = () => {
     [
@@ -291,7 +331,8 @@ const setupButtons = () => {
         { selector: "#edit-profile-btn", callback: () => {
             console.log("📌 Edit Profile button clicked");
             document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
-        }, message: "✅ Found edit profile button" }
+        }, message: "✅ Found edit profile button" },
+        { selector: "#deactivate-account-btn", callback: handleAccountDeactivation, message: "✅ Found deactivate account button" }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -306,13 +347,18 @@ const setupButtons = () => {
 
 
 
+
+
 // Setup for edit profile modal
 const setupEditProfile = () => {
     const editProfileBtn = document.getElementById("edit-profile-btn");
     const profileEditModal = document.getElementById("profile-edit-modal");
     const closeProfileModal = document.getElementById("close-profile-modal");
     const saveProfileBtn = document.getElementById("save-profile-btn");
+    const savePasswordBtn = document.getElementById("save-password-btn");
 
+
+    // Button to open edit profile modal --
     editProfileBtn.addEventListener("click", () => {
         const matchHistoryModal = document.getElementById("profile-match-history-modal");
         matchHistoryModal.classList.remove("profile-match-history-modal-visible");
@@ -336,6 +382,61 @@ const setupEditProfile = () => {
         }
     });
 
+    // Save password button --
+    savePasswordBtn.addEventListener("click", async () => {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            alert("User ID not found. Please log in again.");
+            return;
+        }
+    
+        const newPassword1 = document.getElementById("new-password1").value;
+        const newPassword2 = document.getElementById("new-password2").value;
+        const errorMessage = document.getElementById("password-error-message");
+    
+        if (!newPassword1 || !newPassword2) {
+            errorMessage.textContent = "⚠️ Both password fields are required.";
+            errorMessage.style.display = "block";
+            return;
+        }
+    
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`api/users/${userId}/password/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify({
+                    new_password1: newPassword1,
+                    new_password2: newPassword2,
+                }),
+                credentials: "include",
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                console.error("❌ Failed to update password:", data.errors);
+                const errorMsg = data.errors?.new_password2?.[0] || data.errors?.new_password1?.[0] || data.errors || "Unknown error";
+                errorMessage.textContent = `❌ ${errorMsg}`;
+                errorMessage.style.display = "block";
+                return;
+            }
+    
+            alert("✅ Password updated successfully!");
+            errorMessage.style.display = "none";
+            document.getElementById("new-password1").value = "";
+            document.getElementById("new-password2").value = "";
+        } catch (error) {
+            console.error("❌ Error updating password:", error);
+            alert("❌ Error updating password. Please try again.");
+        }
+    });
+    
+
+    // Save profile button --
     saveProfileBtn.addEventListener("click", async () => {
         const userId = localStorage.getItem("user_id");
         if (!userId) {
@@ -352,7 +453,7 @@ const setupEditProfile = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`http://localhost:8000/users/${userId}/`, {
+            const response = await fetch(`api/users/${userId}/`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -373,7 +474,6 @@ const setupEditProfile = () => {
             console.log("✅ Profile updated successfully:", data);
             alert("✅ Profile updated successfully!");
             fetchProfileData();
-            profileEditModal.classList.remove("profile-edit-modal-visible");
         } catch (error) {
             console.error("❌ Error updating profile:", error);
             alert("❌ Error updating profile.");
@@ -390,7 +490,7 @@ const setupAvatarUpload = () => {
     
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch("http://localhost:8000/users/avatar/", {
+            const response = await fetch("api/users/avatar/", {
                 method: "POST",
                 headers: { "X-CSRFToken": csrfToken },
                 body: formData,
@@ -405,7 +505,7 @@ const setupAvatarUpload = () => {
             }
     
             console.log("✅ Avatar updated:", data.message);
-            const newAvatarUrl = `http://localhost:8000${data.avatar_url}`;
+            const newAvatarUrl = `api/${data.avatar_url}`;
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);

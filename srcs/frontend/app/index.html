@@ -1,75 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Single Page App</title>
-    
-        <!-- Favicons -->
-        <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
-        <link rel="icon" type="image/x-icon" href="static/favicon.ico">
-        <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
-        <link rel="manifest" href="static/site.webmanifest">
-    
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
-        
-        <!-- General Application CSS -->
-        <link rel="stylesheet" href="css/main.css">
-        <link rel="stylesheet" href="css/navbar_footer.css">
-    
-        <!-- Page-Specific CSS -->
-        <link rel="stylesheet" href="css/views/menu.css">
-        <link rel="stylesheet" href="css/views/credits.css">
-        <link rel="stylesheet" href="css/views/leaderboard.css">
-        <link rel="stylesheet" href="css/views/lobby.css">
-        <link rel="stylesheet" href="css/views/terms-privacy.css">
-        <link rel="stylesheet" href="css/views/profile.css">
-        <link rel="stylesheet" href="css/views/register.css">
-        <link rel="stylesheet" href="css/views/login.css">
-    
-        <!-- Game-Specific CSS -->
-        <link rel="stylesheet" href="css/game/game.css">
-    </head>
-    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Page App</title>
 
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+    <link rel="manifest" href="static/site.webmanifest">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css">
+
+    <!-- General Application CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/navbar_footer.css">
+
+    <!-- Page-Specific CSS -->
+    <link rel="stylesheet" href="css/views/menu.css">
+    <link rel="stylesheet" href="css/views/about.css">
+    <link rel="stylesheet" href="css/views/leaderboard.css">
+    <link rel="stylesheet" href="css/views/lobby.css">
+    <link rel="stylesheet" href="css/views/terms-privacy.css">
+    <link rel="stylesheet" href="css/views/profile.css">
+    <link rel="stylesheet" href="css/views/register.css">
+    <link rel="stylesheet" href="css/views/login.css">
+    <link rel="stylesheet" href="css/views/chat.css">
+    <link rel="stylesheet" href="css/views/404.css">
+
+    <!-- Game-Specific CSS -->
+    <link rel="stylesheet" href="css/game/game.css">
+</head>
 <body>
-    <div id="navbar-container" class="navbar bg-light">
-        <a class="navbar-brand" href="#menu">Poggers</a>
-        <div class="auth-container">
-            <button id="auth-btn">Login / Register</button>
+
+
+<!-- MAIN CONTENT -->
+
+<!-- Navbar  Static -->
+    <div id="tr-navbar-container">
+        <div class="tr-navbar-header">
+            <a class="tr-navbar-brand" href="#menu">Poggers</a>
+        </div>
+        <div class="tr-navbar-menu">
+            <button class="tr-nav-btn" id="tr-home-btn">Home</button>
+            <button class="tr-nav-btn" id="tr-auth-btn">Login / Register</button> <!-- Dynamic -->
         </div>
     </div>
+
+    <!-- Main Content -->
     <main id="app"></main>
-    <footer id="footer-container" class="bg-dark text-white p-3 text-center">
-        <p>&copy; 2025 My Website</p>
-    </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="js/bootstrap/bootstrap.bundle.min.js" defer></script>
+    <!-- Footer Static -->
+    <div id="tr-footer-container" class="footer bg-dark text-white mt-5 py-3">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-auto">
+                    <ul class="footer-links list-inline text-center mb-2">
+                        <li class="list-inline-item"><a href="#about" class="text-white">About Us</a></li>
+                        <li class="list-inline-item"><a href="#terms" class="text-white">Privacy Policy & Terms of Service</a></li>
+                        <li class="list-inline-item"><a href="#contact" class="text-white">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white my-2">
+            <div class="text-center">
+                &copy; <span id="current-year"></span> Poggers. All Rights Reserved.
+            </div>
+        </div>
+    </div>
 
-    <!-- General Application Scripts -->
-    <script src="js/navbar_footer.js" defer></script>
-    
-    <!-- Page-Specific Scripts -->
-    <script src="js/views/menu.js" defer></script>
-    <script src="js/views/register.js" defer></script>
-    <script src="js/views/login.js" defer></script>
-    <script src="js/views/lobby.js" defer></script>
-    <script src="js/views/game.js" defer></script>
-    <script src="js/views/profile.js" defer></script>
-    <script src="js/views/popups.js" defer></script>
+<!-- END MAIN CONTENT -->
 
-    <!-- Game-Specific Scripts -->
-    <script src="js/game/ball.js" defer></script>
-    <script src="js/game/controls.js" defer></script>
-    <script src="js/game/paddle.js" defer></script>
-    <script src="js/game/1v1.js" defer></script>
-    <script src="js/game/tournament.js" defer></script>
-    <script src="js/game/main.js" defer></script>
 
-    <!-- Router -->
-    <script type="module" src="js/router.js" defer></script>
+<!-- Bootstrap JS -->
+<script src="js/bootstrap/bootstrap.bundle.min.js" defer></script>
+
+<!-- General Application Scripts -->
+<script src="js/navbar.js" defer></script>
+
+<!-- Page-Specific Scripts -->
+<script src="js/views/menu.js" defer></script>
+<script src="js/views/register.js" defer></script>
+<script src="js/views/login.js" defer></script>
+<script src="js/views/lobby.js" defer></script>
+<script src="js/views/game.js" defer></script>
+<script src="js/views/profile.js" defer></script>
+<script src="js/views/popups.js" defer></script>
+<script src="js/views/leaderboard.js" defer></script>
+
+<!-- Game-Specific Scripts -->
+<script src="js/game/ball.js" defer></script>
+<script src="js/game/controls.js" defer></script>
+<script src="js/game/paddle.js" defer></script>
+<script src="js/game/1v1.js" defer></script>
+<script src="js/game/tournament.js" defer></script>
+<script src="js/game/main.js" defer></script>
+
+<!-- Router -->
+<script type="module" src="js/router.js" defer></script>
+
 </body>
 </html>

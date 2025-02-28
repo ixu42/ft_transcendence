@@ -14,10 +14,13 @@
 
     <!-- Match History Button (Opens Modal) -->
     <div class="button-container">
-        <button id="profile-view-match-history-btn">View Match History</button>
-        <button id="edit-profile-btn" class="edit-profile-btn">Edit Profile</button>
         <button id="profile-menu-btn">Menu</button>
+        <button id="edit-profile-btn" class="edit-profile-btn">Edit Profile</button>
+        <button id="profile-view-match-history-btn">View Match History</button>
         <button id="profile-logout-btn">Logout</button>
+        <button id="deactivate-account-btn" class="deactivate-account-btn">
+            <i class="fas fa-user-slash"></i> Deactivate Account
+        </button>
         <button id="delete-account-btn" class="delete-account-btn">
             <i class="fas fa-trash-alt"></i> Delete Account
         </button>
@@ -47,6 +50,7 @@
 <div id="profile-edit-modal" class="profile-edit-modal profile-edit-modal-hidden">
     <div class="profile-edit-modal-content">
         <h2>Edit Profile</h2>
+        
         <label for="edit-username">Username:</label>
         <input type="text" id="edit-username">
 
@@ -59,7 +63,21 @@
         <label for="edit-last-name">Last Name:</label>
         <input type="text" id="edit-last-name">
 
-        <button id="save-profile-btn">Save Changes</button>
+        <button id="save-profile-btn">Save Profile Changes</button>
+
+        <hr> <!-- Divider -->
+
+        <h3>Change Password</h3>
+        <input type="password" id="new-password1" placeholder="New Password">
+        <input type="password" id="new-password2" placeholder="Confirm New Password">
+
+        <button id="save-password-btn">Save Password</button>
+
+        <p id="password-error-message" style="color: red; display: none;"></p>
+
+
+        <p id="password-error-message" style="color: red; display: none;"></p>
+
         <button id="close-profile-modal">Cancel</button>
     </div>
 </div>

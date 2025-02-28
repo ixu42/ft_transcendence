@@ -58,7 +58,7 @@ function waitForLoginForm() {
 
 async function getCSRFCookie() {
     try {
-        const response = await fetch("http://localhost:8000/get-csrf-token/", {
+        const response = await fetch("/api/get-csrf-token/", {
             method: "GET",
             credentials: "include",
         });
@@ -101,7 +101,7 @@ function bindLoginButton(loginButton) {
         }
 
         try {
-            const response = await fetch("http://localhost:8000/users/login/", {
+            const response = await fetch("/api/users/login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

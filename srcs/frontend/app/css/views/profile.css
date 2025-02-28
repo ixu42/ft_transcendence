@@ -29,21 +29,29 @@
 }.avatar-container:hover .profile-avatar {
     opacity: 0.8;
 }#avatar-upload {
-    display: none;
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+    width: 0;
+    height: 0;
 }
 
 /* Profile Container */
 .profile-container {
+    overflow-y: auto; /* Enable vertical scrolling */
     display: flex;
+    position: relative;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    height: 100vh;
+    height: auto;
+    min-height: 100vh;
     background-color: var(--primary-bg-color);
     color: var(--primary-text-color);
     padding: 20px;
     box-sizing: border-box;
+    z-index: 1001;
 }
 
 /* Text Styling */
@@ -71,13 +79,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1002;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
+    display: none;
 }.profile-match-history-modal-visible {
     opacity: 1;
     pointer-events: auto;
+    display: flex;
 }.profile-match-history-modal .modal-content {
     background: var(--primary-bg-color);
     padding: 20px;
@@ -121,10 +131,10 @@
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(8px);
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1003;
     transition: opacity 0.3s ease;
 }.profile-edit-modal-content {
     background: var(--primary-bg-color);
@@ -144,20 +154,38 @@
     padding: 8px;
     border-radius: 5px;
     border: 1px solid var(--secondary-text-color);
-}#save-profile-btn {
-    background-color: var(--accent-color);
-    color: white;
 }#close-profile-modal {
     background-color: var(--secondary-bg-color);
     color: var(--primary-text-color);
 }.profile-edit-modal-visible {
     opacity: 1;
+    display: flex;
+    pointer-events: auto;
 }.profile-edit-modal {
     opacity: 0;
     pointer-events: none;
 }.profile-edit-modal.profile-edit-modal-visible {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* Input Group */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 4px;
+}.input-group label {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--secondary-text-color);
+    margin-left: 4px;
+}.input-group input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--secondary-text-color);
+    background-color: var(--input-bg-color);
+    font-size: 14px;
 }
 
 
@@ -176,8 +204,10 @@
 #profile-view-match-history-btn,
 #profile-logout-btn,
 .delete-account-btn,
+.deactivate-account-btn,
 #edit-profile-btn,
 #save-profile-btn,
+#save-password-btn,
 #close-profile-modal {
     width: 100%; /* Ensures the button takes up full width */
     max-width: 200px; /* Limit to 200px width */
@@ -200,8 +230,10 @@
 #profile-menu-btn:hover,
 #profile-logout-btn:hover,
 .delete-account-btn:hover,
+.deactivate-account-btn:hover,
 #edit-profile-btn:hover,
 #save-profile-btn:hover,
+#save-password-btn:hover,
 #close-profile-modal:hover {
     transform: scale(1.05); /* Slightly scale up on hover */
 }
@@ -210,6 +242,8 @@
 #edit-profile-btn,
 #profile-view-match-history-btn,        
 #profile-menu-btn,
+#save-profile-btn,
+#save-password-btn,
 #profile-logout-btn {
     background-color: var(--accent-color);
     color: var(--primary-text-color);
@@ -218,25 +252,23 @@
 #profile-view-match-history-btn:hover,
 #edit-profile-btn:hover,
 #profile-menu-btn:hover,
+#save-profile-btn:hover,
+#save-password-btn:hover,
 #profile-logout-btn:hover {
     background-color: var(--link-hover-color);
 }
 
+.deactivate-account-btn,
 .delete-account-btn {
     background-color: #f44336;
     color: white;
 }
 
+.deactivate-account-btn:hover,
 .delete-account-btn:hover {
     background-color: #d32f2f;
 }
 
-/* Adjust icon margin for delete account */
-.delete-account-btn i {
-    margin-right: 8px;
-}
-
-#save-profile-btn:active,
 #close-profile-modal:active {
     transform: translateY(0);
 }
