@@ -22,6 +22,7 @@
     gap: 20px;
 }
 
+/* MENU BUTTONS */
 .menu-btn {
     padding: 15px 30px;
     font-size: 1.2rem;
@@ -33,10 +34,21 @@
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically center the icon and text */
+    justify-content: space-between; /* Space out text and icon */
+    width: 200px; /* Set a fixed width for all buttons */
 }
 
 .menu-btn:hover {
     transform: scale(1.1);
     background: linear-gradient(45deg, #239b56, #1d8348);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* MENU ICONS */
+.menu-icon {
+    width: 24px; /* Adjust the size as needed */
+    height: 24px; /* Adjust the size as needed */
+    margin-left: 10px; /* Adds space between the text and icon */
 }
