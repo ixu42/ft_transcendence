@@ -66,3 +66,20 @@ input {
     pointer-events: auto !important;
     opacity: 1 !important;
 }
+
+
+.login-btn-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
+    vertical-align: middle;
+}.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 250px;
+    padding: 15px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    margin: 10px auto;
+}

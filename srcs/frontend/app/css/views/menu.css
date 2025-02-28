@@ -1,3 +1,6 @@
+
+
+
 #menu-container {
     display: flex;
     flex-direction: column;
@@ -7,16 +10,12 @@
     background-color: var(--primary-bg-color);
     color: var(--primary-text-color);
     text-align: center;
-}
-
-.menu-title {
+}.menu-title {
     font-size: 3rem;
     font-weight: bold;
     margin-bottom: 2rem;
     color: var(--primary-text-color);
-}
-
-#menu-options {
+}#menu-options {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -34,21 +33,16 @@
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Vertically center the icon and text */
-    justify-content: space-between; /* Space out text and icon */
-    width: 200px; /* Set a fixed width for all buttons */
-}
-
-.menu-btn:hover {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 200px;
+}.menu-btn:hover {
     transform: scale(1.1);
     background: linear-gradient(45deg, #239b56, #1d8348);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-}
-
-/* MENU ICONS */
-.menu-icon {
-    width: 24px; /* Adjust the size as needed */
-    height: 24px; /* Adjust the size as needed */
-    margin-left: 10px; /* Adds space between the text and icon */
+}.menu-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
 }

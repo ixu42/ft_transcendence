@@ -1,8 +1,13 @@
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM loaded. Checking splash screen...");
+function setupLoginPage() {
+    console.log("📌 Login page handler triggered");
     checkAndShowSplash();
-    waitForLoginForm();
-});
+    const loginButton = document.getElementById("login-btn");
+    if (loginButton) {
+        bindLoginButton(loginButton);
+    } else {
+        console.error("Login button not found!");
+    }
+}
 
 function checkAndShowSplash() {
     const splashScreen = document.querySelector(".splash-screen");

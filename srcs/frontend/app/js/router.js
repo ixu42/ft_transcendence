@@ -34,8 +34,12 @@ const routeHandlers = {
   "#terms": () => {},
   "#about": () => {},
   "#register": () => {},
-  "#login": () => {},
+  "#login": () => {
+    console.log("📌 Login page handler triggered");
+    setupLoginPage();
+  },
   "#chat": () => {},
+
 };
 
 const handleLocation = async () => {
@@ -68,10 +72,8 @@ const handleLocation = async () => {
     }
 
     console.log(`✅ Loaded route content: ${path}`);
-    
-    // Update the navbar and show the splash screen
+    console.log(` Updating navbar...`);
     updateNavbar(); 
-    checkAndShowSplash();
 
   } catch (error) {
     app.innerHTML = "<h1>Error loading page</h1>";
