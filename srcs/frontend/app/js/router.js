@@ -49,8 +49,8 @@ const handleLocation = async () => {
   const footer = document.getElementById("tr-footer-container");
   const app = document.getElementById("app");
 
-  if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
-  if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
+  if (navbar) navbar.classList.toggle("hidden", hideNavbarAndFooter);
+  if (footer) footer.classList.toggle("hidden", hideNavbarAndFooter);
 
   if (protectedRoutes.includes(path) && !isLoggedIn) {
     console.warn(`🚨 Access denied: ${path} requires authentication.`);

@@ -42,24 +42,40 @@ html, body {
   color: var(--text-color);
   padding: 10px 20px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Ensures space between header and menu */
+  align-items: center; /* Vertically centers items */
   box-sizing: border-box;
-}.tr-navbar-header {
+}
+
+.tr-navbar-header {
   display: flex;
   align-items: center;
-}.tr-navbar-brand {
+}
+
+.tr-navbar-brand {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--text-color);
   text-decoration: none;
   margin: 0;
-}.tr-navbar-menu {
+}
+
+/* NAVBAR ICONS */
+.tr-navbar-icon {
+  width: 24px; /* Adjust the size as needed */
+  height: 24px; /* Adjust the size as needed */
+  margin-right: 8px; /* Adds space between the icon and text */
+  vertical-align: middle; /* Aligns the icon with the text */
+}
+
+.tr-navbar-menu {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-left: auto; /* This forces it to the right */
-}.tr-nav-btn {
+  gap: 10px; /* Adds spacing between buttons */
+  margin-left: auto; /* Pushes the menu to the right */
+}
+
+.tr-nav-btn {
   background-color: var(--accent-color);
   color: var(--text-color);
   padding: 8px 15px;
@@ -68,9 +84,11 @@ html, body {
   cursor: pointer;
   font-size: 1rem;
   white-space: nowrap;
-}.tr-nav-btn:hover {
-  background-color: var(--link-hover-color);
 }
 
-
-  
+.tr-nav-btn:hover {
+  background-color: var(--link-hover-color);
+}
+.tr-nav-btn i {
+  margin-right: 8px; /* Adds space between the icon and text */
+}
