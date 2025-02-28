@@ -466,7 +466,7 @@ For the authenticated user to view their match history including date, winner, p
             "match_history": [
                 {
                     "game_id": 2,
-                    "date_played": "2025-02-19T13:36:15.206Z",
+                    "date_played": "YYYY-MM-DDTHH:MM:SS.sssZ",
                     "player1:": "user1",
                     "player2": "user2",
                     "winner": "user2",
@@ -475,7 +475,7 @@ For the authenticated user to view their match history including date, winner, p
                 },
                 {
                     "game_id": 1,
-                    "date_played": "2025-02-19T13:33:44.228Z",
+                    "date_played": "YYYY-MM-DDTHH:MM:SS.sssZ",
                     "player1:": "user1",
                     "player2": "user2",
                     "winner": "user1",
@@ -534,6 +534,215 @@ Get basic user info and game stats for all users.
             }
             "... more items ..."
         ]
+        ```
+
+</details>
+
+---
+
+### Listing friends
+
+List all the friends of currently authenticated user.
+
+<details>
+    <summary>
+        <code>GET</code>
+        <code><b>users/&lt;user_id&gt;/friends/</b></code>
+    </summary>
+
+- Response
+    - **200**
+        ```json
+        {
+            "friends": [
+                {
+                    "id": 2,
+                    "username": "user2",
+                    "avatar": "/media/avatars/2/<filename>"
+                }
+                "... more items ..."
+            ]
+        }
+        ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to view friends of this user."
+            }
+            ```
+    - **401**
+        - When the user is not authenticated
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+
+</details>
+
+---
+
+### Friend request
+
+Send a friend request to another user. Note that the user_id in url is the id of the recipient of this friend request.
+
+<details>
+    <summary>
+        <code>POST</code>
+        <code><b>users/&lt;user_id&gt;/friends/</b></code>
+    </summary>
+
+- Response
+    - **201**
+        ```json
+        {
+            "message": "Friend request sent."
+        }
+        ```
+    - **400**
+        - When the user_id in url matches the authenticated user's id
+            ```json
+            {
+                "errors": "You cannot send a friend request to yourself."
+            }
+            ```
+    - **401**
+        - When the user is not authenticated
+            ```json
+            {
+                "errors": "User is not authenticated."
+            }
+            ```
+    - **404**
+        - When the recipient's id does not exist in database
+            ```json
+            {
+                "errors": "Recipient of the friend request not found."
+            }
+            ```
+
+</details>
+
+---
+
+### Listing friend requests
+
+List all the pending friend requests received by the authenticated user.
+
+<details>
+    <summary>
+        <code>GET</code>
+        <code><b>users/&lt;user_id&gt;/friends/requests/</b></code>
+    </summary>
+
+- Response
+    - **200**
+        ```json
+        {
+            "friend_requests": [
+                {
+                    "id": 1,
+                    "sender": "user1",
+                    "sent at": "YYYY-MM-DDTHH:MM:SS.sssZ"
+                }
+                "... more items ..."
+            ]
+        }
+        ```
+    - **403**
+        ```json
+        {
+            "errors": "You do not have permission to view another user's friend requests."
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+</details>
+
+---
+
+### Friend request handling
+
+Accept or reject a friend request.
+
+<details>
+    <summary>
+        <code>POST</code>
+        <code><b>users/&lt;user_id&gt;/friends/requests/&lt;request_id&gt;/</b></code>
+    </summary>
+
+- **Expected Request Body**:
+    ```json
+    {
+        "accepted": true
+    }
+    ```
+    - `accepted` (**boolean**): Can be **true** or **false** depending on whether the user accepts or rejects.
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Friend request accepted/rejected."
+        }
+        ```
+    - **404**
+        ```json
+        {
+            "errors": "friend request not found"
+        }
+        ```
+    - **403**
+        ```json
+        {
+            "errors": "You do not have permission to handle another user's friend request."
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+</details>
+
+---
+
+### Friend removal
+
+Unfriend someone.
+
+<details>
+    <summary>
+        <code>DELETE</code>
+        <code><b>users/&lt;user_id&gt;/friends/requests/&lt;request_id&gt;/</b></code>
+    </summary>
+
+- Response
+    - **204**
+    - **400**
+        ```json
+        {
+            "errors": "Not friends with this user(id=5)."
+        }
+        ```
+    - **403**
+        ```json
+        {
+            "errors": "You do not have permission to remove any friend of this user."
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
         ```
 
 </details>

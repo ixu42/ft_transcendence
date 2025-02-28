@@ -109,6 +109,13 @@ def handle_friend_request(request, user_id, request_id):
 @require_http_methods(["DELETE"])
 def remove_friend(request, user_id, friend_id):
     user = request.user
+
+    if not user.id == user_id:
+        return JsonResponse(
+                {"errors": "You do not have permission to remove any friend of this user."},
+                status=403,
+            ) 
+
     friend = CustomUser.objects.filter(id=friend_id)
 
     if not friend:
