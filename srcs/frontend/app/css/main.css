@@ -187,5 +187,15 @@ html, body {
   background-color: #45a049;
 }.decline-request-btn:hover {
   background-color: #da190b;
+}.unfriend-btn {
+  background-color: #f44336; /* Red */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}.unfriend-btn:hover {
+  background-color: #da190b;
 }
 

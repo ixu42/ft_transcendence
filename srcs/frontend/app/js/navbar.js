@@ -161,37 +161,38 @@ async function fetchFriendRequests(userId) {
     }
 }
 
-async function handleFriendRequestAction(requestId, action) {
-    try {
-        const userId = localStorage.getItem("user_id");
-        const accepted = action === 'accept';
-
-        const response = await fetch(`/api/users/${userId}/friends/requests/${requestId}/`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': await getCSRFCookie(),
-            },
-            body: JSON.stringify({ accepted: accepted }), 
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.errors || `Failed to ${action} friend request.`);
-        }
-
-        const data = await response.json();
-        alert(data.message || `Friend request ${action}ed.`);
-
-    } catch (error) {
-        console.error(`Error ${action}ing friend request:`, error);
-        alert(error.message);
-    }
-}
-
 function populateFriendRequests(container, requests) {
     if (!container) return;
+    
+    async function handleFriendRequestAction(requestId, action) {
+        try {
+            const userId = localStorage.getItem("user_id");
+            const accepted = action === 'accept';
+    
+            const response = await fetch(`/api/users/${userId}/friends/requests/${requestId}/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': await getCSRFCookie(),
+                },
+                body: JSON.stringify({ accepted: accepted }), 
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.errors || `Failed to ${action} friend request.`);
+            }
+    
+            const data = await response.json();
+            alert(data.message || `Friend request ${action}ed.`);
+    
+        } catch (error) {
+            console.error(`Error ${action}ing friend request:`, error);
+            alert(error.message);
+        }
+    }
+    
     container.innerHTML = ""; 
 
     if (requests.length === 0) {
@@ -230,6 +231,38 @@ function populateFriendRequests(container, requests) {
 function populateFriendsDropdown(container, friends) {
     if (!container) return;
 
+    async function handleUnfriend(friendId) {
+        try {
+            const userId = localStorage.getItem("user_id");
+    
+            const response = await fetch(`/api/users/${userId}/friends/${friendId}/`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': await getCSRFCookie(),
+                },
+            });
+    
+            if (!response.ok) {
+                // Check for 204 No Content
+                if (response.status === 204) {
+                    alert("Friend removed successfully.");
+                    return; // Exit the function early
+                }
+    
+                // Handle other errors
+                const errorData = await response.json();
+                throw new Error(errorData.errors || "Failed to unfriend.");
+            }
+    
+            alert("Friend removed successfully.");
+    
+        } catch (error) {
+            console.error("Error unfriending:", error);
+            alert(error.message);
+        }
+    }
+
     let friendListContainer = container.querySelector('.friend-list-container');
 
     if (!friendListContainer) {
@@ -250,8 +283,21 @@ function populateFriendsDropdown(container, friends) {
             friendItem.innerHTML = `
                 <img src="${fixAvatarURL(friend.avatar)}" alt="${friend.username}" class="friend-avatar">
                 <span>${friend.username} (ID: ${friend.id})</span>
+                <button class="unfriend-btn" data-id="${friend.id}">Unfriend</button>
             `;
             friendListContainer.appendChild(friendItem);
         });
+        // Add event listeners for unfriend buttons
+        friendListContainer.querySelectorAll('.unfriend-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const friendId = button.dataset.id;
+                await handleUnfriend(friendId);
+                // Refresh friends list after unfriend
+                const userId = localStorage.getItem("user_id");
+                const friends = await fetchFriends(userId);
+                populateFriendsDropdown(container, friends);
+            });
+        });
     }
 }
+

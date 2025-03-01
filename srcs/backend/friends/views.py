@@ -132,4 +132,4 @@ def remove_friend(request, user_id, friend_id):
 
     user.friends.remove(friend)
     friend.friends.remove(user)
-    return JsonResponse(status=204)  # Friend removed successfully
+    return JsonResponse(data={}, status=204)  # Friend removed successfully
