@@ -48,15 +48,23 @@ async function setupFriendsButton(friendsButton) {
         if (isFetching) return;
         isFetching = true;
 
-        console.log("Friends button hovered. Fetching friends...");
+        console.log("Friends button hovered. Fetching friends and requests...");
 
         const userId = localStorage.getItem("user_id");
         console.log("User ID:", userId);
 
         if (userId) {
+            // Fetch friends
+            const friendsSection = document.getElementById("friends-section");
             const friends = await fetchFriends(userId);
             console.log("Fetched friends:", friends);
-            populateFriendsDropdown(friendsDropdownContent, friends);
+            populateFriendsDropdown(friendsSection, friends);
+
+            // Fetch friend requests
+            const friendRequestsSection = document.getElementById("friend-requests-section");
+            const friendRequests = await fetchFriendRequests(userId);
+            console.log("Fetched friend requests:", friendRequests);
+            populateFriendRequests(friendRequestsSection, friendRequests);
         }
         isFetching = false;
     });
@@ -129,6 +137,96 @@ async function fetchFriends(userId) {
     }
 }
 
+// Function to fetch friend requests
+async function fetchFriendRequests(userId) {
+    try {
+        const response = await fetch(`/api/users/${userId}/friends/requests/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": await getCSRFCookie(),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch friend requests: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.friend_requests;
+    } catch (error) {
+        console.error("Error fetching friend requests:", error);
+        return [];
+    }
+}
+
+async function handleFriendRequestAction(requestId, action) {
+    try {
+        const userId = localStorage.getItem("user_id");
+        const accepted = action === 'accept';
+
+        const response = await fetch(`/api/users/${userId}/friends/requests/${requestId}/`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': await getCSRFCookie(),
+            },
+            body: JSON.stringify({ accepted: accepted }), 
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.errors || `Failed to ${action} friend request.`);
+        }
+
+        const data = await response.json();
+        alert(data.message || `Friend request ${action}ed.`);
+
+    } catch (error) {
+        console.error(`Error ${action}ing friend request:`, error);
+        alert(error.message);
+    }
+}
+
+function populateFriendRequests(container, requests) {
+    if (!container) return;
+    container.innerHTML = ""; 
+
+    if (requests.length === 0) {
+        const noRequestsMessage = document.createElement("div");
+        noRequestsMessage.className = "friend-item";
+        noRequestsMessage.textContent = "No friend requests.";
+        container.appendChild(noRequestsMessage);
+    } else {
+        requests.forEach(request => {
+            const requestItem = document.createElement("div");
+            requestItem.className = "friend-item";
+            requestItem.innerHTML = `
+                <span>${request.sender}</span>
+                <button class="accept-request-btn" data-id="${request.id}">Accept</button>
+                <button class="decline-request-btn" data-id="${request.id}">Decline</button>
+            `;
+            container.appendChild(requestItem);
+        });
+        // Add event listeners for accept and decline buttons
+        container.querySelectorAll('.accept-request-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const requestId = button.dataset.id;
+                await handleFriendRequestAction(requestId, 'accept');
+            });
+        });
+
+        container.querySelectorAll('.decline-request-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const requestId = button.dataset.id;
+                await handleFriendRequestAction(requestId, 'decline');
+            });
+        });
+    }
+}
+
 function populateFriendsDropdown(container, friends) {
     if (!container) return;
 
@@ -150,7 +248,7 @@ function populateFriendsDropdown(container, friends) {
             const friendItem = document.createElement("div");
             friendItem.className = "friend-item";
             friendItem.innerHTML = `
-                <img src="${friend.avatar}" alt="${friend.username}" class="friend-avatar">
+                <img src="${fixAvatarURL(friend.avatar)}" alt="${friend.username}" class="friend-avatar">
                 <span>${friend.username} (ID: ${friend.id})</span>
             `;
             friendListContainer.appendChild(friendItem);
