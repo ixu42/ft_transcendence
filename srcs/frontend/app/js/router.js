@@ -73,7 +73,8 @@ const handleLocation = async () => {
 
     console.log(`✅ Loaded route content: ${path}`);
     console.log(` Updating navbar...`);
-    updateNavbar(); 
+  
+    updateNavbar(); // Update the navbar after loading the route content 
 
   } catch (error) {
     app.innerHTML = "<h1>Error loading page</h1>";
