@@ -1,3 +1,4 @@
+
 /* General Lobby Styling */
 #lobby-container {
     display: flex;
@@ -9,7 +10,30 @@
     background: linear-gradient(45deg, #1d1f27, #282c34);
     color: white;
     padding: 20px;
+}.lobby-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}.lobby-btn {
+    width: 250px;
+    padding: 12px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-direction: row-reverse;
+}.lobby-icon {
+    width: 24px;
+    height: 24px;
 }
+
 
 /** Modal Styling */
 .game-mode-modal-overlay {
@@ -57,23 +81,6 @@
     transform: scale(1.05);
 }.game-mode-modal-content .close-btn {
     background: red;
-}
-
-/* Main Lobby Button Group */
-.lobby-button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-    width: 100%;
-    margin-top: 20px;
-}.lobby-button-group .btn {
-    width: 250px;
-    padding: 12px;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 6px;
 }
 
 /* Media Queries for smaller screens */
