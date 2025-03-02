@@ -1,26 +1,12 @@
-
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
 scrape_configs:
-
-  # Scrape Prometheus
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['prometheus:9090'] # Target the Prometheus service
 
-  # Scrape backend
   - job_name: 'backend'
     static_configs:
-      - targets: ['backend:8000']
-
-  # Scrape frontend
-  - job_name: 'frontend'
-    static_configs:
-      - targets: ['frontend:3000']
-
-  # Scrape Grafana
-  - job_name: 'grafana'
-    static_configs:
-      - targets: ['localhost:3000']
+      - targets: ['tr_back:${DJANGO_PORT}'] # Target your backend service
