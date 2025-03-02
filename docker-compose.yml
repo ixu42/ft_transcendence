@@ -1,3 +1,12 @@
+
+volumes:
+  db_volume:
+
+networks:
+  tr_network:
+    name: tr_network
+    driver: bridge
+
 services:
   tr_front:
     build: srcs/frontend
@@ -54,6 +63,7 @@ services:
     restart: always
 
 
+  # Monitoring services
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -77,15 +87,6 @@ services:
     depends_on:
       - tr_back
     restart: always
-
-
-volumes:
-  db_volume:
-
-networks:
-  tr_network:
-    name: tr_network
-    driver: bridge
 
 
 

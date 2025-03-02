@@ -11,6 +11,7 @@ RUN apt-get update && \
     apt-get install -y \
     libpq-dev \
     gcc \
+    curl \
     netcat-openbsd && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean

@@ -20,6 +20,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.views.static import serve
 from . import views
+from django_prometheus import urls as prometheus_urls 
 
 handler404 = "backend.views.custom_404"
 handler500 = "backend.views.custom_500"
@@ -33,4 +34,5 @@ urlpatterns = [
     path("friends/", include("friends.urls")),
     path("get-csrf-token/", views.get_csrf_token),
     path("", views.homepage),
+    path("", include(prometheus_urls)),
 ]
