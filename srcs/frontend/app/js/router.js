@@ -34,8 +34,12 @@ const routeHandlers = {
   "#terms": () => {},
   "#about": () => {},
   "#register": () => {},
-  "#login": () => {},
+  "#login": () => {
+    console.log("📌 Login page handler triggered");
+    setupLoginPage();
+  },
   "#chat": () => {},
+
 };
 
 const handleLocation = async () => {
@@ -49,8 +53,8 @@ const handleLocation = async () => {
   const footer = document.getElementById("tr-footer-container");
   const app = document.getElementById("app");
 
-  if (navbar) navbar.style.display = hideNavbarAndFooter ? "none" : "block";
-  if (footer) footer.style.display = hideNavbarAndFooter ? "none" : "block";
+  if (navbar) navbar.classList.toggle("hidden", hideNavbarAndFooter);
+  if (footer) footer.classList.toggle("hidden", hideNavbarAndFooter);
 
   if (protectedRoutes.includes(path) && !isLoggedIn) {
     console.warn(`🚨 Access denied: ${path} requires authentication.`);
@@ -68,10 +72,9 @@ const handleLocation = async () => {
     }
 
     console.log(`✅ Loaded route content: ${path}`);
-    
-    // Update the navbar and show the splash screen
-    updateNavbar(); 
-    checkAndShowSplash();
+    console.log(` Updating navbar...`);
+  
+    updateNavbar(); // Update the navbar after loading the route content 
 
   } catch (error) {
     app.innerHTML = "<h1>Error loading page</h1>";

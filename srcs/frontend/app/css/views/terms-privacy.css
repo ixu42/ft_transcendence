@@ -1,26 +1,48 @@
-/* Terms and Privacy Page Styles */
+/* Terms and Privacy Page Styles (Terms-Prefixed) */
 
 body {
     background-color: #2c2c2c;
     color: #ffffff;
+    font-family: sans-serif;
+    line-height: 1.6;
 }
 
-h1, h2 {
+.terms-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.terms-h1, .terms-h2 {
     color: #ffffff;
     margin-bottom: 20px;
+    border-bottom: 1px solid #4a4a4a;
+    padding-bottom: 10px;
 }
 
-section {
+.terms-section {
     background-color: #3b3b3b;
-    padding: 20px;
-    border-radius: 5px;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-a {
+.terms-ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.terms-li {
+    margin-bottom: 10px;
+}
+
+.terms-a {
     color: #00d4ff;
     text-decoration: none;
+    transition: color 0.3s ease;
 }
 
-a:hover {
+.terms-a:hover {
     text-decoration: underline;
+    color: #00b3e6;
 }
