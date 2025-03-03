@@ -4,7 +4,7 @@ A brief description of the API and example responses.
 
 ## Base URL
 
-http://localhost:8000/
+http://localhost:8000/api/
 
 ## Endpoints
 
