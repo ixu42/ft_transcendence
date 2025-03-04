@@ -162,8 +162,8 @@ SESSION_COOKIE_AGE = 7200  # 2 hours
 SESSION_SAVE_EVERY_REQUEST = (
     True  # Automatic session refresh every time the user interacts with the server
 )
-SESSION_COOKIE_SECURE = True        # Cookie sent only over HTTPS, trug Nginx
-SESSION_COOKIE_SAMESITE = 'None'    # Required for cross-origin authentication
+SESSION_COOKIE_SECURE = True  # Cookie sent only over HTTPS, trug Nginx
+SESSION_COOKIE_SAMESITE = "None"  # Required for cross-origin authentication
 
 # Axes settings
 AXES_FAILURE_LIMIT = 5
@@ -186,12 +186,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://tr_front:8443",
     "https://tr_front:8443",
     "https://localhost:8443",
-    "http://localhost:8443"
+    "http://localhost:8443",
 ]
 
-CSRF_COOKIE_SECURE = True       # Cookie sent only over HTTPS, trug Nginx
-CSRF_COOKIE_HTTPONLY = False    # If True, JS cannot read the cookie
-CSRF_COOKIE_SAMESITE = "None"   # Required for cross-origin authentication
+CSRF_COOKIE_SECURE = True  # Cookie sent only over HTTPS, trug Nginx
+CSRF_COOKIE_HTTPONLY = False  # If True, JS cannot read the cookie
+CSRF_COOKIE_SAMESITE = "None"  # Required for cross-origin authentication
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -201,7 +201,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://tr_front:8443",
     "https://tr_front:8443",
     "https://localhost:8443",
-    "http://localhost:8443"
+    "http://localhost:8443",
 ]
 
-CORS_ALLOW_CREDENTIALS = True   # Required for cross-origin authentication
+CORS_ALLOW_CREDENTIALS = True  # Required for cross-origin authentication
