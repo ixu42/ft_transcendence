@@ -19,7 +19,9 @@ services:
       - DJANGO_PORT=${DJANGO_PORT}
       - TZ=UTC
     networks:
-      - tr_network
+      tr_network:
+        aliases:
+          - tr-front
     ports:
       - "8443:8443"
 
@@ -41,7 +43,9 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - TZ=UTC
     networks:
-      - tr_network
+      tr_network:
+        aliases:
+          - tr-back
     ports:
         - "${DJANGO_PORT}:${DJANGO_PORT}"
     depends_on:
@@ -70,10 +74,11 @@ services:
     volumes:
       - ./srcs/server-tools/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
-      - tr_network
+      tr_network:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
+      - --web.listen-address=0.0.0.0:9090
       - --web.console.libraries=/usr/share/prometheus/console_libraries
       - --web.console.templates=/usr/share/prometheus/consoles
       - --web.external-url=https://localhost:8443/prometheus/

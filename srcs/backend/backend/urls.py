@@ -34,5 +34,5 @@ urlpatterns = [
     path("friends/", include("friends.urls")),
     path("get-csrf-token/", views.get_csrf_token),
     path("", views.homepage),
-    path("", include(prometheus_urls)),
+    path("", include(prometheus_urls)), 
 ]
