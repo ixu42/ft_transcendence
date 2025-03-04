@@ -3,10 +3,13 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
+
   - job_name: 'prometheus'
+    metrics_path: /prometheus/metrics
     static_configs:
-      - targets: ['localhost:9090'] # Target the Prometheus service
+      - targets: ['localhost:9090']
 
   - job_name: 'backend'
+    metrics_path: /metrics
     static_configs:
-      - targets: ['localhost:8000'] # Target your backend service
+      - targets: ['tr-back:8000']
