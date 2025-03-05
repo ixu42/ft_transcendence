@@ -1,8 +1,6 @@
-document.addEventListener("view-changed", ({ detail }) => {
-    if (detail.path === "#game") checkGameMode();
-});
 
-const checkGameMode = () => {
+
+const setupGame = () => {
     const params = new URLSearchParams(window.location.hash.split("?")[1]);
     const type = params.get("type") || "local";  // Default: Local game
     const mode = params.get("mode") || "1v1";    // Default: 1v1 mode
@@ -26,8 +24,10 @@ const checkGameMode = () => {
                         initializeTournament();
                         break;
                     case "1v1":
-                    default:
                         initializeGame();
+                        break;
+                    case "ai":
+                        initializeAIGame();
                         break;
                 }
                 break;

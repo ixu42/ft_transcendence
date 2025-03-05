@@ -19,8 +19,8 @@ const isUserLoggedIn = () => localStorage.getItem("isLoggedIn") === "true";
 const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
-  "#game": () => checkGameMode(),
-  "#lobby": () => bindLobbyEventListeners(),
+  "#game": () => setupGame(),
+  "#lobby": () => setupLobby(),
   "#menu": () => console.log("Menu loaded"),
   "#leaderboard": () => {
     console.log("📌 Leaderboard page handler triggered");

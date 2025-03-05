@@ -23,6 +23,7 @@ const showGameModal = () => {
     // Event listeners for the game mode buttons
     document.getElementById("start-tournament-btn")?.addEventListener("click", () => startGame("local", "tournament"));
     document.getElementById("start-1v1-btn")?.addEventListener("click", () => startGame("local", "1v1"));
+    document.getElementById("start-ai-btn")?.addEventListener("click", () => startGame("local", "ai"));
     document.getElementById("close-btn")?.addEventListener("click", closeGameModal);
 
     // Close modal if overlay is clicked
