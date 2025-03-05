@@ -26,7 +26,7 @@ class TestSaveGameStats(TestCase):
             url = self.url
         if not request_body:
             request_body = json.dumps({"player1_score": 10, "player2_score": 5})
-        print(request_body)
+
         return self.client.patch(
             url,
             data=request_body,
@@ -80,7 +80,9 @@ class TestSaveGameStats(TestCase):
         self.client.login(username="player1", password="password1")
         response = self.make_request(request_body=json.dumps({"player1_score": 10}))
         self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(response.content, {"errors": "Invalid data provided."})
+        self.assertJSONEqual(
+            response.content, {"errors": {"player2_score": ["This field is required."]}}
+        )
 
     def test_save_game_stats_unauthenticated(self):
         response = self.make_request()
