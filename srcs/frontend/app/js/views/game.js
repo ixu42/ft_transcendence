@@ -29,6 +29,9 @@ const setupGame = () => {
                     case "ai":
                         initializeAIGame();
                         break;
+                    default:
+                        console.error(`❌ Unknown game mode: ${mode}`);
+                        initializeGame();
                 }
                 break;
             default:
