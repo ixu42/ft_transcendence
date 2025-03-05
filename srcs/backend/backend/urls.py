@@ -29,6 +29,7 @@ urlpatterns = [
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     path("admin/", admin.site.urls),
     path("users/", include("users.urls")),
+    path("games/", include("games.urls")),
     path("tournaments/", include("tournaments.urls")),
     path("friends/", include("friends.urls")),
     path("get-csrf-token/", views.get_csrf_token),

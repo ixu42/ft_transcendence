@@ -4,7 +4,7 @@ from . import views
 app_name = "friends"
 
 urlpatterns = [
-    # list friend (GET) / send a friend request (POST)
+    # List friend (GET) / send a friend request (POST)
     path("", views.friend_list_create, name="friend_list_create"),
     # List pending friend requests for a user (GET)
     path(

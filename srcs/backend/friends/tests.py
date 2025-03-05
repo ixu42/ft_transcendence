@@ -4,18 +4,14 @@ from django.urls import reverse
 import json
 from .models import FriendRequest
 
-CustomUser = get_user_model()
+User = get_user_model()
 
 
 class BaseTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user1 = CustomUser.objects.create_user(
-            username="user1", password="password1"
-        )
-        cls.user2 = CustomUser.objects.create_user(
-            username="user2", password="password2"
-        )
+        cls.user1 = User.objects.create_user(username="user1", password="password1")
+        cls.user2 = User.objects.create_user(username="user2", password="password2")
 
     def login(self, user, password=None):
         if password is None:
