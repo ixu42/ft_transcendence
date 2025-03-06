@@ -1,4 +1,25 @@
 from django import forms
+from django.contrib.auth import get_user_model
+from .models import Game
+
+User = get_user_model()
+
+
+class LocalGameForm(forms.ModelForm):
+    class Meta:
+        model = Game
+        fields = ["player1", "player2"]
+
+    def save(self, user, commit=True):
+        game = super().save(commit=False)
+
+        if user:
+            game.player1 = user
+        game.player2 = User.objects.get(username="guest_player")
+
+        if commit:
+            game.save()
+        return game
 
 
 class GameStatsForm(forms.Form):
@@ -8,7 +29,7 @@ class GameStatsForm(forms.Form):
     def update_game(self, game):
         player1_score = self.cleaned_data["player1_score"]
         player2_score = self.cleaned_data["player2_score"]
-    
+
         game.player1_score = player1_score
         game.player2_score = player2_score
 
