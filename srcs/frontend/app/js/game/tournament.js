@@ -35,11 +35,11 @@ const initializeTournament = () => {
     const tournament = setupTournament();
     if (!tournament) return;
     const game = createGame();
+    game.winningScore = tournament.winningScore;
     setupTournamentControls(tournament);
     setupControls(game.player, game.player2, game);
     
     let currentMatchIndex = 0;
-
     tournamentLoop(tournament, game, currentMatchIndex);
 };
 
@@ -55,6 +55,7 @@ const tournamentLoop = (tournament, game, currentMatchIndex) => {
         drawMatch(tournament.players, game.canvas, currentMatchIndex);
         if (tournament.keyboardEnter) {
             tournament.state = 'playing';
+            game.state = 'prepare';
             tournament.keyboardEnter = false;
         }
     }

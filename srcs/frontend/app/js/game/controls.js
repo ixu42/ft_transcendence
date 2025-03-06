@@ -5,11 +5,11 @@ const setupControls = (player, player2, game) => {
             key === 'arrowdown' ? player2.keyboardDown = true :
             key === 'w' ? player.keyboardUp = true :
             key === 's' ? player.keyboardDown = true : null;
-        if (game.state === "game" && (key === ' ' || key === 'escape')) 
+        if (key === ' ' || key === 'escape')
         {
             if (game.state == 'pause')
                 game.state = game.lastState;
-            else
+            else if (game.state == 'game')
             {
                 game.lastState = game.state;
                 game.state = "pause";
@@ -31,7 +31,6 @@ const setupControls = (player, player2, game) => {
                 game.winningScore = -1;
                 game.state = 'prepare';
             }
-            console.log("Winning Score: " + game.winningScore);
         }
 
         if (game.state === 'gameOver') {

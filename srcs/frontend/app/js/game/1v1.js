@@ -7,7 +7,7 @@ const createGame = (isAI = false) => {
     const state = isAI ? "levelSelection" : "scoreSelection";
     const lastState = "prepare";
     const aiLevel = 'none';
-    const winningScore = 0;
+    const winningScore = -1;
 
     return { player, player2, ball, canvas, context, state, lastState, isAI, aiLevel, winningScore };
 };
