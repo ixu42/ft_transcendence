@@ -10,12 +10,17 @@ class LocalGameForm(forms.ModelForm):
         model = Game
         fields = ["player1", "player2"]
 
-    def save(self, user, commit=True):
-        game = super().save(commit=False)
+    def save(self, user, opponent, commit=True):
+        game = super().save(
+            commit=False
+        )  # Create a Game model instance without saving to database yet
 
         if user:
             game.player1 = user
-        game.player2 = User.objects.get(username="guest_player")
+        if opponent == "AI":
+            game.player2 = None
+        else:
+            game.player2 = User.objects.get(username="guest_player")
 
         if commit:
             game.save()

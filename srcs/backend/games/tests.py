@@ -31,7 +31,7 @@ class TestCreateLocalGame(BaseTestCase):
     def setUp(self):
         self.url = reverse("games:create_local_game")
 
-    def make_request(self, url=None, request_body=None):
+    def make_request(self, url=None):
         if not url:
             url = self.url
         return self.client.post(url)
@@ -43,7 +43,38 @@ class TestCreateLocalGame(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Game.objects.count(), 1)
         self.assertEqual(response.json()["message"], "Local game created.")
-        self.assertEqual(Game.objects.first().player1, self.user1)
+        game = Game.objects.first()
+        guest_player = User.objects.get(username="guest_player")
+        self.assertEqual(game.player1, self.user1)
+        self.assertEqual(game.player2, guest_player)
+
+    def test_create_local_game_unauthenticated(self):
+        response = self.make_request()
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(Game.objects.count(), 0)
+
+
+@override_settings(AXES_ENABLED=False)
+class TestCreateAIGame(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("games:create_ai_game")
+
+    def make_request(self, url=None):
+        if not url:
+            url = self.url
+        return self.client.post(url)
+
+    def test_create_ai_game_authenticated_valid_data(self):
+        self.login(self.user1)
+        response = self.make_request()
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Game.objects.count(), 1)
+        self.assertEqual(response.json()["message"], "AI game created.")
+        game = Game.objects.first()
+        self.assertEqual(game.player1, self.user1)
+        self.assertEqual(game.player2, None)
 
     def test_create_local_game_unauthenticated(self):
         response = self.make_request()

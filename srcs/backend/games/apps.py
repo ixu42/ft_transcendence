@@ -7,4 +7,6 @@ class GamesConfig(AppConfig):
     name = "games"
 
     def ready(self):  # Executed once when the app starts
-        import_module("games.signals")  # Ensure signals are loaded when the app is ready
+        import_module(
+            "games.signals"
+        )  # Ensure signals are loaded when the app is ready

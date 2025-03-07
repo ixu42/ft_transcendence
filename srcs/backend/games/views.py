@@ -9,11 +9,19 @@ from .forms import GameStatsForm, LocalGameForm
 @login_required_json
 @require_POST
 def create_local_game(request):
-    game = LocalGameForm().save(user=request.user)
+    game = LocalGameForm().save(user=request.user, opponent="guest_player")
 
     return JsonResponse(
         {"message": "Local game created.", "game_id": game.id}, status=201
     )
+
+
+@login_required_json
+@require_POST
+def create_ai_game(request):
+    game = LocalGameForm().save(user=request.user, opponent="AI")
+
+    return JsonResponse({"message": "AI game created.", "game_id": game.id}, status=201)
 
 
 @login_required_json
