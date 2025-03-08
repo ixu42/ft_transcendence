@@ -208,18 +208,18 @@ Get details of the authenticated user's profile.
             "extra_fields": "..."
         }
         ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
             }
             ```
 
@@ -252,18 +252,18 @@ Update details of the authenticated user's profile, include username, email, fir
             "message": "User profile updated."
         }
         ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
             }
             ```
 
@@ -312,18 +312,18 @@ Update the password of the authenticated user.
             }
         }
         ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to update password of this user."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to update password of this user."
             }
             ```
 
@@ -353,18 +353,18 @@ For the authenticated user to deactivate their account. Recommended by Django in
             "message": "Account deactivated."
         }
         ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
             }
             ```
 
@@ -388,18 +388,18 @@ For the authenticated user to delete its account. In this case, user object and 
             "message": "Account deleted."
         }
         ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to access this user's profile."
             }
             ```
 
@@ -433,18 +433,18 @@ For the authenticated user to view their participated tournaments related info, 
                 "... more items ..."
             ]
         }
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to view participated tournaments of this user."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to view participated tournaments of this user."
             }
             ```
 
@@ -486,18 +486,18 @@ For the authenticated user to view their match history including date, winner, p
             ]
         }
         ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to view match history of this user."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to view match history of this user."
             }
             ```
 
@@ -512,7 +512,7 @@ Get basic user info and game stats for all users.
 <details>
     <summary><code>GET</code><code><b>users/leaderboard/</b></code></summary>
 
-- Response
+- **Response**
     - **200**
         ```json
         [
@@ -550,7 +550,7 @@ List all the friends of currently authenticated user.
         <code><b>users/&lt;user_id&gt;/friends/</b></code>
     </summary>
 
-- Response
+- **Response**
     - **200**
         ```json
         {
@@ -564,18 +564,18 @@ List all the friends of currently authenticated user.
             ]
         }
         ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to view friends of this user."
-            }
-            ```
     - **401**
         - When the user is not authenticated
             ```json
             {
                 "errors": "User is not authenticated."
+            }
+            ```
+    - **403**
+        - When the user_id in url does not match the authenticated user's id
+            ```json
+            {
+                "errors": "You do not have permission to view friends of this user."
             }
             ```
 
@@ -593,7 +593,7 @@ Send a friend request to another user. Note that the user_id in url is the id of
         <code><b>users/&lt;user_id&gt;/friends/</b></code>
     </summary>
 
-- Response
+- **Response**
     - **201**
         ```json
         {
@@ -636,7 +636,7 @@ List all the pending friend requests received by the authenticated user.
         <code><b>users/&lt;user_id&gt;/friends/requests/</b></code>
     </summary>
 
-- Response
+- **Response**
     - **200**
         ```json
         {
@@ -650,16 +650,16 @@ List all the pending friend requests received by the authenticated user.
             ]
         }
         ```
-    - **403**
-        ```json
-        {
-            "errors": "You do not have permission to view another user's friend requests."
-        }
-        ```
     - **401**
         ```json
         {
             "errors": "User is not authenticated."
+        }
+        ```
+    - **403**
+        ```json
+        {
+            "errors": "You do not have permission to view another user's friend requests."
         }
         ```
 
@@ -691,10 +691,10 @@ Accept or reject a friend request.
             "message": "Friend request accepted/rejected."
         }
         ```
-    - **404**
+    - **401**
         ```json
         {
-            "errors": "friend request not found"
+            "errors": "User is not authenticated."
         }
         ```
     - **403**
@@ -703,10 +703,10 @@ Accept or reject a friend request.
             "errors": "You do not have permission to handle another user's friend request."
         }
         ```
-    - **401**
+    - **404**
         ```json
         {
-            "errors": "User is not authenticated."
+            "errors": "friend request not found"
         }
         ```
 
@@ -724,12 +724,18 @@ Unfriend someone.
         <code><b>users/&lt;user_id&gt;/friends/requests/&lt;request_id&gt;/</b></code>
     </summary>
 
-- Response
+- **Response**
     - **204**
     - **400**
         ```json
         {
             "errors": "Not friends with this user(id=5)."
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
         }
         ```
     - **403**
@@ -738,10 +744,127 @@ Unfriend someone.
             "errors": "You do not have permission to remove any friend of this user."
         }
         ```
+
+</details>
+
+---
+
+### Local 1v1 game creation
+
+Create a local 1v1 game for a logged-in user.
+
+<details>
+    <summary>
+        <code>POST</code>
+        <code><b>games/local/</b></code>
+    </summary>
+
+- **Response**
+    - **201**
+        ```json
+        {
+            "message": "Local game created.",
+            "game_id": 1
+        }
+        ```
     - **401**
         ```json
         {
             "errors": "User is not authenticated."
+        }
+        ```
+
+</details>
+
+---
+
+### Local AI game creation
+
+Create a local 1v1 game against AI for a logged-in user.
+
+<details>
+    <summary>
+        <code>POST</code>
+        <code><b>games/ai/</b></code>
+    </summary>
+
+- **Response**
+    - **201**
+        ```json
+        {
+            "message": "AI game created.",
+            "game_id": 2
+        }
+        ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+
+</details>
+
+---
+
+### Saving game stats
+
+Save the stats for a completed game for a logged-in user.
+
+<details>
+    <summary>
+        <code>PATCH</code>
+        <code><b>&lt;game_id&gt;/stats/</b></code>
+    </summary>
+
+- **Expected Request Body**:
+    ```json
+    {
+        "player1_score": 6,
+        "player2_score": 10
+    }
+    ```
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Game stats saved."
+        }
+        ```
+    - **400**
+        - When the data in Json payload is malformed
+            ```json
+            {
+                "errors": "Invalid JSON input."
+            }
+            ```
+        - When errors occur during the form validation
+            ```json
+            {
+                "errors": {
+                    "player2_score": [
+                        "This field is required."
+                    ]
+                }
+            }
+            ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
+    - **403**
+        - When the logged-in user is not a player of the game
+            ```json
+            {
+                "errors": "You are not part of this game."
+            }
+            ```
+    - **404**
+        ```json
+        {
+            "errors": "Game not found."
         }
         ```
 
