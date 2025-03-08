@@ -1,6 +1,6 @@
 
 
-const setupGame = () => {
+const setupGameJs = () => {
     const params = new URLSearchParams(window.location.hash.split("?")[1]);
     const type = params.get("type") || "local";  // Default: Local game
     const mode = params.get("mode") || "1v1";    // Default: 1v1 mode
@@ -19,7 +19,8 @@ const setupGame = () => {
                 initializeOnlineGame(mode);
                 break;
             case "local":
-                switch (mode) {
+                switch (mode)
+                {
                     case "tournament":
                         initializeTournament();
                         break;
