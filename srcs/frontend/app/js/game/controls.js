@@ -21,23 +21,26 @@ const setupControls = (player, player2, game) => {
         }
 
         if (game.state === 'scoreSelection') {
-            if (event.key === '1') {
+            if (key === '1') {
                 game.winningScore = 3;
                 game.state = 'prepare';
-            } else if (event.key === '2') {
+            } else if (key === '2') {
                 game.winningScore = 7;
                 game.state = 'prepare';
-            } else if (event.key === '3') {
+            } else if (key === '3') {
                 game.winningScore = -1;
                 game.state = 'prepare';
             }
         }
 
         if (game.state === 'gameOver') {
-            if (key === ' ') {
-                resetGame(game);
-                game.state = game.isAI ? 'levelSelection' : 'scoreSelection';
+            if (key === 'x') {
+                window.location.href = "/#lobby"; // Adjust the URL to your lobby page
             }
+            // if (key === ' ') {
+            //     resetGame(game);
+            //     game.state = game.isAI ? 'levelSelection' : 'scoreSelection';
+            // }
         }
     });
 

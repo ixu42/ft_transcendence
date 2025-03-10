@@ -77,6 +77,7 @@ const tournamentLoop = (tournament, game, currentMatchIndex) => {
             if (currentMatchIndex >= tournament.players.length - 1)
                 currentMatchIndex = 0;
             if (tournament.players.length === 1) {
+                game.state = 'gameOver';
                 drawWinner(tournament.players[0], game.canvas);
                 return;
             }
@@ -121,4 +122,5 @@ const drawWinner = (player, canvas) => {
     context.font = '30px Arial';
     context.fillStyle = '#fff';
     context.fillText(`Winner: ${player.name}`, canvas.width / 2 - 50, canvas.height / 2);
+    context.fillText('Press X to exit', canvas.width / 2 - 50, canvas.height / 2 + 40);
 };

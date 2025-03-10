@@ -71,7 +71,7 @@ const drawGameOver = (game) => {
         else 
             context.fillText('Player 2 Wins!', game.canvas.width / 2 - 50, game.canvas.height / 2 - 20);
     }
-    context.fillText('Press Space to Restart', game.canvas.width / 2 - 100, game.canvas.height / 2 + 20);
+    context.fillText('Press X to exit', game.canvas.width / 2 - 50, game.canvas.height / 2 + 40);
 };
 
 const resetGame = (game) => {
