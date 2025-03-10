@@ -1,4 +1,4 @@
-const initializeAIGame = () => {
+const initializeAIGame = (gameId) => {
     const canvas = document.getElementById('pong');
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");

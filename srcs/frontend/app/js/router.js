@@ -19,24 +19,15 @@ const isUserLoggedIn = () => localStorage.getItem("isLoggedIn") === "true";
 const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
-  "#game": () => setupGame(),
-  "#lobby": () => setupLobby(),
+  "#game": () => setupGameJs(),
+  "#lobby": () => setupLobbyJs(),
   "#menu": () => console.log("Menu loaded"),
-  "#leaderboard": () => {
-    console.log("📌 Leaderboard page handler triggered");
-    setupLeaderboard();
-  },
-  "#profile": () => {
-    console.log("📌 Profile page handler triggered");
-    setupProfilePage();
-  },
+  "#leaderboard": () => setupLeaderboardJs(),
+  "#profile": () => setupProfilePageJs(),
   "#terms": () => {},
   "#about": () => {},
   "#register": () => {},
-  "#login": () => {
-    console.log("📌 Login page handler triggered");
-    setupLoginPage();
-  },
+  "#login": () => setupLoginPageJs(),
   "#chat": () => {},
 
 };

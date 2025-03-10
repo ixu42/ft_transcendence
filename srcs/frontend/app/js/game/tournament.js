@@ -26,7 +26,7 @@ const setupTournament = () => {
     return { players, winningScore, keyboardEnter: false, state: 'table' };
 };
 
-const initializeTournament = () => {
+const initializeTournament = (gameId) => {
     const canvas = document.getElementById('pong');
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");

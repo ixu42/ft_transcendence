@@ -1,5 +1,5 @@
 
-function setupLoginPage()
+function setupLoginPageJs()
 {
     checkAndShowSplash();
     const loginButton = document.getElementById("login-btn");

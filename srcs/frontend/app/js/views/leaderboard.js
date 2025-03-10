@@ -1,4 +1,4 @@
-const setupLeaderboard = async () => {
+const setupLeaderboardJs = async () => {
     try {
         const response = await fetch('/api/users/leaderboard/', {
             method: 'GET',

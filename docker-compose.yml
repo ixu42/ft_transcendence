@@ -102,8 +102,7 @@ services:
   nginx_exporter:
     image: nginx/nginx-prometheus-exporter:latest
     container_name: nginx_exporter
-    environment:
-      - NGINX_STATUS_URL=http://tr-front:8443/nginx_status
+    command: ["-nginx.scrape-uri", "https://tr-front:8443/nginx_status"]
     expose:
       - 9113
     restart: always
@@ -111,6 +110,8 @@ services:
       tr_network:
         aliases:
           - nginx-exporter
+
+
 
   postgres_exporter:
     image: wrouesnel/postgres_exporter
