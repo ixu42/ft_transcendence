@@ -390,12 +390,15 @@ const setupEditProfile = () => {
             return;
         }
     
+        // Get values from the input fields
+        const oldPassword = document.getElementById("old-password").value;
         const newPassword1 = document.getElementById("new-password1").value;
         const newPassword2 = document.getElementById("new-password2").value;
         const errorMessage = document.getElementById("password-error-message");
     
-        if (!newPassword1 || !newPassword2) {
-            errorMessage.textContent = "⚠️ Both password fields are required.";
+        // Validate all fields are filled
+        if (!oldPassword || !newPassword1 || !newPassword2) {
+            errorMessage.textContent = "⚠️ All password fields are required.";
             errorMessage.style.display = "block";
             return;
         }
@@ -409,6 +412,7 @@ const setupEditProfile = () => {
                     "X-CSRFToken": csrfToken,
                 },
                 body: JSON.stringify({
+                    old_password: oldPassword,
                     new_password1: newPassword1,
                     new_password2: newPassword2,
                 }),
@@ -427,6 +431,7 @@ const setupEditProfile = () => {
     
             alert("✅ Password updated successfully!");
             errorMessage.style.display = "none";
+            document.getElementById("old-password").value = "";
             document.getElementById("new-password1").value = "";
             document.getElementById("new-password2").value = "";
         } catch (error) {
@@ -434,6 +439,7 @@ const setupEditProfile = () => {
             alert("❌ Error updating password. Please try again.");
         }
     });
+    
     
 
     // Save profile button --
