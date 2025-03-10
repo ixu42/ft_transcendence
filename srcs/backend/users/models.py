@@ -7,7 +7,7 @@ from django.core.files.storage import default_storage
 from django.templatetags.static import static
 from django.conf import settings
 from games.models import Game
-
+from django.utils import timezone
 
 def user_avatar_upload_path(instance, filename):
     return os.path.join("avatars", str(instance.id), filename)
@@ -33,6 +33,7 @@ class CustomUser(AbstractUser):
     )
     score = models.IntegerField(default=0)
     friends = models.ManyToManyField("self", symmetrical=True, blank=True)
+    last_active = models.DateTimeField(null=True, blank=True)
 
     @property
     def default_avatar(self):
@@ -81,6 +82,14 @@ class CustomUser(AbstractUser):
 
         self.avatar = new_avatar
         self.save()
+
+    def is_online(self, minutes=5):
+        """
+        Returns True if the user has been active within the last `minutes` minutes.
+        """
+        if self.last_active:
+            return self.last_active >= timezone.now() - timezone.timedelta(minutes=minutes)
+        return False
 
     def save(self, *args, **kwargs):
         # Set default avatar if the instance is being created and no avatar is provided
