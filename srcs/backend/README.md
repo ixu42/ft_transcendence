@@ -281,6 +281,7 @@ Update the password of the authenticated user.
 - **Expected Request Body**:
     ```json
     {
+        "old_password": "securepassword123",
         "new_password1": "securepassword456",
         "new_password2": "securepassword456"
     }
