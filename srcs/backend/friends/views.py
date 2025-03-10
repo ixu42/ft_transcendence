@@ -46,7 +46,7 @@ def friend_list_create(request, user_id):
                 status=403,
             )
         friends = list(request.user.friends.values("id", "username", "avatar", "last_active"))
-        threshold = timezone.now() - timedelta(minutes=5)
+        threshold = timezone.now() - timedelta(minutes=1)
         for friend in friends:
             friend["online"] = friend["last_active"] and friend["last_active"] >= threshold
         return JsonResponse({"friends": friends})
