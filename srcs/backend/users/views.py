@@ -118,7 +118,6 @@ def get_profile(request):
             "last_name": user.last_name,
             "total_wins": user.total_wins,
             "total_losses": user.total_losses,
-            # friends
         },
         status=200,
     )
