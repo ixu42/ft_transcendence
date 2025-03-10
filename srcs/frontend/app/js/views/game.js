@@ -1,92 +1,47 @@
 
 
-const setupGameJs = () => {
-    const params = new URLSearchParams(window.location.hash.split("?")[1]);
-    const type = params.get("type") || "local";  // Default: Local game
-    const mode = params.get("mode") || "1v1";    // Default: 1v1 mode
+const setupGameJs = async () => {
+    try {
+        const params = new URLSearchParams(window.location.hash.split("?")[1]);
+        const type = params.get("type") || "local";  // Default: Local game
+        const mode = params.get("mode") || "1v1";      // Default: 1v1 mode
+        let response;
 
-    console.log(`🎮 Starting ${type.toUpperCase()} | Mode: ${mode.toUpperCase()}`);
+        console.log(`🎮 Starting ${type.toUpperCase()} | Mode: ${mode.toUpperCase()}`);
 
-    setTimeout(() => {
-        const canvas = document.getElementById("pong");
-        if (!canvas) {
-            console.error("❌ Pong canvas not found! Game cannot start.");
-            return;
+        if (type === "online") {
+            initializeOnlineGame(mode);
+        } else if (type === "local") {
+            switch (mode) {
+                case "tournament":
+                    response = await apiRequest('games/local/', 'POST');
+                    if (response.error) { throw new Error(response.error); }
+                    initializeTournament(response.game_id);
+                    break;
+                case "1v1":
+                    response = await apiRequest('games/local/', 'POST');
+                    if (response.error) { throw new Error(response.error); }
+                    initializeGame(response.game_id);
+                    break;
+                case "ai":
+                    response = await apiRequest('games/ai/', 'POST');
+                    if (response.error) { throw new Error(response.error);}
+                    initializeAIGame(response.game_id);
+                    break;
+                default:
+                    console.error(`❌ Unknown game mode: ${mode}`);
+                    initializeGame(response.game_id);
+            }
+        } else {
+            console.error(`❌ Unknown game type: ${type}`);
         }
-
-        switch (type) {
-            case "online":
-                initializeOnlineGame(mode);
-                break;
-            case "local":
-                switch (mode)
-                {
-                    case "tournament":
-                        initializeTournament();
-                        break;
-                    case "1v1":
-                        initializeGame();
-                        break;
-                    case "ai":
-                        initializeAIGame();
-                        break;
-                    default:
-                        console.error(`❌ Unknown game mode: ${mode}`);
-                        initializeGame();
-                }
-                break;
-            default:
-                console.error(`❌ Unknown game type: ${type}`);
-        }
-    }, 100);
+    } catch (error) {
+        console.error("Error setting up the game:", error);
+    }
 };
 
-
-async function apiRequest(endpoint, method, body = null) {
-    const url = `api/${endpoint}`;
-    const headers = {
-        "Content-Type": "application/json",
-    };
-    const csrfToken = await getCSRFCookie();
-    if (csrfToken) {
-        headers["X-CSRFToken"] = csrfToken;
-    }
-    const options = {
-        method: method,
-        headers: headers,
-        credentials: "include",
-    };
-
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    try {
-        const response = await fetch(url, options);
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Error: ${JSON.stringify(errorData.errors || errorData.message)}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Request failed:', error);
-        return { error: error.message };
-    }
-}
-
-async function createAiGame() {
-    const response = await apiRequest('games/ai/', 'POST');
-    if (response.message === 'AI game created.') {
-        console.log('AI Game created successfully with Game ID:', response.game_id);
-        return response.game_id;
-    }
-    console.log('Failed to create AI game:', response.error || response.errors);
-}
-
-
-async function saveGameStats(gameId, player1Score, player2Score) {
+async function saveGameStats(gameId, player1Score, player2Score)
+{
     const body = {
         player1_score: player1Score,
         player2_score: player2Score,
