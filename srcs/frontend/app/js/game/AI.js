@@ -6,7 +6,7 @@ const initializeAIGame = (gameId) => {
         return;
     }
     const game = createGame(true);
-    setupControls(game.player, game.player2, game);
+    setupControls(game.player, game.player2, game, gameId);
     setupAILevelControls(game);
     console.log("Starting game loop");
     gameLoop(game);
