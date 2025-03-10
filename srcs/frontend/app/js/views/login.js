@@ -1,10 +1,12 @@
-function setupLoginPage() {
-    console.log("📌 Login page handler triggered");
+
+function setupLoginPageJs()
+{
     checkAndShowSplash();
     const loginButton = document.getElementById("login-btn");
-    if (loginButton) {
-        bindLoginButton(loginButton);
-    } else {
+    if (loginButton){
+        handleLogin(loginButton);
+    }
+    else{
         console.error("Login button not found!");
     }
 }
@@ -53,7 +55,7 @@ async function getCSRFCookie() {
     }
 }
 
-function bindLoginButton(loginButton) {
+function handleLogin(loginButton) {
     loginButton.addEventListener("click", async () => {
         const username = document.getElementById("login-username-email").value.trim();
         const password = document.getElementById("login-password").value.trim();

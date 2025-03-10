@@ -1,4 +1,3 @@
-import { showPopup as showRegisterPopup } from './views/popups.js';
 
 const routes = {
   "#": "/views/login.html",
@@ -20,29 +19,29 @@ const isUserLoggedIn = () => localStorage.getItem("isLoggedIn") === "true";
 const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
-  "#game": () => checkGameMode(),
-  "#lobby": () => bindLobbyEventListeners(),
+  "#game": () => setupGameJs(),
+  "#lobby": () => setupLobbyJs(),
   "#menu": () => console.log("Menu loaded"),
-  "#leaderboard": () => {
-    console.log("📌 Leaderboard page handler triggered");
-    setupLeaderboard();
-  },
-  "#profile": () => {
-    console.log("📌 Profile page handler triggered");
-    setupProfilePage();
-  },
+  "#leaderboard": () => setupLeaderboardJs(),
+  "#profile": () => setupProfilePageJs(),
   "#terms": () => {},
   "#about": () => {},
   "#register": () => {},
-  "#login": () => {
-    console.log("📌 Login page handler triggered");
-    setupLoginPage();
-  },
+  "#login": () => setupLoginPageJs(),
   "#chat": () => {},
 
 };
 
 const handleLocation = async () => {
+
+  if (!window.location.hash)
+  {
+    const defaultRoute = isUserLoggedIn() ? "#menu" : "#login";
+    console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
+    console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
+    history.replaceState(null, null, defaultRoute);
+  }
+  
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
@@ -56,6 +55,7 @@ const handleLocation = async () => {
   if (navbar) navbar.classList.toggle("hidden", hideNavbarAndFooter);
   if (footer) footer.classList.toggle("hidden", hideNavbarAndFooter);
 
+  // Check for protected routes.
   if (protectedRoutes.includes(path) && !isLoggedIn) {
     console.warn(`🚨 Access denied: ${path} requires authentication.`);
     showRegisterPopup();
@@ -72,8 +72,7 @@ const handleLocation = async () => {
     }
 
     console.log(`✅ Loaded route content: ${path}`);
-    console.log(` Updating navbar...`);
-  
+    console.log(`Updating navbar...`);
     updateNavbar(); // Update the navbar after loading the route content 
 
   } catch (error) {
@@ -81,7 +80,6 @@ const handleLocation = async () => {
     console.error(`❌ Failed to load route ${path}:`, error);
   }
 };
-
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
 

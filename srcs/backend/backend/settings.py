@@ -27,7 +27,11 @@ SECRET_KEY = "django-insecure-@auby^w*3yw6(7hx*0eiu*b)0-pnhgm@ntm8un^^m65+jg%w%8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost", "tr-back", "tr-front", "tr-db", \
+                 "nginx-exporter", "postgres-exporter", "docker-exporter"]
+#ALLOWED_HOSTS = ["*"]
+
+SITE_ID = 1
 
 # Application definition
 
@@ -47,10 +51,20 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Django Monitoring
+    "django_prometheus",
+    # Allauth apps
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+
 ]
 
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -60,6 +74,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
+    # Allauth middleware
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 
@@ -170,6 +187,7 @@ AXES_LOCKOUT_CALLABLE = "backend.views.lockout"
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",  # Django Axes backend
     "django.contrib.auth.backends.ModelBackend",  # Default Django backend
+    "allauth.account.auth_backends.AuthenticationBackend", # allauth backend
 ]
 
 CSRF_TRUSTED_ORIGINS = [

@@ -1,5 +1,5 @@
 up:
-	docker compose up -d
+	docker compose up --build -d
 
 down:
 	docker compose down
@@ -8,7 +8,7 @@ restart:
 	docker compose restart
 
 build:
-	docker compose build
+	docker compose build --no-cache --parallel
 
 rebuild: build up
 

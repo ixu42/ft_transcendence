@@ -27,7 +27,7 @@ const logout = async () => {
     }
 };
 
-const setupProfilePage = () => {
+const setupProfilePageJs = () => {
     console.log("⚡ setupProfilePage() called!");
 
     try {
