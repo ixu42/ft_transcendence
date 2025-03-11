@@ -83,14 +83,6 @@ class CustomUser(AbstractUser):
         self.avatar = new_avatar
         self.save()
 
-    def is_online(self, minutes=5):
-        """
-        Returns True if the user has been active within the last `minutes` minutes.
-        """
-        if self.last_active:
-            return self.last_active >= timezone.now() - timezone.timedelta(minutes=minutes)
-        return False
-
     def save(self, *args, **kwargs):
         # Set default avatar if the instance is being created and no avatar is provided
         if not self.pk and not self.avatar:
