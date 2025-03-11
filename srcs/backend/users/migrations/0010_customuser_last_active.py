@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0009_customuser_friends'),
+        ("users", "0009_customuser_friends"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='last_active',
+            model_name="customuser",
+            name="last_active",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

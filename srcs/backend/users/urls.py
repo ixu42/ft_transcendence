@@ -25,5 +25,5 @@ urlpatterns = [
     # Friends
     path("<int:user_id>/friends/", include("friends.urls")),
     # Online status
-    path('heartbeat/', views.heartbeat, name='heartbeat'),
+    path("heartbeat/", views.heartbeat, name="heartbeat"),
 ]

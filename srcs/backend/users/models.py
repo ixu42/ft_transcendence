@@ -7,7 +7,7 @@ from django.core.files.storage import default_storage
 from django.templatetags.static import static
 from django.conf import settings
 from games.models import Game
-from django.utils import timezone
+
 
 def user_avatar_upload_path(instance, filename):
     return os.path.join("avatars", str(instance.id), filename)

@@ -18,6 +18,7 @@ from users.models import CustomUser
 from games.models import Game
 from django.utils import timezone
 
+
 def login_required_json(view_func):
     """
     Custom decorator that ensures the user is authenticated.
@@ -348,5 +349,5 @@ def leaderboard(request):
 @require_GET
 def heartbeat(request):
     request.user.last_active = timezone.now()
-    request.user.save(update_fields=['last_active'])
+    request.user.save(update_fields=["last_active"])
     return JsonResponse({"message": "Heartbeat updated."})

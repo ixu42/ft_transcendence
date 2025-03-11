@@ -7,6 +7,7 @@ from friends.models import FriendRequest
 from users.models import CustomUser
 from django.utils import timezone
 
+
 # Send a friend request to the user with id specified in the url
 @login_required_json
 @require_POST
@@ -45,10 +46,14 @@ def friend_list_create(request, user_id):
                 {"errors": "You do not have permission to view friends of this user."},
                 status=403,
             )
-        friends = list(request.user.friends.values("id", "username", "avatar", "last_active"))
+        friends = list(
+            request.user.friends.values("id", "username", "avatar", "last_active")
+        )
         threshold = timezone.now() - timedelta(minutes=1)
         for friend in friends:
-            friend["online"] = friend["last_active"] and friend["last_active"] >= threshold
+            friend["online"] = (
+                friend["last_active"] and friend["last_active"] >= threshold
+            )
         return JsonResponse({"friends": friends})
     else:
         return send_friend_request(request, user_id)
