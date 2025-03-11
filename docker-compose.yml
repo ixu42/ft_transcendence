@@ -6,6 +6,9 @@ networks:
   tr_network:
     name: tr_network
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
 
 services:
 
