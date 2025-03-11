@@ -3,8 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
-from django.db.models import Window, F, Q
-from django.db.models.functions import Rank
+from django.db.models import Q
 import os
 import shutil
 from functools import wraps
@@ -335,11 +334,27 @@ def match_history(request, user_id):
 
 @require_GET
 def leaderboard(request):
-    users = CustomUser.objects.annotate(
-        rank=Window(expression=Rank(), order_by=F("score").desc())
-    ).order_by("-score", "id")
+    users = CustomUser.objects.all()
 
-    data = list(users.values("id", "username", "avatar", "score", "rank"))
+    data = []
+    for user in users:
+        if user.username == "admin" or user.username == "guest_player":
+            continue
+
+        data.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "avatar": user.get_avatar(),
+                "total_wins": user.total_wins,
+                "win_rate": user.win_rate,
+            }
+        )
+
+    data.sort(key=lambda x: (-x["total_wins"], -x["win_rate"], x["id"]))
+
+    for rank, user in enumerate(data, start=1):
+        user["rank"] = rank
 
     return JsonResponse(data, safe=False)
 
