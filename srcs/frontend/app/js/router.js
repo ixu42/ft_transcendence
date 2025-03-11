@@ -11,6 +11,7 @@ const routes = {
   "#game": "/views/game.html",
   "#profile": "/views/profile.html",
   '#chat': "/views/chat.html",
+  '#contact': "/views/contact.html",
   404: "/views/404.html",
 };
 
