@@ -259,3 +259,82 @@ class TestUserProfile(TestCase):
         self.assertIn("message", data)
         self.assertEqual(data["message"], "Account deleted.")
         self.assertEqual(User.objects.filter(id=self.user.id).exists(), False)
+
+
+class TestUpdatePassword(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser", password="securepassword123"
+        )
+        self.url = reverse("users:update_password", args=[self.user.id])
+
+    def make_request(self, request_body):
+        return self.client.post(
+            self.url, data=request_body, content_type="application/json"
+        )
+
+    def test_update_password_success(self):
+        self.client.force_login(self.user)
+        request_body = {
+            "old_password": "securepassword123",
+            "new_password1": "securepassword456",
+            "new_password2": "securepassword456",
+        }
+        response = self.make_request(json.dumps(request_body))
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("id", data)
+        self.assertIn("username", data)
+        self.assertIn("message", data)
+        self.assertEqual(data["message"], "User password updated.")
+
+    def test_update_password_old_pass_invalid(self):
+        self.client.force_login(self.user)
+        request_body = {
+            "old_password": "invalidpassword123",
+            "new_password1": "securepassword456",
+            "new_password2": "securepassword456",
+        }
+        response = self.make_request(json.dumps(request_body))
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertIn("old_password", data["errors"])
+        self.assertEqual(data["errors"]["old_password"], ["Old password is incorrect."])
+
+    def test_update_password_new_pass_same_as_old(self):
+        self.client.force_login(self.user)
+        request_body = {
+            "old_password": "securepassword123",
+            "new_password1": "securepassword123",
+            "new_password2": "securepassword123",
+        }
+        response = self.make_request(json.dumps(request_body))
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertIn("new_password1", data["errors"])
+        self.assertEqual(
+            data["errors"]["new_password1"],
+            ["New password cannot be the same as the old one."],
+        )
+
+    def test_update_password_new_pass_no_match(self):
+        self.client.force_login(self.user)
+        request_body = {
+            "old_password": "securepassword123",
+            "new_password1": "securepassword456",
+            "new_password2": "securepassword789",
+        }
+        response = self.make_request(json.dumps(request_body))
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertIn("new_password2", data["errors"])
+        self.assertEqual(
+            data["errors"]["new_password2"], ["The two password fields didn’t match."]
+        )

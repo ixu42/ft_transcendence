@@ -29,6 +29,8 @@ class ProfileUpdateForm(UserChangeForm):
 
 
 class PasswordUpdateForm(SetPasswordForm):
+    old_password = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         model = CustomUser
         fields = ["old_password", "new_password1", "new_password2"]
