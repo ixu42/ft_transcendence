@@ -75,7 +75,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
-    'users.middleware.UpdateLastActiveMiddleware',
+    "users.middleware.UpdateLastActiveMiddleware",
 ]
 
 

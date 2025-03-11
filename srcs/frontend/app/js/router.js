@@ -32,6 +32,22 @@ const routeHandlers = {
 
 };
 
+function startHeartbeat()
+{
+  async function sendHeartbeat() {
+    try {
+      await apiRequest("users/heartbeat/", "GET");
+      console.log("Heartbeat updated");
+    } catch (error) {
+      console.error("Heartbeat error:", error);
+    }
+  }
+  
+  sendHeartbeat();
+  setInterval(sendHeartbeat, 30000);
+}
+
+
 const handleLocation = async () => {
 
   if (!window.location.hash)
@@ -74,7 +90,8 @@ const handleLocation = async () => {
     console.log(`✅ Loaded route content: ${path}`);
     console.log(`Updating navbar...`);
     updateNavbar(); // Update the navbar after loading the route content 
-
+    startHeartbeat();
+  
   } catch (error) {
     app.innerHTML = "<h1>Error loading page</h1>";
     console.error(`❌ Failed to load route ${path}:`, error);
