@@ -5,6 +5,7 @@ import json
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
 import io
+from games.models import Game
 
 User = get_user_model()
 
@@ -424,3 +425,38 @@ class TestUpdateAvatar(BaseTestCase):
             data["errors"]["avatar"],
             ["File size exceeds the limit 3.0 MB."],
         )
+
+
+class TestMatchHistory(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("users:match_history", args=[self.user.id])
+        self.login()
+
+        Game.objects.create(
+            player1=self.user,
+            player2=None,
+            winner=self.user,
+            player1_score=10,
+            player2_score=5,
+        )
+
+    def test_match_history_success(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("match_history", data)
+        self.assertEqual(len(data["match_history"]), 1)
+        game_data = data["match_history"][0]
+        self.assertIn("game_id", game_data)
+        self.assertIn("date_played", game_data)
+        self.assertIn("player1", game_data)
+        self.assertIn("player2", game_data)
+        self.assertIn("winner", game_data)
+        self.assertIn("player1_score", game_data)
+        self.assertIn("player2_score", game_data)
+        self.assertEqual(game_data["player1"], self.user.username)
+        self.assertEqual(game_data["player2"], "AI")
+        self.assertEqual(game_data["winner"], self.user.username)
+        self.assertEqual(game_data["player1_score"], 10)
+        self.assertEqual(game_data["player2_score"], 5)
