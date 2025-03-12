@@ -6,6 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
 import io
 from games.models import Game
+from tournaments.models import Tournament
 
 User = get_user_model()
 
@@ -460,3 +461,83 @@ class TestMatchHistory(BaseTestCase):
         self.assertEqual(game_data["winner"], self.user.username)
         self.assertEqual(game_data["player1_score"], 10)
         self.assertEqual(game_data["player2_score"], 5)
+
+
+class TestParticipatedTournaments(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("users:participated_tournaments", args=[self.user.id])
+        self.login()
+
+        self.other_user = User.objects.create_user(
+            username="otheruser", password="securepassword123"
+        )
+
+        self.tournament = Tournament.objects.create(
+            name="Test Tournament",
+            creator=self.user,
+            status=Tournament.TournamentStatus.PENDING,
+        )
+        self.tournament.add_player(user=self.user, display_name="User1")
+        self.tournament.add_player(user=self.other_user, display_name="User2")
+
+    def test_participated_tournaments_success(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("participated_tournaments", data)
+        tournaments_data = data["participated_tournaments"]
+        self.assertEqual(len(tournaments_data), 1)
+        tournament_data = tournaments_data[0]
+        self.assertIn("id", tournament_data)
+        self.assertIn("name", tournament_data)
+        self.assertIn("status", tournament_data)
+        self.assertIn("started_at", tournament_data)
+        self.assertIn("players", tournament_data)
+        self.assertEqual(tournament_data["name"], "Test Tournament")
+        self.assertEqual(tournament_data["status"], "PENDING")
+        self.assertEqual(len(tournament_data["players"]), 2)
+        self.assertIn(self.user.username, tournament_data["players"])
+        self.assertIn(self.other_user.username, tournament_data["players"])
+
+
+class TestLeaderboard(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("users:leaderboard")
+
+        other_user = User.objects.create(
+            username="testuser2", password="securepassword123"
+        )
+        self.create_game(self.user, None, self.user, 10, 5)
+        self.create_game(self.user, other_user, other_user, 5, 10)
+
+    def create_game(self, player1, player2, winner, player1_score, player2_score):
+        Game.objects.create(
+            player1=player1,
+            player2=player2,
+            winner=winner,
+            player1_score=player1_score,
+            player2_score=player2_score,
+        )
+
+    def assert_leaderboard_entry(self, entry, username, total_wins, win_rate, rank):
+        self.assertIn("id", entry)
+        self.assertIn("username", entry)
+        self.assertIn("avatar", entry)
+        self.assertIn("total_wins", entry)
+        self.assertIn("win_rate", entry)
+        self.assertIn("rank", entry)
+
+        self.assertEqual(entry["username"], username)
+        self.assertEqual(entry["total_wins"], total_wins)
+        self.assertEqual(entry["win_rate"], win_rate)
+        self.assertEqual(entry["rank"], rank)
+
+    def test_leaderboard_success(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 2)
+        self.assert_leaderboard_entry(data[0], "testuser2", 1, 100.0, 1)
+        self.assert_leaderboard_entry(data[1], "testuser", 1, 50.0, 2)
