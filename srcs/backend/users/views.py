@@ -84,8 +84,7 @@ def login_user(request):
     if user is not None:
         login(request, user)
         return JsonResponse(
-            {"id": user.id, "username": user.username, "message": "Login successful."},
-            status=200,
+            {"id": user.id, "username": user.username, "message": "Login successful."}
         )
     else:
         return JsonResponse({"errors": "Invalid password."}, status=401)
@@ -98,8 +97,7 @@ def logout_user(request):
     username = request.user.username
     logout(request)
     return JsonResponse(
-        {"id": user_id, "username": username, "message": "Logout successful."},
-        status=200,
+        {"id": user_id, "username": username, "message": "Logout successful."}
     )
 
 
@@ -118,8 +116,7 @@ def get_profile(request):
             "last_name": user.last_name,
             "total_wins": user.total_wins,
             "total_losses": user.total_losses,
-        },
-        status=200,
+        }
     )
 
 
@@ -143,8 +140,7 @@ def update_profile(request):
                 "id": user.id,
                 "username": user.username,
                 "message": "User profile updated.",
-            },
-            status=200,
+            }
         )
     else:
         return JsonResponse({"errors": form.errors}, status=400)
@@ -159,8 +155,7 @@ def deactivate_user_account(request):
     CustomUser.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
 
     return JsonResponse(
-        {"id": user_id, "username": username, "message": "Account deactivated."},
-        status=200,
+        {"id": user_id, "username": username, "message": "Account deactivated."}
     )
 
 
@@ -181,7 +176,7 @@ def delete_user_account(request):
     user.delete()  # Hard delete, remove the user instance and all related data from database
 
     return JsonResponse(
-        {"id": user_id, "username": username, "message": "Account deleted."}, status=200
+        {"id": user_id, "username": username, "message": "Account deleted."}
     )
 
 
@@ -236,8 +231,7 @@ def update_password(request, user_id):
                 "id": user.id,
                 "username": user.username,
                 "message": "User password updated.",
-            },
-            status=200,
+            }
         )
     else:
         return JsonResponse({"errors": form.errors}, status=400)
@@ -260,8 +254,7 @@ def update_avatar(request):
                 "username": request.user.username,
                 "message": "Avatar updated.",
                 "avatar_url": request.user.get_avatar(),
-            },
-            status=200,
+            }
         )
 
     return JsonResponse({"errors": form.errors}, status=400)
@@ -292,12 +285,7 @@ def participated_tournaments(request, user_id):
         for tournament in participated_tournaments
     ]
 
-    return JsonResponse(
-        {
-            "participated_tournaments": tournament_data,
-        },
-        status=200,
-    )
+    return JsonResponse({"participated_tournaments": tournament_data})
 
 
 @login_required_json
