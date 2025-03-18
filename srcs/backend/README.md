@@ -215,13 +215,6 @@ Get details of the authenticated user's profile.
                 "errors": "User is not authenticated."
             }
             ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
-            }
-            ```
 
 </details>
 
@@ -257,13 +250,6 @@ Update details of the authenticated user's profile, include username, email, fir
             ```json
             {
                 "errors": "User is not authenticated."
-            }
-            ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
             }
             ```
 
@@ -361,13 +347,6 @@ For the authenticated user to deactivate their account. Recommended by Django in
                 "errors": "User is not authenticated."
             }
             ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
-            }
-            ```
 
 </details>
 
@@ -394,13 +373,6 @@ For the authenticated user to delete its account. In this case, user object and 
             ```json
             {
                 "errors": "User is not authenticated."
-            }
-            ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to access this user's profile."
             }
             ```
 

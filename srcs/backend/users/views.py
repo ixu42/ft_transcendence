@@ -68,6 +68,29 @@ def register_user(request):
         return JsonResponse({"errors": form.errors}, status=400)
 
 
+def custom_login(request, user, response, force_login=False):
+    # Manually create a session for the user
+    user_session = SessionStore()
+    user_session["user_id"] = user.id
+    user_session.create()  # Generate a unique session_key, and save session data to database
+
+    cookie_name = "session_" + str(user.id)
+
+    if cookie_name in request.COOKIES and not force_login:
+        return JsonResponse({"errors": "User is already logged in."}, status=400)
+
+    current_session_id = user_session.session_key
+    response.set_cookie(
+        cookie_name,
+        current_session_id,
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=settings.SESSION_COOKIE_AGE,
+    )
+    return response
+
+
 @require_POST
 def login_user(request):
     try:
@@ -93,52 +116,32 @@ def login_user(request):
     if user is None:
         return JsonResponse({"errors": "Invalid password."}, status=401)
 
-    # Manually create a session for the user
-    user_session = SessionStore()
-    user_session["user_id"] = user.id
-    user_session.create()  # Generate a unique session_key, and save session data to database
-
-    cookie_name = "session_" + str(user.id)
-
-    if cookie_name in request.COOKIES:
-        return JsonResponse({"errors": "User is already logged in."}, status=400)
-
     response = JsonResponse(
         {"id": user.id, "username": user.username, "message": "Login successful."}
     )
-    current_session_id = user_session.session_key
-    response.set_cookie(
-        cookie_name,
-        current_session_id,
-        httponly=True,
-        secure=True,
-        samesite="None",
-        max_age=settings.SESSION_COOKIE_AGE,
-    )
+    return custom_login(request, user, response)
+
+
+def custom_logout(request, user_id, response):
+    session_cookie = request.COOKIES.get(f"session_{user_id}")
+    SessionStore(session_cookie).delete()  # Delete session data from database
+    response.delete_cookie(f"session_{user_id}")
     return response
 
 
 @login_required_json
 @require_POST
 def logout_user(request, user_id):
-    session_cookie = request.COOKIES.get(f"session_{user_id}")
-
-    SessionStore(session_cookie).delete()  # Delete session data from database
-
     username = CustomUser.objects.get(id=user_id).username
-
     response = JsonResponse(
         {"id": user_id, "username": username, "message": "Logout successful."}
-    )
-    response.delete_cookie(f"session_{user_id}")
-
-    return response
+    ) 
+    return custom_logout(request, user_id, response)
 
 
-@login_required_json
 @require_GET
-def get_profile(request):
-    user = request.user
+def get_profile(request, user_id):
+    user = CustomUser.objects.get(id=user_id)
 
     return JsonResponse(
         {
@@ -154,50 +157,44 @@ def get_profile(request):
     )
 
 
-@login_required_json
 @require_http_methods(["PATCH"])
-def update_profile(request):
+def update_profile(request, user_id):
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse({"errors": "Invalid JSON input."}, status=400)
 
-    user = request.user
+    user = CustomUser.objects.get(id=user_id)
     form = ProfileUpdateForm(data, instance=user)
 
     if form.is_valid():
         form.save()
-        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-
-        return JsonResponse(
+        response = JsonResponse(
             {
                 "id": user.id,
                 "username": user.username,
                 "message": "User profile updated.",
             }
         )
+        return custom_login(request, user, response, True)
     else:
         return JsonResponse({"errors": form.errors}, status=400)
 
 
-@login_required_json
 @require_http_methods(["PATCH"])
-def deactivate_user_account(request):
-    user_id = request.user.id
-    username = request.user.username
-    logout(request)
+def deactivate_user_account(request, user_id):
     CustomUser.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
 
-    return JsonResponse(
+    username = CustomUser.objects.get(id=user_id).username
+    response = JsonResponse(
         {"id": user_id, "username": username, "message": "Account deactivated."}
     )
+    return custom_logout(request, user_id, response)
 
 
-@login_required_json
 @require_http_methods(["DELETE"])
-def delete_user_account(request):
-    user = request.user
-    user_id = user.id
+def delete_user_account(request, user_id):
+    user = CustomUser.objects.get(id=user_id)
     username = user.username
 
     # If user has avatar in media directory, delete user's avatar and its related directory
@@ -206,25 +203,19 @@ def delete_user_account(request):
         if os.path.exists(user_folder):
             shutil.rmtree(user_folder)
 
-    logout(request)
     user.delete()  # Hard delete, remove the user instance and all related data from database
 
-    return JsonResponse(
+    response = JsonResponse(
         {"id": user_id, "username": username, "message": "Account deleted."}
     )
+    return custom_logout(request, user_id, response)
 
 
 @login_required_json
 @require_http_methods(["GET", "PATCH", "DELETE"])
 def user_profile(request, user_id):
-    if request.user.id != user_id:
-        return JsonResponse(
-            {"errors": "You do not have permission to access this user's profile."},
-            status=403,
-        )
-
     if request.method == "GET":
-        return get_profile(request)
+        return get_profile(request, user_id)
 
     elif request.method == "PATCH":
         try:
@@ -233,12 +224,12 @@ def user_profile(request, user_id):
             return JsonResponse({"errors", "Invalid JSON input."}, status=400)
 
         if body.get("deactivate") is True:
-            return deactivate_user_account(request)
+            return deactivate_user_account(request, user_id)
 
-        return update_profile(request)
+        return update_profile(request, user_id)
 
     elif request.method == "DELETE":
-        return delete_user_account(request)
+        return delete_user_account(request,user_id)
 
 
 @login_required_json
