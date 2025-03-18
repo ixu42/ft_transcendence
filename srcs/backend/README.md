@@ -75,29 +75,27 @@ Authenticate a user and logs them in. If a user fails to log in with incorrect c
         }
         ```
     - **400**
-        - When the user is already logged in
-            ```json
-            {
-                "errors": "User is already authenticated."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is already authenticated."
+        }
+        ```
     - **401**
-            ```json
-            {
-                "errors": "Invalid password."
-            }
-            ```
-            ```json
-            {
-                "errors": "Username does not exist."
-            }
-            ```
-        - When username and/or password are/is missing
-            ```json
-            {
-                "errors": "Username and password are required."
-            }
-            ```
+        ```json
+        {
+            "errors": "Invalid password."
+        }
+        ```
+        ```json
+        {
+            "errors": "Username does not exist."
+        }
+        ```
+        ```json
+        {
+            "errors": "Username and password are required."
+        }
+        ```
     - **403**
         - When the user fails to log in due to incorrect credentials 5 times in a row
             ```json
@@ -127,12 +125,11 @@ For the currently authenticated user to log out.
         }
         ```
     - **401**
-        - When the user is not logged in
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -143,7 +140,7 @@ For the currently authenticated user to log out.
 Allow users to upload a new avatar image.
 
 <details>
-    <summary><code>POST</code><code><b>users/avatar/</b></code></summary>
+    <summary><code>POST</code><code><b>users/{user_id}/avatar/</b></code></summary>
 
 - **Expected Request Body**:
     The request should be a `multipart/form-data` request with the following field:
@@ -185,6 +182,12 @@ Allow users to upload a new avatar image.
                 "errors": "No file uploaded."
             }
             ```
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -209,12 +212,11 @@ Get details of the authenticated user's profile.
         }
         ```
     - **401**
-        - When the user is not authenticated
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -246,12 +248,11 @@ Update details of the authenticated user's profile, include username, email, fir
         }
         ```
     - **401**
-        - When the user is not authenticated
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -300,19 +301,11 @@ Update the password of the authenticated user.
         }
         ```
     - **401**
-        - When the user is not authenticated
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to update password of this user."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -341,12 +334,11 @@ For the authenticated user to deactivate their account. Recommended by Django in
         }
         ```
     - **401**
-        - When the user is not authenticated
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -369,12 +361,11 @@ For the authenticated user to delete its account. In this case, user object and 
         }
         ```
     - **401**
-        - When the user is not authenticated
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -407,19 +398,11 @@ For the authenticated user to view their participated tournaments related info, 
             ]
         }
     - **401**
-        - When the user is not authenticated
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to view participated tournaments of this user."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -460,19 +443,11 @@ For the authenticated user to view their match history including date, winner, p
         }
         ```
     - **401**
-        - When the user is not authenticated
-            ```json
-            {
-                "errors": "User is not authenticated."
-            }
-            ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to view match history of this user."
-            }
-            ```
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
+        ```
 
 </details>
 
@@ -507,6 +482,33 @@ Get basic user info and game stats for all users.
             }
             "... more items ..."
         ]
+        ```
+
+</details>
+
+---
+
+### Heartbeat for online status
+
+Update the last active timestamp of the user to track their online status.
+
+<details>
+    <summary>
+        <code>GET</code>
+        <code><b>users/{user_id}/heartbeat/</b></code>
+    </summary>
+
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Heartbeat updated."
+        }
+    - **401**
+        ```json
+        {
+            "errors": "User is not authenticated."
+        }
         ```
 
 </details>

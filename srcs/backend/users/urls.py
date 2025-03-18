@@ -11,7 +11,7 @@ urlpatterns = [
     # Profile routes
     path("<int:user_id>/", views.user_profile, name="user_profile"),
     path("<int:user_id>/password/", views.update_password, name="update_password"),
-    path("avatar/", views.update_avatar, name="update_avatar"),
+    path("<int:user_id>/avatar/", views.update_avatar, name="update_avatar"),
     # Participated tournaments
     path(
         "<int:user_id>/tournaments/",
@@ -25,5 +25,5 @@ urlpatterns = [
     # Friends
     path("<int:user_id>/friends/", include("friends.urls")),
     # Online status
-    path("heartbeat/", views.heartbeat, name="heartbeat"),
+    path("<int:user_id>/heartbeat/", views.heartbeat, name="heartbeat"),
 ]

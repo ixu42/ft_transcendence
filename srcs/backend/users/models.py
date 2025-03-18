@@ -74,8 +74,6 @@ class CustomUser(AbstractUser):
         """
         Updates the user's avatar and handles file cleanup.
         """
-        print(old_file_path)
-        print(self.default_avatar)
         if old_file_path != self.default_avatar:
             if default_storage.exists(old_file_path):
                 default_storage.delete(old_file_path)

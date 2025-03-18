@@ -8,15 +8,17 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.conf import settings
 from django.db.models import Q
 from functools import wraps
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 from users.forms import (
     CustomUserCreationForm,
     AvatarUpdateForm,
     ProfileUpdateForm,
     PasswordUpdateForm,
 )
-from users.models import CustomUser
 from games.models import Game
-from django.utils import timezone
+
+User = get_user_model()
 
 
 def login_required_json(view_func):
@@ -107,8 +109,8 @@ def login_user(request):
         )
 
     try:
-        user = CustomUser.objects.get(username=username)
-    except CustomUser.DoesNotExist:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
         return JsonResponse({"errors": "Username does not exist."}, status=401)
 
     user = authenticate(request, username=username, password=password)
@@ -132,7 +134,7 @@ def custom_logout(request, user_id, response):
 @login_required_json
 @require_POST
 def logout_user(request, user_id):
-    username = CustomUser.objects.get(id=user_id).username
+    username = User.objects.get(id=user_id).username
     response = JsonResponse(
         {"id": user_id, "username": username, "message": "Logout successful."}
     ) 
@@ -141,7 +143,7 @@ def logout_user(request, user_id):
 
 @require_GET
 def get_profile(request, user_id):
-    user = CustomUser.objects.get(id=user_id)
+    user = User.objects.get(id=user_id)
 
     return JsonResponse(
         {
@@ -164,7 +166,7 @@ def update_profile(request, user_id):
     except json.JSONDecodeError:
         return JsonResponse({"errors": "Invalid JSON input."}, status=400)
 
-    user = CustomUser.objects.get(id=user_id)
+    user = User.objects.get(id=user_id)
     form = ProfileUpdateForm(data, instance=user)
 
     if form.is_valid():
@@ -183,9 +185,9 @@ def update_profile(request, user_id):
 
 @require_http_methods(["PATCH"])
 def deactivate_user_account(request, user_id):
-    CustomUser.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
+    User.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
 
-    username = CustomUser.objects.get(id=user_id).username
+    username = User.objects.get(id=user_id).username
     response = JsonResponse(
         {"id": user_id, "username": username, "message": "Account deactivated."}
     )
@@ -194,7 +196,7 @@ def deactivate_user_account(request, user_id):
 
 @require_http_methods(["DELETE"])
 def delete_user_account(request, user_id):
-    user = CustomUser.objects.get(id=user_id)
+    user = User.objects.get(id=user_id)
     username = user.username
 
     # If user has avatar in media directory, delete user's avatar and its related directory
@@ -235,50 +237,45 @@ def user_profile(request, user_id):
 @login_required_json
 @require_POST
 def update_password(request, user_id):
-    if request.user.id != user_id:
-        return JsonResponse(
-            {"errors": "You do not have permission to update password of this user."},
-            status=403,
-        )
-
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse({"errors": "Invalid JSON input."}, status=400)
 
-    user = request.user
+    user = User.objects.get(id=user_id)
     form = PasswordUpdateForm(user, data)
     if form.is_valid():
         form.save()
-        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        return JsonResponse(
+        response = JsonResponse(
             {
                 "id": user.id,
                 "username": user.username,
                 "message": "User password updated.",
             }
         )
+        return custom_login(request, user, response, True)
     else:
         return JsonResponse({"errors": form.errors}, status=400)
 
 
 @login_required_json
 @require_POST
-def update_avatar(request):
+def update_avatar(request, user_id):
     if "avatar" not in request.FILES:
         return JsonResponse({"errors": "No file uploaded."}, status=400)
 
-    old_file_path = request.user.avatar.name  # Store old file path for cleanup
-    form = AvatarUpdateForm(request.POST, request.FILES, instance=request.user)
+    user = User.objects.get(id=user_id)
+    old_file_path = user.avatar.name  # Store old file path for cleanup
+    form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
 
     if form.is_valid():
-        request.user.update_avatar(form.cleaned_data.get("avatar"), old_file_path)
+        user.update_avatar(form.cleaned_data.get("avatar"), old_file_path)
         return JsonResponse(
             {
-                "id": request.user.id,
-                "username": request.user.username,
+                "id": user.id,
+                "username": user.username,
                 "message": "Avatar updated.",
-                "avatar_url": request.user.get_avatar(),
+                "avatar_url": user.get_avatar(),
             }
         )
 
@@ -288,14 +285,7 @@ def update_avatar(request):
 @login_required_json
 @require_GET
 def participated_tournaments(request, user_id):
-    user = request.user
-    if user.id != user_id:
-        return JsonResponse(
-            {
-                "errors": "You do not have permission to view participated tournaments of this user."
-            },
-            status=403,
-        )
+    user = User.objects.get(id=user_id)
 
     participated_tournaments = user.participated_tournaments.all()
 
@@ -316,14 +306,7 @@ def participated_tournaments(request, user_id):
 @login_required_json
 @require_GET
 def match_history(request, user_id):
-    user = request.user
-    if user.id != user_id:
-        return JsonResponse(
-            {
-                "errors": "You do not have permission to view match history of this user."
-            },
-            status=403,
-        )
+    user = User.objects.get(id=user_id)
 
     games = Game.objects.filter(Q(player1=user) | Q(player2=user)).order_by(
         "-date_played"
@@ -347,7 +330,7 @@ def match_history(request, user_id):
 
 @require_GET
 def leaderboard(request):
-    users = CustomUser.objects.all()
+    users = User.objects.all()
 
     data = []
     for user in users:
@@ -375,7 +358,8 @@ def leaderboard(request):
 # Heartbeat for online status
 @login_required_json
 @require_GET
-def heartbeat(request):
-    request.user.last_active = timezone.now()
-    request.user.save(update_fields=["last_active"])
+def heartbeat(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.last_active = timezone.now()
+    user.save(update_fields=["last_active"])
     return JsonResponse({"message": "Heartbeat updated."})
