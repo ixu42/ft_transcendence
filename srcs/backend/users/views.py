@@ -10,6 +10,7 @@ from django.db.models import Q
 from functools import wraps
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.middleware.csrf import rotate_token, get_token
 from users.forms import (
     CustomUserCreationForm,
     AvatarUpdateForm,
@@ -90,6 +91,9 @@ def custom_login(request, user, response, force_login=False):
         samesite="None",
         max_age=settings.SESSION_COOKIE_AGE,
     )
+    rotate_token(request)  # Clear old csrf token and create a new one linked to new session
+    csrf_token = get_token(request)
+    response.set_cookie("csrftoken", csrf_token)
     return response
 
 
