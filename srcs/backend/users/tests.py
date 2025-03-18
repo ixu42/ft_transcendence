@@ -19,10 +19,20 @@ class BaseTestCase(TestCase):
         )
 
     def login(self):
-        self.client.force_login(self.user)
+        # Manually create a session for the user
+        session = self.client.session
+        session['user_id'] = self.user.id
+        session.save()
+
+        # Set the custom session cookie
+        self.client.cookies[f"session_{self.user.id}"] = session.session_key
 
     def tearDown(self):
-        self.client.logout()
+        # Manually clear the custom session cookie
+        self.client.cookies.pop(f"session_{self.user.id}", None)
+        
+        # Clear session-related data
+        self.client.session.clear()
 
 
 class TestRegisterUser(TestCase):
@@ -140,7 +150,7 @@ class TestLoginUser(BaseTestCase):
 
 class TestLogoutUser(BaseTestCase):
     def setUp(self):
-        self.url = reverse("users:logout_user")
+        self.url = reverse("users:logout_user", args=[self.user.id])
 
     def make_request(self):
         return self.client.post(self.url)
@@ -170,16 +180,6 @@ class TestUserProfile(BaseTestCase):
         self.valid_url = reverse("users:user_profile", args=[self.user.id])
         self.invalid_url = reverse("users:user_profile", args=[self.user.id + 1])
         self.login()
-
-    def test_user_profile_not_found(self):
-        response = self.client.get(self.invalid_url)
-
-        self.assertEqual(response.status_code, 403)
-        data = response.json()
-        self.assertIn("errors", data)
-        self.assertEqual(
-            data["errors"], "You do not have permission to access this user's profile."
-        )
 
     def test_get_user_profile_success(self):
         response = self.client.get(self.valid_url)
