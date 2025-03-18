@@ -1,11 +1,12 @@
 import json
+import os
+import shutil
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.sessions.backends.db import SessionStore
 from django.conf import settings
 from django.db.models import Q
-import os
-import shutil
 from functools import wraps
 from users.forms import (
     CustomUserCreationForm,
@@ -26,8 +27,19 @@ def login_required_json(view_func):
 
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated:
+        user_id = kwargs.get("user_id")  # Get user_id from route
+        if not user_id:
+            return JsonResponse(
+                {"errors": "user_id is required in the route."}, status=400
+            )
+
+        cookie_name = f"session_{user_id}"
+        session_cookie = request.COOKIES.get(cookie_name)
+
+        # Check if the custom session cookie exists
+        if not session_cookie:
             return JsonResponse({"errors": "User is not authenticated."}, status=401)
+
         return view_func(request, *args, **kwargs)
 
     return wrapper
@@ -58,9 +70,6 @@ def register_user(request):
 
 @require_POST
 def login_user(request):
-    if request.user.is_authenticated:
-        return JsonResponse({"errors": "User is already logged in."}, status=400)
-
     try:
         body = json.loads(request.body)
     except json.JSONDecodeError:
@@ -81,24 +90,49 @@ def login_user(request):
 
     user = authenticate(request, username=username, password=password)
 
-    if user is not None:
-        login(request, user)
-        return JsonResponse(
-            {"id": user.id, "username": user.username, "message": "Login successful."}
-        )
-    else:
+    if user is None:
         return JsonResponse({"errors": "Invalid password."}, status=401)
+
+    # Manually create a session for the user
+    user_session = SessionStore()
+    user_session["user_id"] = user.id
+    user_session.create()  # Generate a unique session_key, and save session data to database
+
+    cookie_name = "session_" + str(user.id)
+
+    if cookie_name in request.COOKIES:
+        return JsonResponse({"errors": "User is already logged in."}, status=400)
+
+    response = JsonResponse(
+        {"id": user.id, "username": user.username, "message": "Login successful."}
+    )
+    current_session_id = user_session.session_key
+    response.set_cookie(
+        cookie_name,
+        current_session_id,
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=settings.SESSION_COOKIE_AGE,
+    )
+    return response
 
 
 @login_required_json
 @require_POST
-def logout_user(request):
-    user_id = request.user.id
-    username = request.user.username
-    logout(request)
-    return JsonResponse(
+def logout_user(request, user_id):
+    session_cookie = request.COOKIES.get(f"session_{user_id}")
+
+    SessionStore(session_cookie).delete()  # Delete session data from database
+
+    username = CustomUser.objects.get(id=user_id).username
+
+    response = JsonResponse(
         {"id": user_id, "username": username, "message": "Logout successful."}
     )
+    response.delete_cookie(f"session_{user_id}")
+
+    return response
 
 
 @login_required_json

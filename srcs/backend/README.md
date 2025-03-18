@@ -115,7 +115,7 @@ Authenticate a user and logs them in. If a user fails to log in with incorrect c
 For the currently authenticated user to log out.
 
 <details>
-    <summary><code>POST</code><code><b>users/logout/</b></code></summary>
+    <summary><code>POST</code><code><b>users/{user_id}/logout/</b></code></summary>
 
 - **Response**
     - **200**
@@ -195,7 +195,7 @@ Allow users to upload a new avatar image.
 Get details of the authenticated user's profile.
 
 <details>
-    <summary><code>GET</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+    <summary><code>GET</code><code><b>users/{user_id}/</b></code></summary>
 
 - **Response**
     - **200**
@@ -233,7 +233,7 @@ Update details of the authenticated user's profile, include username, email, fir
 
 
 <details>
-    <summary><code>PATCH</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+    <summary><code>PATCH</code><code><b>users/{user_id}/</b></code></summary>
 
 - **Expected Request Body**:
     ```json
@@ -276,7 +276,7 @@ Update details of the authenticated user's profile, include username, email, fir
 Update the password of the authenticated user.
 
 <details>
-    <summary><code>POST</code><code><b>users/&lt;user_id&gt;/password/</b></code></summary>
+    <summary><code>POST</code><code><b>users/{user_id}/password/</b></code></summary>
 
 - **Expected Request Body**:
     ```json
@@ -337,7 +337,7 @@ Update the password of the authenticated user.
 For the authenticated user to deactivate their account. Recommended by Django instead of deleting user account, as the related data to the user won't be affected.
 
 <details>
-    <summary><code>PATCH</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+    <summary><code>PATCH</code><code><b>users/{user_id}/</b></code></summary>
 
 - **Expected Request Body**:
     ```json
@@ -378,7 +378,7 @@ For the authenticated user to deactivate their account. Recommended by Django in
 For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
 
 <details>
-    <summary><code>DELETE</code><code><b>users/&lt;user_id&gt;/</b></code></summary>
+    <summary><code>DELETE</code><code><b>users/{user_id}/</b></code></summary>
 
 - **Response**
     - **200**
@@ -413,7 +413,7 @@ For the authenticated user to delete its account. In this case, user object and 
 For the authenticated user to view their participated tournaments related info, including id, name, status, started_at, players.
 
 <details>
-    <summary><code>GET</code><code><b>users/&lt;user_id&gt;/tournaments/</b></code></summary>
+    <summary><code>GET</code><code><b>users/{user_id}/tournaments/</b></code></summary>
 
 - **Response** 
     - **200**
@@ -458,7 +458,7 @@ For the authenticated user to view their participated tournaments related info, 
 For the authenticated user to view their match history including date, winner, players and their scores.
 
 <details>
-    <summary><code>GET</code><code><b>users/&lt;user_id&gt;/match-history/</b></code></summary>
+    <summary><code>GET</code><code><b>users/{user_id}/match-history/</b></code></summary>
 
 - **Response**
     - **200**
@@ -548,7 +548,7 @@ List all the friends of currently authenticated user.
 <details>
     <summary>
         <code>GET</code>
-        <code><b>users/&lt;user_id&gt;/friends/</b></code>
+        <code><b>users/{user_id}/friends/</b></code>
     </summary>
 
 - **Response**
@@ -591,7 +591,7 @@ Send a friend request to another user. Note that the user_id in url is the id of
 <details>
     <summary>
         <code>POST</code>
-        <code><b>users/&lt;user_id&gt;/friends/</b></code>
+        <code><b>users/{user_id}/friends/</b></code>
     </summary>
 
 - **Response**
@@ -634,7 +634,7 @@ List all the pending friend requests received by the authenticated user.
 <details>
     <summary>
         <code>GET</code>
-        <code><b>users/&lt;user_id&gt;/friends/requests/</b></code>
+        <code><b>users/{user_id}/friends/requests/</b></code>
     </summary>
 
 - **Response**
@@ -675,7 +675,7 @@ Accept or reject a friend request.
 <details>
     <summary>
         <code>POST</code>
-        <code><b>users/&lt;user_id&gt;/friends/requests/&lt;request_id&gt;/</b></code>
+        <code><b>users/{user_id}/friends/requests/{request_id}/</b></code>
     </summary>
 
 - **Expected Request Body**:
@@ -722,7 +722,7 @@ Unfriend someone.
 <details>
     <summary>
         <code>DELETE</code>
-        <code><b>users/&lt;user_id&gt;/friends/requests/&lt;request_id&gt;/</b></code>
+        <code><b>users/{user_id}/friends/requests/{request_id}/</b></code>
     </summary>
 
 - **Response**
@@ -815,7 +815,7 @@ Save the stats for a completed game for a logged-in user.
 <details>
     <summary>
         <code>PATCH</code>
-        <code><b>games/&lt;game_id&gt;/stats/</b></code>
+        <code><b>games/{game_id}/stats/</b></code>
     </summary>
 
 - **Expected Request Body**:
