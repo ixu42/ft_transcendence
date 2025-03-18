@@ -22,7 +22,7 @@ class BaseTestCase(TestCase):
     def login(self):
         # Manually create a session for the user
         session = self.client.session
-        session['user_id'] = self.user.id
+        session["user_id"] = self.user.id
         session.save()
 
         # Set the custom session cookie
@@ -31,7 +31,7 @@ class BaseTestCase(TestCase):
     def tearDown(self):
         # Manually clear the custom session cookie
         self.client.cookies.pop(f"session_{self.user.id}", None)
-        
+
         # Clear session-related data
         self.client.session.clear()
 
@@ -548,7 +548,7 @@ class TestHeartbeat(BaseTestCase):
     def setUp(self):
         self.url = reverse("users:heartbeat", args=[self.user.id])
         self.login()
-    
+
     def test_heartbeat_success(self):
         response = self.client.get(self.url)
 

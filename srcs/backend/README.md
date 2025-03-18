@@ -546,13 +546,6 @@ List all the friends of currently authenticated user.
                 "errors": "User is not authenticated."
             }
             ```
-    - **403**
-        - When the user_id in url does not match the authenticated user's id
-            ```json
-            {
-                "errors": "You do not have permission to view friends of this user."
-            }
-            ```
 
 </details>
 
@@ -560,12 +553,12 @@ List all the friends of currently authenticated user.
 
 ### Friend request
 
-Send a friend request to another user. Note that the user_id in url is the id of the recipient of this friend request.
+Send a friend request to another user. The recipient id is passed as a query parameter.
 
 <details>
     <summary>
         <code>POST</code>
-        <code><b>users/{user_id}/friends/</b></code>
+        <code><b>users/{user_id}/friends/requests?recipient_id={recipient_id}</b></code>
     </summary>
 
 - **Response**
@@ -580,6 +573,24 @@ Send a friend request to another user. Note that the user_id in url is the id of
             ```json
             {
                 "errors": "You cannot send a friend request to yourself."
+            }
+            ```
+        - When no recipient_id query param is passed
+            ```json
+            {
+                "errors": "Missing recipient_id query parameter."
+            }
+            ```
+        - When recipient_id passed cannot be converted to integer
+            ```json
+            {
+                "errors": "recipient_id must be an integer."
+            }
+            ```
+        - When the same request has been sent earlier
+            ```json
+            {
+                "errors": "Friend request already sent."
             }
             ```
     - **401**
@@ -631,12 +642,6 @@ List all the pending friend requests received by the authenticated user.
             "errors": "User is not authenticated."
         }
         ```
-    - **403**
-        ```json
-        {
-            "errors": "You do not have permission to view another user's friend requests."
-        }
-        ```
 
 </details>
 
@@ -672,12 +677,6 @@ Accept or reject a friend request.
             "errors": "User is not authenticated."
         }
         ```
-    - **403**
-        ```json
-        {
-            "errors": "You do not have permission to handle another user's friend request."
-        }
-        ```
     - **404**
         ```json
         {
@@ -711,12 +710,6 @@ Unfriend someone.
         ```json
         {
             "errors": "User is not authenticated."
-        }
-        ```
-    - **403**
-        ```json
-        {
-            "errors": "You do not have permission to remove any friend of this user."
         }
         ```
 

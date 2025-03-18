@@ -3,7 +3,7 @@ import os
 import shutil
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 from django.contrib.sessions.backends.db import SessionStore
 from django.conf import settings
 from django.db.models import Q
@@ -137,7 +137,7 @@ def logout_user(request, user_id):
     username = User.objects.get(id=user_id).username
     response = JsonResponse(
         {"id": user_id, "username": username, "message": "Logout successful."}
-    ) 
+    )
     return custom_logout(request, user_id, response)
 
 
@@ -231,7 +231,7 @@ def user_profile(request, user_id):
         return update_profile(request, user_id)
 
     elif request.method == "DELETE":
-        return delete_user_account(request,user_id)
+        return delete_user_account(request, user_id)
 
 
 @login_required_json
