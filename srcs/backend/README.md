@@ -724,7 +724,7 @@ Create a local 1v1 game for a logged-in user.
 <details>
     <summary>
         <code>POST</code>
-        <code><b>games/local/</b></code>
+        <code><b>users/{user_id}/games/local/</b></code>
     </summary>
 
 - **Response**
@@ -753,7 +753,7 @@ Create a local 1v1 game against AI for a logged-in user.
 <details>
     <summary>
         <code>POST</code>
-        <code><b>games/ai/</b></code>
+        <code><b>users/{user_id}/games/ai/</b></code>
     </summary>
 
 - **Response**
@@ -782,7 +782,7 @@ Save the stats for a completed game for a logged-in user.
 <details>
     <summary>
         <code>PATCH</code>
-        <code><b>games/{game_id}/stats/</b></code>
+        <code><b>users/{user_id}/games/{game_id}/stats/</b></code>
     </summary>
 
 - **Expected Request Body**:

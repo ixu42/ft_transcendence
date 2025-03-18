@@ -26,4 +26,6 @@ urlpatterns = [
     path("<int:user_id>/friends/", include("friends.urls")),
     # Online status
     path("<int:user_id>/heartbeat/", views.heartbeat, name="heartbeat"),
+    # Game stats
+    path("<int:user_id>/games/", include("games.urls")),
 ]
