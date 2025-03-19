@@ -25,6 +25,7 @@ class Game(models.Model):
         blank=True,
     )
     date_played = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
     player1_score = models.IntegerField(default=0)
     player2_score = models.IntegerField(default=0)
 

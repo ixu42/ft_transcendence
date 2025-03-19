@@ -8,11 +8,12 @@ class GameAdmin(admin.ModelAdmin):
         "date_played",
         "get_player1",
         "get_player2",
+        "completed",
         "get_winner",
         "player1_score",
         "player2_score",
     )
-    list_filter = ("date_played", "winner")
+    list_filter = ("date_played", "completed", "winner")
     search_fields = ("player1__username", "player2__username", "winner__username")
 
     def get_player1(self, obj):
