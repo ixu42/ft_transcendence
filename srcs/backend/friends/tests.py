@@ -99,7 +99,7 @@ class TestSendOrListFriendRequest(BaseTestCase):
         data = response.json()
         self.assertIn("errors", data)
         self.assertEqual(data["errors"], "Recipient of the friend request not found.")
-    
+
     def test_send_request_to_a_friend(self):
         self.user1.friends.add(self.user2)
         response = self.client.post(self.url1)
@@ -108,7 +108,7 @@ class TestSendOrListFriendRequest(BaseTestCase):
         data = response.json()
         self.assertIn("errors", data)
         self.assertEqual(data["errors"], "Already friends with this user.")
-    
+
     def test_send_request_already_sent(self):
         FriendRequest.objects.create(sender=self.user1, receiver=self.user2)
         response = self.client.post(self.url1)

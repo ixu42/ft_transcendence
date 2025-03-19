@@ -376,7 +376,7 @@ For the authenticated user to delete its account. In this case, user object and 
 For the authenticated user to view their participated tournaments related info, including id, name, status, started_at, players.
 
 <details>
-    <summary><code>GET</code><code><b>users/{user_id}/tournaments/</b></code></summary>
+    <summary><code>GET</code><code><b>users/{user_id}/tournaments-history/</b></code></summary>
 
 - **Response** 
     - **200**

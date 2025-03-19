@@ -187,7 +187,7 @@ const setupMatchHistoryModal = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`api/users/${userId}/tournaments/`, {
+            const response = await fetch(`api/users/${userId}/tournaments-history/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

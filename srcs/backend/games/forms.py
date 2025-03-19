@@ -45,7 +45,7 @@ class GameStatsForm(forms.Form):
             game.winner = game.player2
         else:
             game.winner = None
-        
+
         game.completed = True
 
         return game

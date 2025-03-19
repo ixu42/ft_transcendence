@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-
 ]
 
 
@@ -197,7 +196,7 @@ AXES_LOCKOUT_CALLABLE = "backend.views.lockout"
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",  # Django Axes backend
     "django.contrib.auth.backends.ModelBackend",  # Default Django backend
-    "allauth.account.auth_backends.AuthenticationBackend", # allauth backend
+    "allauth.account.auth_backends.AuthenticationBackend",  # allauth backend
 ]
 
 CSRF_TRUSTED_ORIGINS = [

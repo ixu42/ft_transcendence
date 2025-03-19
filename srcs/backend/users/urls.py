@@ -14,7 +14,7 @@ urlpatterns = [
     path("<int:user_id>/avatar/", views.update_avatar, name="update_avatar"),
     # Participated tournaments
     path(
-        "<int:user_id>/tournaments/",
+        "<int:user_id>/tournaments-history/",
         views.participated_tournaments,
         name="participated_tournaments",
     ),
@@ -26,6 +26,6 @@ urlpatterns = [
     path("<int:user_id>/friends/", include("friends.urls")),
     # Online status
     path("<int:user_id>/heartbeat/", views.heartbeat, name="heartbeat"),
-    # Game stats
+    # Game routes
     path("<int:user_id>/games/", include("games.urls")),
 ]

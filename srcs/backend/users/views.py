@@ -22,7 +22,7 @@ from games.models import Game
 User = get_user_model()
 
 
-def login_required_json(view_func):
+def custom_login_required(view_func):
     """
     Custom decorator that ensures the user is authenticated.
     Returns a 401 JSON response instead of redirecting.
@@ -34,6 +34,13 @@ def login_required_json(view_func):
         if not user_id:
             return JsonResponse(
                 {"errors": "user_id is required in the route."}, status=400
+            )
+
+        try:
+            User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return JsonResponse(
+                {"errors": f"User not found with user_id {user_id}."}, status=404
             )
 
         cookie_name = f"session_{user_id}"
@@ -91,7 +98,9 @@ def custom_login(request, user, response, force_login=False):
         samesite="None",
         max_age=settings.SESSION_COOKIE_AGE,
     )
-    rotate_token(request)  # Clear old csrf token and create a new one linked to new session
+    rotate_token(
+        request
+    )  # Clear old csrf token and create a new one linked to new session
     csrf_token = get_token(request)
     response.set_cookie("csrftoken", csrf_token)
     return response
@@ -135,7 +144,7 @@ def custom_logout(request, user_id, response):
     return response
 
 
-@login_required_json
+@custom_login_required
 @require_POST
 def logout_user(request, user_id):
     username = User.objects.get(id=user_id).username
@@ -217,7 +226,7 @@ def delete_user_account(request, user_id):
     return custom_logout(request, user_id, response)
 
 
-@login_required_json
+@custom_login_required
 @require_http_methods(["GET", "PATCH", "DELETE"])
 def user_profile(request, user_id):
     if request.method == "GET":
@@ -238,7 +247,7 @@ def user_profile(request, user_id):
         return delete_user_account(request, user_id)
 
 
-@login_required_json
+@custom_login_required
 @require_POST
 def update_password(request, user_id):
     try:
@@ -262,7 +271,7 @@ def update_password(request, user_id):
         return JsonResponse({"errors": form.errors}, status=400)
 
 
-@login_required_json
+@custom_login_required
 @require_POST
 def update_avatar(request, user_id):
     if "avatar" not in request.FILES:
@@ -286,7 +295,7 @@ def update_avatar(request, user_id):
     return JsonResponse({"errors": form.errors}, status=400)
 
 
-@login_required_json
+@custom_login_required
 @require_GET
 def participated_tournaments(request, user_id):
     user = User.objects.get(id=user_id)
@@ -307,7 +316,7 @@ def participated_tournaments(request, user_id):
     return JsonResponse({"participated_tournaments": tournament_data})
 
 
-@login_required_json
+@custom_login_required
 @require_GET
 def match_history(request, user_id):
     user = User.objects.get(id=user_id)
@@ -360,7 +369,7 @@ def leaderboard(request):
 
 
 # Heartbeat for online status
-@login_required_json
+@custom_login_required
 @require_GET
 def heartbeat(request, user_id):
     user = User.objects.get(id=user_id)

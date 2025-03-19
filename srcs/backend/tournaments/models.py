@@ -58,14 +58,12 @@ class Tournament(models.Model):
 
     def start(self, user):
         self.check_status()
-        if self.players.count() < 2:
-            raise ValidationError("Cannot start tournament with less than 2 players.")
-        if user != self.creator:
-            raise ValidationError("Only the creator of the tournament can start it.")
+        if self.players.count() < 3:
+            raise ValidationError("Cannot start tournament with less than 3 players.")
+        if not (user == self.creator or user in self.players.all()):
+            raise ValidationError("Only tournament players can start the tournament.")
         self.status = Tournament.TournamentStatus.ACTIVE
-        self.started_at = (
-            timezone.now()
-        )  # UTC time or user's local time (if interacting with the user)? Currently UTC
+        self.started_at = timezone.now()  # UTC time
         self.save()
 
     def __str__(self):
