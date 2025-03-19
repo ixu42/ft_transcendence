@@ -74,16 +74,16 @@ async function setupFriendsButton(friendsButton) {
         const newSendFriendRequestBtn = document.getElementById("send-friend-request-btn");
 
         newSendFriendRequestBtn.addEventListener("click", async () => {
-            const userIdInput = document.getElementById("friend-id-input");
-            const friendId = userIdInput.value.trim();
-        
-            if (!friendId) {
-                alert("Please enter a valid User ID.");
+            const userNameInput = document.getElementById("friend-username-input");
+            const friendUsername = userNameInput.value.trim();
+
+            if (!friendUsername) {
+                alert("Please enter a valid username.");
                 return;
             }
         
             try {
-                const response = await fetch(`api/users/${userId}/friends/requests/?recipient_id=${encodeURIComponent(friendId)}`, {  // ✅ Pass recipient_id as a query parameter
+                const response = await fetch(`api/users/${userId}/friends/requests/?recipient_username=${encodeURIComponent(friendUsername)}`, {  // ✅ Pass recipient_username as a query parameter
                     method: "POST",
                     credentials: "include",
                     headers: {

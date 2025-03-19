@@ -553,12 +553,12 @@ List all the friends of currently authenticated user.
 
 ### Friend request
 
-Send a friend request to another user. The recipient id is passed as a query parameter.
+Send a friend request to another user. The recipient username is passed as a query parameter.
 
 <details>
     <summary>
         <code>POST</code>
-        <code><b>users/{user_id}/friends/requests?recipient_id={recipient_id}</b></code>
+        <code><b>users/{user_id}/friends/requests?recipient_username={recipient_username}</b></code>
     </summary>
 
 - **Response**
@@ -575,22 +575,22 @@ Send a friend request to another user. The recipient id is passed as a query par
                 "errors": "You cannot send a friend request to yourself."
             }
             ```
-        - When no recipient_id query param is passed
+        - When no recipient_username query param is passed
             ```json
             {
-                "errors": "Missing recipient_id query parameter."
-            }
-            ```
-        - When recipient_id passed cannot be converted to integer
-            ```json
-            {
-                "errors": "recipient_id must be an integer."
+                "errors": "Missing recipient_username query parameter."
             }
             ```
         - When the same request has been sent earlier
             ```json
             {
                 "errors": "Friend request already sent."
+            }
+            ```
+        - When recipient is already a friend of the user
+            ```json
+            {
+                "errors": "Already friends with this user."
             }
             ```
     - **401**

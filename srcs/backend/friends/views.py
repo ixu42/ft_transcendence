@@ -24,29 +24,31 @@ def list_friends(request, user_id):
 # Target user id passed as a query parameter
 @require_POST
 def send_friend_request(request, user_id):
-    recipient_id = request.GET.get("recipient_id")
+    recipient_username = request.GET.get("recipient_username")
 
-    if not recipient_id:
+    if not recipient_username:
         return JsonResponse(
-            {"errors": "Missing recipient_id query parameter."}, status=400
+            {"errors": "Missing recipient_username query parameter."}, status=400
         )
 
     try:
-        recipient_id = int(recipient_id)
-        recipient = User.objects.get(id=recipient_id)
-    except ValueError:
-        return JsonResponse({"errors": "recipient_id must be an integer."}, status=400)
+        recipient = User.objects.get(username=recipient_username)
     except User.DoesNotExist:
         return JsonResponse(
             {"errors": "Recipient of the friend request not found."}, status=404
         )
 
-    if recipient_id == user_id:
+    if recipient.friends.filter(id=user_id).exists():
         return JsonResponse(
-            {"errors": "You cannot send a friend request to yourself."}, status=400
+            {"errors": "Already friends with this user."}, status=400
         )
 
     user = User.objects.get(id=user_id)
+
+    if recipient == user:
+        return JsonResponse(
+            {"errors": "You cannot send a friend request to yourself."}, status=400
+        )
 
     existing_request = FriendRequest.objects.filter(
         sender=user, receiver=recipient, status="pending"
