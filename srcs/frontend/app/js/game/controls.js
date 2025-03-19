@@ -36,13 +36,7 @@ const setupControls = async (player, player2, game, gameId) => {
         if (game.state === 'gameOver') {
             if (key === 'x') {
                 if (localStorage.getItem("isLoggedIn") === "true") {
-                    console.log("Game Over! Player 1: " + game.player.score + " Player 2: " + game.player2.score);
-                    const requestBody = {
-                        player1_score: game.player.score,
-                        player2_score: game.player2.score
-                    };
-                    const response = await apiRequest(`games/${gameId}/stats/`, 'PATCH', requestBody);
-                    console.log(response.message || response);
+                   await saveGameStats(gameId, player.score, player2.score);
                 }
                 window.location.href = "/#lobby"; // Adjust the URL to your lobby page
             }

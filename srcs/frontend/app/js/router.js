@@ -46,9 +46,10 @@ const startHeartbeat = async () => {
     return; // Prevent multiple intervals
   }
 
+  const userId = localStorage.getItem("user_id");
   async function sendHeartbeat() {
     try {
-      await apiRequest("users/heartbeat/", "GET");
+      await apiRequest(`users/${userId}/heartbeat/`, "GET");
       console.log("Heartbeat updated");
     } catch (error) {
       console.error("Heartbeat error:", error);
@@ -59,7 +60,7 @@ const startHeartbeat = async () => {
   }
 
   await sendHeartbeat();
-  heartbeatInterval = setInterval(sendHeartbeat, 30000);
+  heartbeatInterval = setInterval(sendHeartbeat, 10000);
 }
 
 const stopHeartbeat = () => {

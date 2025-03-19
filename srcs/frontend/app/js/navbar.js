@@ -42,6 +42,7 @@ async function setupFriendsButton(friendsButton) {
     const friendsDropdownContent = document.getElementById("friends-dropdown-content");
     const sendFriendRequestBtn = document.getElementById("send-friend-request-btn");
     let isFetching = false;
+    const userId = localStorage.getItem("user_id");
 
     // Fetch friends on hover
     friendsButton.addEventListener("mouseenter", async () => {
@@ -49,8 +50,6 @@ async function setupFriendsButton(friendsButton) {
         isFetching = true;
 
         console.log("Friends button hovered. Fetching friends and requests...");
-
-        const userId = localStorage.getItem("user_id");
         console.log("User ID:", userId);
 
         if (userId) {
@@ -75,38 +74,38 @@ async function setupFriendsButton(friendsButton) {
         const newSendFriendRequestBtn = document.getElementById("send-friend-request-btn");
 
         newSendFriendRequestBtn.addEventListener("click", async () => {
-
             const userIdInput = document.getElementById("friend-id-input");
             const friendId = userIdInput.value.trim();
-
+        
             if (!friendId) {
                 alert("Please enter a valid User ID.");
                 return;
             }
-
+        
             try {
-                const response = await fetch(`/api/users/${friendId}/friends/`, {
+                const response = await fetch(`api/users/${userId}/friends/requests/?recipient_id=${encodeURIComponent(friendId)}`, {  // ✅ Pass recipient_id as a query parameter
                     method: "POST",
                     credentials: "include",
                     headers: {
-                        "Content-Type": "application/json",
                         "X-CSRFToken": await getCSRFCookie(),
                     },
                 });
-
+        
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.errors || "Failed to send friend request.");
+                    console.error("Error:", errorData);
+                    alert(`Error: ${errorData.errors || response.statusText}`);
+                    return;
                 }
-
-                const data = await response.json();
-                alert(data.message || "Friend request sent successfully!");
-                userIdInput.value = "";
+        
+                console.log("Friend request sent successfully!");
+                alert("Friend request sent!");
             } catch (error) {
-                console.error("Error sending friend request:", error);
-                alert(error.message);
+                console.error("Friend request error:", error);
+                alert("Something went wrong. Please try again.");
             }
         });
+        
     }
 }
 
