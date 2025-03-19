@@ -278,21 +278,22 @@ function populateFriendsDropdown(container, friends) {
         friendListContainer.appendChild(noFriendsMessage);
     } else {
         friends.forEach(friend => {
+            const onlineIndicator = friend.online 
+                ? `<span style="color:green;">Online</span>` 
+                : `<span style="color:red;">Offline</span>`;
             const friendItem = document.createElement("div");
             friendItem.className = "friend-item";
             friendItem.innerHTML = `
                 <img src="${fixAvatarURL(friend.avatar)}" alt="${friend.username}" class="friend-avatar">
-                <span>${friend.username} (ID: ${friend.id})</span>
+                <span>${friend.username} - ${onlineIndicator}</span>
                 <button class="unfriend-btn" data-id="${friend.id}">Unfriend</button>
             `;
             friendListContainer.appendChild(friendItem);
         });
-        // Add event listeners for unfriend buttons
         friendListContainer.querySelectorAll('.unfriend-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const friendId = button.dataset.id;
                 await handleUnfriend(friendId);
-                // Refresh friends list after unfriend
                 const userId = localStorage.getItem("user_id");
                 const friends = await fetchFriends(userId);
                 populateFriendsDropdown(container, friends);

@@ -1,9 +1,11 @@
+from datetime import timedelta
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from users.views import login_required_json
 import json
 from friends.models import FriendRequest
 from users.models import CustomUser
+from django.utils import timezone
 
 
 # Send a friend request to the user with id specified in the url
@@ -34,6 +36,7 @@ def send_friend_request(request, user_id):
     return JsonResponse({"message": "Friend request sent."}, status=201)
 
 
+# List all the friends of the user with id specified in the url
 @login_required_json
 @require_http_methods(["GET", "POST"])
 def friend_list_create(request, user_id):
@@ -43,8 +46,15 @@ def friend_list_create(request, user_id):
                 {"errors": "You do not have permission to view friends of this user."},
                 status=403,
             )
-        friends = request.user.friends.values("id", "username", "avatar")
-        return JsonResponse({"friends": list(friends)})
+        friends = list(
+            request.user.friends.values("id", "username", "avatar", "last_active")
+        )
+        threshold = timezone.now() - timedelta(minutes=1)
+        for friend in friends:
+            friend["online"] = (
+                friend["last_active"] and friend["last_active"] >= threshold
+            )
+        return JsonResponse({"friends": friends})
     else:
         return send_friend_request(request, user_id)
 

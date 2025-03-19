@@ -3,8 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
-from django.db.models import Window, F, Q
-from django.db.models.functions import Rank
+from django.db.models import Q
 import os
 import shutil
 from functools import wraps
@@ -16,6 +15,7 @@ from users.forms import (
 )
 from users.models import CustomUser
 from games.models import Game
+from django.utils import timezone
 
 
 def login_required_json(view_func):
@@ -84,8 +84,7 @@ def login_user(request):
     if user is not None:
         login(request, user)
         return JsonResponse(
-            {"id": user.id, "username": user.username, "message": "Login successful."},
-            status=200,
+            {"id": user.id, "username": user.username, "message": "Login successful."}
         )
     else:
         return JsonResponse({"errors": "Invalid password."}, status=401)
@@ -98,8 +97,7 @@ def logout_user(request):
     username = request.user.username
     logout(request)
     return JsonResponse(
-        {"id": user_id, "username": username, "message": "Logout successful."},
-        status=200,
+        {"id": user_id, "username": username, "message": "Logout successful."}
     )
 
 
@@ -118,9 +116,7 @@ def get_profile(request):
             "last_name": user.last_name,
             "total_wins": user.total_wins,
             "total_losses": user.total_losses,
-            # friends
-        },
-        status=200,
+        }
     )
 
 
@@ -144,8 +140,7 @@ def update_profile(request):
                 "id": user.id,
                 "username": user.username,
                 "message": "User profile updated.",
-            },
-            status=200,
+            }
         )
     else:
         return JsonResponse({"errors": form.errors}, status=400)
@@ -160,8 +155,7 @@ def deactivate_user_account(request):
     CustomUser.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
 
     return JsonResponse(
-        {"id": user_id, "username": username, "message": "Account deactivated."},
-        status=200,
+        {"id": user_id, "username": username, "message": "Account deactivated."}
     )
 
 
@@ -182,7 +176,7 @@ def delete_user_account(request):
     user.delete()  # Hard delete, remove the user instance and all related data from database
 
     return JsonResponse(
-        {"id": user_id, "username": username, "message": "Account deleted."}, status=200
+        {"id": user_id, "username": username, "message": "Account deleted."}
     )
 
 
@@ -237,8 +231,7 @@ def update_password(request, user_id):
                 "id": user.id,
                 "username": user.username,
                 "message": "User password updated.",
-            },
-            status=200,
+            }
         )
     else:
         return JsonResponse({"errors": form.errors}, status=400)
@@ -261,8 +254,7 @@ def update_avatar(request):
                 "username": request.user.username,
                 "message": "Avatar updated.",
                 "avatar_url": request.user.get_avatar(),
-            },
-            status=200,
+            }
         )
 
     return JsonResponse({"errors": form.errors}, status=400)
@@ -293,12 +285,7 @@ def participated_tournaments(request, user_id):
         for tournament in participated_tournaments
     ]
 
-    return JsonResponse(
-        {
-            "participated_tournaments": tournament_data,
-        },
-        status=200,
-    )
+    return JsonResponse({"participated_tournaments": tournament_data})
 
 
 @login_required_json
@@ -321,7 +308,7 @@ def match_history(request, user_id):
         {
             "game_id": game.id,
             "date_played": game.date_played,
-            "player1:": game.player1.username if game.player1 else "AI",
+            "player1": game.player1.username if game.player1 else "AI",
             "player2": game.player2.username if game.player2 else "AI",
             "winner": game.winner.username if game.winner else "AI",
             "player1_score": game.player1_score,
@@ -335,10 +322,35 @@ def match_history(request, user_id):
 
 @require_GET
 def leaderboard(request):
-    users = CustomUser.objects.annotate(
-        rank=Window(expression=Rank(), order_by=F("score").desc())
-    ).order_by("-score", "id")
+    users = CustomUser.objects.all()
 
-    data = list(users.values("id", "username", "avatar", "score", "rank"))
+    data = []
+    for user in users:
+        if user.username == "admin" or user.username == "guest_player":
+            continue
+
+        data.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "avatar": user.get_avatar(),
+                "total_wins": user.total_wins,
+                "win_rate": user.win_rate,
+            }
+        )
+
+    data.sort(key=lambda x: (-x["total_wins"], -x["win_rate"], x["id"]))
+
+    for rank, user in enumerate(data, start=1):
+        user["rank"] = rank
 
     return JsonResponse(data, safe=False)
+
+
+# Heartbeat for online status
+@login_required_json
+@require_GET
+def heartbeat(request):
+    request.user.last_active = timezone.now()
+    request.user.save(update_fields=["last_active"])
+    return JsonResponse({"message": "Heartbeat updated."})

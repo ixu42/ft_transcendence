@@ -1,5 +1,5 @@
-const setupControls = (player, player2, game) => {
-    document.addEventListener('keydown', function(event) {
+const setupControls = async (player, player2, game, gameId) => {
+    document.addEventListener('keydown', async (event) => {
         const key = event.key.toLowerCase();
         key === 'arrowup' ? player2.keyboardUp = true :
             key === 'arrowdown' ? player2.keyboardDown = true :
@@ -35,13 +35,19 @@ const setupControls = (player, player2, game) => {
 
         if (game.state === 'gameOver') {
             if (key === 'x') {
+                if (localStorage.getItem("isLoggedIn") === "true") {
+                    console.log("Game Over! Player 1: " + game.player.score + " Player 2: " + game.player2.score);
+                    const requestBody = {
+                        player1_score: game.player.score,
+                        player2_score: game.player2.score
+                    };
+                    const response = await apiRequest(`games/${gameId}/stats/`, 'PATCH', requestBody);
+                    console.log(response.message || response);
+                }
                 window.location.href = "/#lobby"; // Adjust the URL to your lobby page
             }
-            // if (key === ' ') {
-            //     resetGame(game);
-            //     game.state = game.isAI ? 'levelSelection' : 'scoreSelection';
-            // }
         }
+        
     });
 
     document.addEventListener('keyup', function(event) {

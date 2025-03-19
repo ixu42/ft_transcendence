@@ -107,7 +107,7 @@ const initializeGame = (gameId) => {
             return;
         }
         const game = createGame(false);
-        setupControls(game.player, game.player2, game);
+        setupControls(game.player, game.player2, game, gameId);
         console.log("Starting game loop");
         gameLoop(game);
 };

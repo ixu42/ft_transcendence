@@ -11,6 +11,7 @@ const routes = {
   "#game": "/views/game.html",
   "#profile": "/views/profile.html",
   '#chat': "/views/chat.html",
+  '#contact': "/views/contact.html",
   404: "/views/404.html",
 };
 
@@ -31,6 +32,43 @@ const routeHandlers = {
   "#chat": () => {},
 
 };
+
+let heartbeatInterval = null; // Store interval ID
+
+const startHeartbeat = async () => {
+  if (!isUserLoggedIn()) {
+    console.log("User is not logged in, skipping heartbeat.");
+    return;
+  }
+
+  if (heartbeatInterval) {
+    console.log("Heartbeat already running.");
+    return; // Prevent multiple intervals
+  }
+
+  async function sendHeartbeat() {
+    try {
+      await apiRequest("users/heartbeat/", "GET");
+      console.log("Heartbeat updated");
+    } catch (error) {
+      console.error("Heartbeat error:", error);
+      if (error.response?.status === 401) {
+        stopHeartbeat();
+      }
+    }
+  }
+
+  await sendHeartbeat();
+  heartbeatInterval = setInterval(sendHeartbeat, 30000);
+}
+
+const stopHeartbeat = () => {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+    console.log("Heartbeat stopped.");
+  }
+}
 
 const handleLocation = async () => {
 
@@ -73,8 +111,14 @@ const handleLocation = async () => {
 
     console.log(`✅ Loaded route content: ${path}`);
     console.log(`Updating navbar...`);
-    updateNavbar(); // Update the navbar after loading the route content 
+    updateNavbar(); // Update the navbar after loading the route content
 
+    if (isLoggedIn) {
+      startHeartbeat();
+    } else {
+      stopHeartbeat();
+    }
+  
   } catch (error) {
     app.innerHTML = "<h1>Error loading page</h1>";
     console.error(`❌ Failed to load route ${path}:`, error);

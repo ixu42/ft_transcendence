@@ -24,4 +24,6 @@ urlpatterns = [
     path("leaderboard/", views.leaderboard, name="leaderboard"),
     # Friends
     path("<int:user_id>/friends/", include("friends.urls")),
+    # Online status
+    path("heartbeat/", views.heartbeat, name="heartbeat"),
 ]

@@ -27,9 +27,18 @@ SECRET_KEY = "django-insecure-@auby^w*3yw6(7hx*0eiu*b)0-pnhgm@ntm8un^^m65+jg%w%8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost", "tr-back", "tr-front", "tr-db", \
-                 "nginx-exporter", "postgres-exporter", "docker-exporter"]
-#ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "0.0.0.0",
+    "127.0.0.1",
+    "localhost",
+    "tr-back",
+    "tr-front",
+    "tr-db",
+    "nginx-exporter",
+    "postgres-exporter",
+    "docker-exporter",
+]
+# ALLOWED_HOSTS = ["*"]
 
 SITE_ID = 1
 
@@ -77,6 +86,7 @@ MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusAfterMiddleware",
     # Allauth middleware
     "allauth.account.middleware.AccountMiddleware",
+    "users.middleware.UpdateLastActiveMiddleware",
 ]
 
 

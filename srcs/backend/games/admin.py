@@ -22,6 +22,8 @@ class GameAdmin(admin.ModelAdmin):
         return obj.player2.username if obj.player2 else "AI Player"
 
     def get_winner(self, obj):
+        if not obj.player1_score and not obj.player2_score:
+            return None
         return obj.winner.username if obj.winner else "AI Player"
 
     get_player1.short_description = "Player 1"

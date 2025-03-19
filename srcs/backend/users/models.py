@@ -31,8 +31,8 @@ class CustomUser(AbstractUser):
             validate_file_size,
         ],
     )
-    score = models.IntegerField(default=0)
     friends = models.ManyToManyField("self", symmetrical=True, blank=True)
+    last_active = models.DateTimeField(null=True, blank=True)
 
     @property
     def default_avatar(self):
@@ -56,7 +56,8 @@ class CustomUser(AbstractUser):
     def win_rate(self):
         if self.total_games == 0:
             return 0
-        return f"{self.total_wins / self.total_games * 100} %"
+        res = self.total_wins / self.total_games * 100
+        return round(res, 1) if res > 0 else 0
 
     def get_avatar(self):
         """

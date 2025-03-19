@@ -281,6 +281,7 @@ Update the password of the authenticated user.
 - **Expected Request Body**:
     ```json
     {
+        "old_password": "securepassword123",
         "new_password1": "securepassword456",
         "new_password2": "securepassword456"
     }
@@ -814,7 +815,7 @@ Save the stats for a completed game for a logged-in user.
 <details>
     <summary>
         <code>PATCH</code>
-        <code><b>&lt;game_id&gt;/stats/</b></code>
+        <code><b>games/&lt;game_id&gt;/stats/</b></code>
     </summary>
 
 - **Expected Request Body**:

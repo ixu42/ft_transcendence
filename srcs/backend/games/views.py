@@ -52,4 +52,4 @@ def save_game_stats(request, game_id):
     game = form.update_game(game)
     game.save()
 
-    return JsonResponse({"message": "Game stats saved."}, status=200)
+    return JsonResponse({"message": "Game stats saved."})

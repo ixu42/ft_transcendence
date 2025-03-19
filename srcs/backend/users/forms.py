@@ -29,9 +29,19 @@ class ProfileUpdateForm(UserChangeForm):
 
 
 class PasswordUpdateForm(SetPasswordForm):
+    old_password = forms.CharField(widget=forms.PasswordInput)
+
     class Meta:
         model = CustomUser
-        fields = ["new_password1", "new_password2"]
+        fields = ["old_password", "new_password1", "new_password2"]
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get("old_password")
+
+        if not check_password(old_password, self.user.password):
+            raise forms.ValidationError("Old password is incorrect.")
+
+        return old_password
 
     def clean_new_password1(self):
         new_password = self.cleaned_data.get("new_password1")
