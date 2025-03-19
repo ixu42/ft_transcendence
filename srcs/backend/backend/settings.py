@@ -40,6 +40,8 @@ ALLOWED_HOSTS = [
 ]
 # ALLOWED_HOSTS = ["*"]
 
+SITE_ID = 1
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -60,6 +62,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Django Monitoring
     "django_prometheus",
+    # Allauth apps
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+
 ]
 
 
@@ -75,6 +84,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
+    # Allauth middleware
+    "allauth.account.middleware.AccountMiddleware",
     "users.middleware.UpdateLastActiveMiddleware",
 ]
 
@@ -186,6 +197,7 @@ AXES_LOCKOUT_CALLABLE = "backend.views.lockout"
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",  # Django Axes backend
     "django.contrib.auth.backends.ModelBackend",  # Default Django backend
+    "allauth.account.auth_backends.AuthenticationBackend", # allauth backend
 ]
 
 CSRF_TRUSTED_ORIGINS = [

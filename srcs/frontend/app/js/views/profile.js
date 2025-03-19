@@ -1,12 +1,12 @@
 
 const logout = async () => {
     console.log("Logout button clicked");
-
+    const userId = localStorage.getItem("user_id");
     const csrfToken = await getCSRFCookie();
     if (!csrfToken) {
         return console.error("❌ CSRF Token is missing.");
     }
-    const response = await fetch("api/users/logout/", {
+    const response = await fetch(`api/users/${userId}/logout/`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -493,10 +493,11 @@ const setupAvatarUpload = () => {
     const handleAvatarUpload = async (file) => {
         const formData = new FormData();
         formData.append("avatar", file);
+        const userId = localStorage.getItem("user_id");
     
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch("api/users/avatar/", {
+            const response = await fetch(`api/users/${userId}/avatar/`, {
                 method: "POST",
                 headers: { "X-CSRFToken": csrfToken },
                 body: formData,

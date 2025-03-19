@@ -67,9 +67,9 @@ class TestSendOrListFriendRequest(BaseTestCase):
         url1 = reverse(
             "users:friends:send_or_list_friend_request", args=[self.user1.id]
         )
-        self.url1 = f"{url1}?recipient_id={self.user2.id}"
-        self.url1_self = f"{url1}?recipient_id={self.user1.id}"
-        self.url1_nonexistent = f"{url1}?recipient_id=4242"
+        self.url1 = f"{url1}?recipient_username={self.user2.username}"
+        self.url1_self = f"{url1}?recipient_username={self.user1.username}"
+        self.url1_nonexistent = f"{url1}?recipient_username=nonexistent_user"
 
         self.url2 = reverse(
             "users:friends:send_or_list_friend_request", args=[self.user2.id]
@@ -87,6 +87,7 @@ class TestSendOrListFriendRequest(BaseTestCase):
 
         self.assertEqual(response.status_code, 400)
         data = response.json()
+        self.assertIn("errors", data)
         self.assertEqual(
             data["errors"], "You cannot send a friend request to yourself."
         )
@@ -96,7 +97,26 @@ class TestSendOrListFriendRequest(BaseTestCase):
 
         self.assertEqual(response.status_code, 404)
         data = response.json()
+        self.assertIn("errors", data)
         self.assertEqual(data["errors"], "Recipient of the friend request not found.")
+    
+    def test_send_request_to_a_friend(self):
+        self.user1.friends.add(self.user2)
+        response = self.client.post(self.url1)
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertEqual(data["errors"], "Already friends with this user.")
+    
+    def test_send_request_already_sent(self):
+        FriendRequest.objects.create(sender=self.user1, receiver=self.user2)
+        response = self.client.post(self.url1)
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertEqual(data["errors"], "Friend request already sent.")
 
     def test_list_friend_requests_success(self):
         # Create a friend request (user1 -> user2)
