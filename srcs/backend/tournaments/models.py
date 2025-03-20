@@ -12,7 +12,6 @@ class Tournament(models.Model):
         PENDING = "PENDING", _("Pending")
         ACTIVE = "ACTIVE", _("Active")
         COMPLETED = "COMPLETED", _("Completed")
-        CANCELED = "CANCELED", _("Canceled")
 
     name = models.CharField(max_length=50, blank=True)  # Name of the tournament
     creator = models.ForeignKey(
@@ -37,11 +36,9 @@ class Tournament(models.Model):
 
     def check_status(self):
         if self.status == Tournament.TournamentStatus.ACTIVE:
-            raise ValidationError("Tournament has already started")
+            raise ValidationError("Tournament has already started.")
         if self.status == Tournament.TournamentStatus.COMPLETED:
-            raise ValidationError("Tournament has already completed")
-        if self.status == Tournament.TournamentStatus.CANCELED:
-            raise ValidationError("Tournament has been canceled")
+            raise ValidationError("Tournament has already completed.")
 
     def add_player(self, user, display_name):
         self.check_status()

@@ -3,8 +3,6 @@ from .models import Tournament, TournamentPlayer
 
 
 class TournamentCreationForm(forms.ModelForm):
-    """Form for creating a new tournament."""
-
     display_name = forms.CharField(
         max_length=50,
         required=True,
@@ -13,7 +11,7 @@ class TournamentCreationForm(forms.ModelForm):
 
     class Meta:
         model = Tournament
-        fields = ["name"]
+        fields = ["name", "display_name"]
 
     def save(self, user, commit=True):
         """Create a tournament and add the creator as a player."""
@@ -21,10 +19,22 @@ class TournamentCreationForm(forms.ModelForm):
         tournament.creator = user
         display_name = self.cleaned_data.get("display_name")
         if not tournament.name:
-            tournament.name = f"{display_name}'s game"
+            tournament.name = f"{display_name}'s tournament"
         if commit:
             tournament.save()
             TournamentPlayer.objects.create(
                 tournament=tournament, user=user, display_name=display_name
             )
         return tournament
+
+
+class TournamentJoiningForm(forms.ModelForm):
+    display_name = forms.CharField(
+        max_length=50,
+        required=True,
+        help_text="This will be your name in the tournament.",
+    )
+
+    class Meta:
+        model = Tournament
+        fields = ["display_name"]
