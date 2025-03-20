@@ -114,7 +114,9 @@ class TestCreateTournament(BaseTestCase):
 
     def test_create_tournament_success(self):
         response = self.make_request(
-            self.url, json.dumps({"name": "", "display_name": "player1"}), "POST"
+            self.url,
+            json.dumps({"tournament_name": "", "display_name": "player1"}),
+            "POST",
         )
 
         self.assertEqual(response.status_code, 201)
@@ -137,7 +139,7 @@ class TestCreateTournament(BaseTestCase):
 
     def test_create_tournament_invalid_form(self):
         response = self.make_request(
-            self.url, json.dumps({"name": "", "display_name": ""}), "POST"
+            self.url, json.dumps({"tournament_name": "", "display_name": ""}), "POST"
         )
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -173,7 +175,10 @@ class TestJoinTournament(BaseTestCase):
         url = self.get_url(self.url_name, 4242, self.user2.id)
         response = self.make_request(url, json.dumps({"display_name": "player2"}))
         self.assertEqual(response.status_code, 404)
-        self.assertJSONEqual(response.content, {"errors": "Tournament not found."})
+        self.assertJSONEqual(
+            response.content,
+            {"errors": "Tournament not found with tournament_id 4242."},
+        )
 
     def test_join_tournament_invalid_json_input(self):
         response = self.make_request(self.url, "invalid")
@@ -222,7 +227,10 @@ class TestStartTournament(BaseTestCase):
     def test_start_tournament_tournament_not_found(self):
         response = self.make_request(self.get_url(self.url_name, 4242, self.user3.id))
         self.assertEqual(response.status_code, 404)
-        self.assertJSONEqual(response.content, {"errors": "Tournament not found."})
+        self.assertJSONEqual(
+            response.content,
+            {"errors": "Tournament not found with tournament_id 4242."},
+        )
 
     def test_start_tournament_2_players(self):
         self.tournament.players.remove(self.user3)
@@ -294,7 +302,10 @@ class TestSaveTournamentStats(BaseTestCase):
             json.dumps({"winner_id": self.user3.id}),
         )
         self.assertEqual(response.status_code, 404)
-        self.assertJSONEqual(response.content, {"errors": "Tournament not found."})
+        self.assertJSONEqual(
+            response.content,
+            {"errors": "Tournament not found with tournament_id 4242."},
+        )
 
     def test_save_tournament_stats_invalid_json_input(self):
         response = self.make_request(self.url, "invalid")
@@ -312,7 +323,9 @@ class TestSaveTournamentStats(BaseTestCase):
     def test_save_tournament_winner_not_found(self):
         response = self.make_request(self.url, json.dumps({"winner_id": 4242}))
         self.assertEqual(response.status_code, 404)
-        self.assertJSONEqual(response.content, {"errors": "Winner not found."})
+        self.assertJSONEqual(
+            response.content, {"errors": "Winner not found with winner_id 4242."}
+        )
 
     def test_save_tournament__by_non_player(self):
         non_player = User.objects.create(username="non_player")

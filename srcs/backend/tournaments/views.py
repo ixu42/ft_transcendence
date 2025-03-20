@@ -87,7 +87,10 @@ def join_tournament(request, tournament_id):
         display_name = data.get("display_name")
         tournament.add_player(user, data.get("display_name"))
     except Tournament.DoesNotExist:
-        return JsonResponse({"errors": "Tournament not found."}, status=404)
+        return JsonResponse(
+            {"errors": f"Tournament not found with tournament_id {tournament_id}."},
+            status=404,
+        )
     except json.JSONDecodeError:
         return JsonResponse({"errors": "Invalid JSON input."}, status=400)
     except ValidationError as e:
@@ -112,7 +115,10 @@ def start_tournament(request, tournament_id):
         tournament = Tournament.objects.get(id=tournament_id)
         tournament.start(user)
     except Tournament.DoesNotExist:
-        return JsonResponse({"errors": "Tournament not found."}, status=404)
+        return JsonResponse(
+            {"errors": f"Tournament not found with tournament_id {tournament_id}."},
+            status=404,
+        )
     except ValidationError as e:
         return JsonResponse({"errors": str(e)}, status=400)
 
@@ -142,11 +148,16 @@ def save_tournament_stats(request, tournament_id):
         winner = User.objects.get(id=winner_id)
         tournament.save_stats(user, winner)
     except Tournament.DoesNotExist:
-        return JsonResponse({"errors": "Tournament not found."}, status=404)
+        return JsonResponse(
+            {"errors": f"Tournament not found with tournament_id {tournament_id}."},
+            status=404,
+        )
     except json.JSONDecodeError:
         return JsonResponse({"errors": "Invalid JSON input."}, status=400)
     except User.DoesNotExist:
-        return JsonResponse({"errors": "Winner not found."}, status=404)
+        return JsonResponse(
+            {"errors": f"Winner not found with winner_id {winner_id}."}, status=404
+        )
     except ValidationError as e:
         return JsonResponse({"errors": str(e)}, status=400)
 

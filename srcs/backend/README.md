@@ -42,9 +42,7 @@ Register a new user in the system.
         ```
     - **400**
         ```json
-        {
-            "errors": {"username": ["A user with that username already exists."]}
-        }
+        {"errors": {"username": ["A user with that username already exists."]}}
         ```
 
 </details>
@@ -76,32 +74,22 @@ Authenticate a user and logs them in. If a user fails to log in with incorrect c
         ```
     - **400**
         ```json
-        {
-            "errors": "User is already authenticated."
-        }
+        {"errors": "User is already authenticated."}
         ```
     - **401**
         ```json
-        {
-            "errors": "Invalid password."
-        }
+        {"errors": "Invalid password."}
         ```
         ```json
-        {
-            "errors": "Username does not exist."
-        }
+        {"errors": "Username does not exist."}
         ```
         ```json
-        {
-            "errors": "Username and password are required."
-        }
+        {"errors": "Username and password are required."}
         ```
     - **403**
         - When the user fails to log in due to incorrect credentials 5 times in a row
             ```json
-            {
-                "error": "Locked out due to too many login failures."
-            }
+            {"error": "Locked out due to too many login failures."}
             ```
 
 </details>
@@ -126,9 +114,7 @@ For the currently authenticated user to log out.
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -178,15 +164,11 @@ Allow users to upload a new avatar image.
             ```
         - When no file is uploaded
             ```json
-            {
-                "errors": "No file uploaded."
-            }
+            {"errors": "No file uploaded."}
             ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -213,9 +195,7 @@ Get details of the authenticated user's profile.
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -249,9 +229,7 @@ Update details of the authenticated user's profile, include username, email, fir
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -302,9 +280,7 @@ Update the password of the authenticated user.
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -320,9 +296,7 @@ For the authenticated user to deactivate their account. Recommended by Django in
 
 - **Expected Request Body**:
     ```json
-    {
-        "deactivate": true
-    }
+    {"deactivate": true}
     ```
 - **Response**
     - **200**
@@ -335,9 +309,7 @@ For the authenticated user to deactivate their account. Recommended by Django in
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -362,9 +334,7 @@ For the authenticated user to delete its account. In this case, user object and 
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -399,9 +369,7 @@ For the authenticated user to view their participated tournaments related info, 
         }
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -444,9 +412,7 @@ For the authenticated user to view their match history including date, winner, p
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -501,14 +467,10 @@ Update the last active timestamp of the user to track their online status.
 - **Response**
     - **200**
         ```json
-        {
-            "message": "Heartbeat updated."
-        }
+        {"message": "Heartbeat updated."}
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -542,9 +504,7 @@ List all the friends of currently authenticated user.
     - **401**
         - When the user is not authenticated
             ```json
-            {
-                "errors": "User is not authenticated."
-            }
+            {"errors": "User is not authenticated."}
             ```
 
 </details>
@@ -558,54 +518,40 @@ Send a friend request to another user. The recipient username is passed as a que
 <details>
     <summary>
         <code>POST</code>
-        <code><b>users/{user_id}/friends/requests?recipient_username={recipient_username}</b></code>
+        <code><b>users/{user_id}/friends/requests/?recipient_username={recipient_username}</b></code>
     </summary>
 
 - **Response**
     - **201**
         ```json
-        {
-            "message": "Friend request sent."
-        }
+        {"message": "Friend request sent."}
         ```
     - **400**
         - When the user_id in url matches the authenticated user's id
             ```json
-            {
-                "errors": "You cannot send a friend request to yourself."
-            }
+            {"errors": "You cannot send a friend request to yourself."}
             ```
         - When no recipient_username query param is passed
             ```json
-            {
-                "errors": "Missing recipient_username query parameter."
-            }
+            {"errors": "Missing recipient_username query parameter."}
             ```
         - When the same request has been sent earlier
             ```json
-            {
-                "errors": "Friend request already sent."
-            }
+            {"errors": "Friend request already sent."}
             ```
         - When recipient is already a friend of the user
             ```json
-            {
-                "errors": "Already friends with this user."
-            }
+            {"errors": "Already friends with this user."}
             ```
     - **401**
         - When the user is not authenticated
             ```json
-            {
-                "errors": "User is not authenticated."
-            }
+            {"errors": "User is not authenticated."}
             ```
     - **404**
         - When the recipient's id does not exist in database
             ```json
-            {
-                "errors": "Recipient of the friend request not found."
-            }
+            {"errors": "Recipient of the friend request not found."}
             ```
 
 </details>
@@ -638,9 +584,7 @@ List all the pending friend requests received by the authenticated user.
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -659,29 +603,21 @@ Accept or reject a friend request.
 
 - **Expected Request Body**:
     ```json
-    {
-        "accepted": true
-    }
+    {"accepted": true}
     ```
     - `accepted` (**boolean**): Can be **true** or **false** depending on whether the user accepts or rejects.
 - **Response**
     - **200**
         ```json
-        {
-            "message": "Friend request accepted/rejected."
-        }
+        {"message": "Friend request accepted/rejected."}
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
     - **404**
         ```json
-        {
-            "errors": "friend request not found"
-        }
+        {"errors": "friend request not found"}
         ```
 
 </details>
@@ -702,15 +638,11 @@ Unfriend someone.
     - **204**
     - **400**
         ```json
-        {
-            "errors": "Not friends with this user(id=5)."
-        }
+        {"errors": "Not friends with this user(id=5)."}
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -737,9 +669,7 @@ Create a local 1v1 game for a logged-in user.
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -766,9 +696,7 @@ Create a local 1v1 game against AI for a logged-in user.
         ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
 
 </details>
@@ -795,16 +723,12 @@ Save the stats for a completed game for a logged-in user.
 - **Response**
     - **200**
         ```json
-        {
-            "message": "Game stats saved."
-        }
+        {"message": "Game stats saved."}
         ```
     - **400**
         - When the data in Json payload is malformed
             ```json
-            {
-                "errors": "Invalid JSON input."
-            }
+            {"errors": "Invalid JSON input."}
             ```
         - When errors occur during the form validation
             ```json
@@ -818,22 +742,264 @@ Save the stats for a completed game for a logged-in user.
             ```
     - **401**
         ```json
-        {
-            "errors": "User is not authenticated."
-        }
+        {"errors": "User is not authenticated."}
         ```
     - **403**
         - When the logged-in user is not a player of the game
             ```json
-            {
-                "errors": "You are not part of this game."
-            }
+            {"errors": "You are not part of this game."}
             ```
     - **404**
         ```json
+        {"errors": "Game not found."}
+        ```
+
+</details>
+
+---
+
+### Tournament creation
+
+Create a tournament.
+
+<details>
+    <summary>
+        <code>POST</code>
+        <code><b>tournaments/?user_id={user_id}</b></code>
+    </summary>
+
+- **Expected Request Body**:
+    ```json
+    {
+        "tournament_name": "",
+        "display_name": "player1"
+    }
+    ```
+- **Response**
+    - **201**
+        ```json
         {
-            "errors": "Game not found."
+            "message": "Tournament created.",
+            "tournament_id": 1,
+            "tournament_name": "player1's tournament"
         }
+        ```
+    - **400**
+        - When the data in Json payload is malformed
+            ```json
+            {"errors": "Invalid JSON input."}
+            ```
+        - When errors occur during the form validation
+            ```json
+            {
+                "errors": {
+                    "display_name": [
+                        "This field is required."
+                    ]
+                }
+            }
+            ```
+        - When user_id is not passed as query param
+            ```json
+            {"errors": "Missing user_id query parameter."}
+            ```
+        - When invalid user_id is passed, e.g. a string
+            ```json
+            {"errors": "Invalid user_id value passed in query param."}
+            ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+    - **404**
+        - When user is not found with given user_id
+            ```json
+            {"errors": "User not found with user_id {user_id}."}
+            ```
+
+</details>
+
+---
+
+### Tournament joining
+
+Join a tournament.
+
+<details>
+    <summary>
+        <code>PATCH</code>
+        <code><b>tournaments/{id}/players/?user_id={user_id}</b></code>
+    </summary>
+
+- **Expected Request Body**:
+    ```json
+    {"display_name": "player2"}
+    ```
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "player2 joined tournament.",
+            "tournament_id": 1,
+            "tournament_name": "player1's tournament"
+        }
+        ```
+    - **400**
+        ```json
+        {"errors": "Invalid JSON input."}
+        ```
+        ```json
+        {
+            "errors": {
+                "display_name": [
+                    "This field is required."
+                ]
+            }
+        }
+        ```
+        ```json
+        {"errors": "Missing user_id query parameter."}
+        ```
+        ```json
+        {"errors": "Invalid user_id value passed in query param."}
+        ```
+        ```json
+        {"errors": "['Tournament has already started/completed.']"}
+        ```
+        ```json
+        {"errors": "['Tournament is full']"}
+        ```
+        ```json
+        {"errors": "['You are already in this tournament.']"}
+        ```
+        ```json
+        {"errors": "['Display name is already taken in this tournament. Choose another.']"}
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+    - **404**
+        ```json
+        {"errors": "User not found with user_id {user_id}."}
+        ```
+        ```json
+        {"errors": "Tournament not found with tournament_id {tournament_id}."}
+        ```
+
+</details>
+
+---
+
+### Tournament commencement
+
+Start a tournament.
+
+<details>
+    <summary>
+        <code>PATCH</code>
+        <code><b>tournaments/{id}/start/?user_id={user_id}</b></code>
+    </summary>
+
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Tournament started.",
+            "tournament_id": 1,
+            "tournament_name": "player1's tournament"
+        }
+        ```
+    - **400**
+        ```json
+        {"errors": "Missing user_id query parameter."}
+        ```
+        ```json
+        {"errors": "Invalid user_id value passed in query param."}
+        ```
+        ```json
+        {"errors": "['Tournament has already started/completed.']"}
+        ```
+        ```json
+        {"errors": "['Cannot start tournament with less than 3 players.']"}
+        ```
+        ```json
+        {"errors": "['Only tournament players can start the tournament.']"}
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+    - **404**
+        ```json
+        {"errors": "User not found with user_id {user_id}."}
+        ```
+        ```json
+        {"errors": "Tournament not found with tournament_id {tournament_id}."}
+        ```
+
+</details>
+
+---
+
+### Tournament stats saving
+
+Save the stats of a completed tournament.
+
+<details>
+    <summary>
+        <code>PATCH</code>
+        <code><b>tournaments/{id}/stats/?user_id={user_id}</b></code>
+    </summary>
+
+- **Expected Request Body**:
+    ```json
+    {"winner_id": 2}
+    ```
+- **Response**
+    - **200**
+        ```json
+        {
+            "message": "Tournament stats saved.",
+            "tournament_id": 1,
+            "tournament_name": "player1's tournament"
+        }
+        ```
+    - **400**
+        ```json
+        {"errors": "Invalid JSON input."}
+        ```
+        ```json
+        {"errors": "Missing winner_id field in request body."}
+        ```
+        ```json
+        {"errors": "Missing user_id query parameter."}
+        ```
+        ```json
+        {"errors": "Invalid user_id value passed in query param."}
+        ```
+        ```json
+        {"errors": "['Only tournament players can save stats.']"}
+        ```
+        ```json
+        {"errors": "['Tournament is not active.']"}
+        ```
+        ```json
+        {"errors": "['Winner must be a player in the tournament.']"}
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+    - **404**
+        ```json
+        {"errors": "User not found with user_id {user_id}."}
+        ```
+        ```json
+        {"errors": "Tournament not found with tournament_id {tournament_id}."}
+        ```
+        ```json
+        {"errors": "Winner not found with winner_id {winner_id}."}
         ```
 
 </details>

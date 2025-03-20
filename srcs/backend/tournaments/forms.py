@@ -13,6 +13,12 @@ class TournamentCreationForm(forms.ModelForm):
         model = Tournament
         fields = ["name", "display_name"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Map "tournament_name" in the request data to "name"
+        if "tournament_name" in self.data:
+            self.data["name"] = self.data.get("tournament_name")
+
     def save(self, user, commit=True):
         """Create a tournament and add the creator as a player."""
         tournament = super().save(commit=False)
