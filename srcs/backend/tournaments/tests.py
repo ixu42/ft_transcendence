@@ -1,10 +1,9 @@
 import json
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.test import RequestFactory
 from django.http import JsonResponse
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from .views import custom_login_required
 from .models import Tournament, TournamentPlayer
 
@@ -12,6 +11,16 @@ User = get_user_model()
 
 
 class BaseTestCase(TestCase):
+    def setUp_tournament_with_players(self):
+        self.user1 = User.objects.create(username="user1")
+        self.user2 = User.objects.create(username="user2")
+        self.user3 = User.objects.create(username="user3")
+        self.tournament = Tournament.objects.create(
+            name="test tournament", creator=self.user1
+        )
+        for user in [self.user1, self.user2, self.user3]:
+            self.add_player(self.tournament, user)
+
     def login(self, user):
         session = self.client.session
         session["user_id"] = user.id
@@ -27,6 +36,20 @@ class BaseTestCase(TestCase):
             self.client.cookies.pop(key, None)
 
         self.client.session.clear()
+
+    def make_request(self, url, data=None):
+        if not data:
+            return self.client.post(url)
+        return self.client.post(url, data=data, content_type="application/json")
+
+    def get_url(self, url_name, tournament_id, user_id):
+        url = reverse(url_name, args=[tournament_id])
+        return f"{url}?user_id={user_id}"
+
+    def add_player(self, tournament, user):
+        TournamentPlayer.objects.create(
+            tournament=tournament, user=user, display_name=f"{user.username}"
+        )
 
 
 @custom_login_required
@@ -85,13 +108,10 @@ class TestCreateTournament(BaseTestCase):
         self.url = f"{url}?user_id={self.user.id}"
         self.login(self.user)
 
-    def make_request(self, data=None):
-        if not data:
-            data = json.dumps({"name": "", "display_name": "player1"})
-        return self.client.post(self.url, data=data, content_type="application/json")
-
     def test_create_tournament_success(self):
-        response = self.make_request()
+        response = self.make_request(
+            self.url, json.dumps({"name": "", "display_name": "player1"})
+        )
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Tournament.objects.count(), 1)
@@ -107,12 +127,14 @@ class TestCreateTournament(BaseTestCase):
         self.assertEqual(tournament.name, "player1's tournament")
 
     def test_create_tournament_invalid_json_input(self):
-        response = self.make_request(data="invalid")
+        response = self.make_request(self.url, "invalid")
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"errors": "Invalid JSON input."})
 
     def test_create_tournament_invalid_form(self):
-        response = self.make_request(data={"name": "", "display_name": ""})
+        response = self.make_request(
+            self.url, json.dumps({"name": "", "display_name": ""})
+        )
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
             response.content, {"errors": {"display_name": ["This field is required."]}}
@@ -126,22 +148,12 @@ class TestJoinTournament(BaseTestCase):
         self.tournament = Tournament.objects.create(
             name="test tournament", creator=self.user1
         )
-        self.url = self.get_url(self.tournament.id)
+        self.url_name = "tournaments:join_tournament"
+        self.url = self.get_url(self.url_name, self.tournament.id, self.user2.id)
         self.login(self.user2)
 
-    def get_url(self, tournament_id):
-        url = reverse("tournaments:join_tournament", args=[tournament_id])
-        return f"{url}?user_id={self.user2.id}"
-
-    def make_request(self, url=None, data=None):
-        if not url:
-            url = self.url
-        if not data:
-            data = json.dumps({"display_name": "player2"})
-        return self.client.post(url, data=data, content_type="application/json")
-
     def test_join_tournament_success(self):
-        response = self.make_request()
+        response = self.make_request(self.url, json.dumps({"display_name": "player2"}))
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -154,18 +166,18 @@ class TestJoinTournament(BaseTestCase):
         )
 
     def test_join_tournament_tournament_not_found(self):
-        url = self.get_url(4242)
-        response = self.make_request(url=url)
+        url = self.get_url(self.url_name, 4242, self.user2.id)
+        response = self.make_request(url, json.dumps({"display_name": "player2"}))
         self.assertEqual(response.status_code, 404)
         self.assertJSONEqual(response.content, {"errors": "Tournament not found."})
 
     def test_join_tournament_invalid_json_input(self):
-        response = self.make_request(data="invalid")
+        response = self.make_request(self.url, "invalid")
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"errors": "Invalid JSON input."})
 
     def test_join_tournament_empty_display_name(self):
-        response = self.make_request(data={"display_name": ""})
+        response = self.make_request(self.url, json.dumps({"display_name": ""}))
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
             response.content, {"errors": {"display_name": ["This field is required."]}}
@@ -177,7 +189,7 @@ class TestJoinTournament(BaseTestCase):
             TournamentPlayer.objects.create(
                 tournament=self.tournament, user=user, display_name=f"new_player{i}"
             )
-        response = self.make_request()
+        response = self.make_request(self.url, json.dumps({"display_name": "player2"}))
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"errors": "['Tournament is full']"})
@@ -185,38 +197,13 @@ class TestJoinTournament(BaseTestCase):
 
 class TestStartTournament(BaseTestCase):
     def setUp(self):
-        self.user1 = User.objects.create(username="user1")
-        self.user2 = User.objects.create(username="user2")
-        self.user3 = User.objects.create(username="user3")
-        self.tournament = Tournament.objects.create(
-            name="test tournament", creator=self.user1
-        )
-        for user in [self.user1, self.user2, self.user3]:
-            self.add_player(user)
-
-        self.url = self.get_url(self.tournament.id)
+        self.setUp_tournament_with_players()
+        self.url_name = "tournaments:start_tournament"
+        self.url = self.get_url(self.url_name, self.tournament.id, self.user3.id)
         self.login(self.user3)
 
-    def add_player(self, user):
-        TournamentPlayer.objects.create(
-            tournament=self.tournament, user=user, display_name=f"{user.username}"
-        )
-
-    def get_url(self, tournament_id=None, user_id=None):
-        if not user_id:
-            user_id = self.user3.id
-        if not tournament_id:
-            tournament_id = self.tournament.id
-        url = reverse("tournaments:start_tournament", args=[tournament_id])
-        return f"{url}?user_id={user_id}"
-
-    def make_request(self, url=None):
-        if not url:
-            url = self.url
-        return self.client.post(url)
-
     def test_start_tournament_success(self):
-        response = self.make_request()
+        response = self.make_request(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -229,14 +216,13 @@ class TestStartTournament(BaseTestCase):
         )
 
     def test_start_tournament_tournament_not_found(self):
-        url = self.get_url(4242)
-        response = self.make_request(url=url)
+        response = self.make_request(self.get_url(self.url_name, 4242, self.user3.id))
         self.assertEqual(response.status_code, 404)
         self.assertJSONEqual(response.content, {"errors": "Tournament not found."})
 
     def test_start_tournament_2_players(self):
         self.tournament.players.remove(self.user3)
-        response = self.make_request()
+        response = self.make_request(self.url)
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -247,8 +233,9 @@ class TestStartTournament(BaseTestCase):
     def test_start_tournament_by_non_player(self):
         non_player = User.objects.create(username="non_player")
         self.login(non_player)
-        url = self.get_url(user_id=non_player.id)
-        response = self.make_request(url=url)
+        response = self.make_request(
+            self.get_url(self.url_name, self.tournament.id, non_player.id)
+        )
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -259,7 +246,7 @@ class TestStartTournament(BaseTestCase):
     def test_start_completed_tournament(self):
         self.tournament.status = Tournament.TournamentStatus.COMPLETED
         self.tournament.save()
-        response = self.make_request()
+        response = self.make_request(self.url)
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -269,44 +256,20 @@ class TestStartTournament(BaseTestCase):
 
 class TestSaveTournamentStats(BaseTestCase):
     def setUp(self):
-        self.user1 = User.objects.create(username="user1")
-        self.user2 = User.objects.create(username="user2")
-        self.user3 = User.objects.create(username="user3")
-        self.tournament = Tournament.objects.create(
-            name="test tournament", creator=self.user1
-        )
-        for user in [self.user1, self.user2, self.user3]:
-            self.add_player(user)
+        self.setUp_tournament_with_players()
         self.start_tournament()
 
-        self.url = self.get_url(self.tournament.id)
+        self.url_name = "tournaments:save_tournament_stats"
+        self.url = self.get_url(self.url_name, self.tournament.id, self.user3.id)
         self.login(self.user3)
-
-    def add_player(self, user):
-        TournamentPlayer.objects.create(
-            tournament=self.tournament, user=user, display_name=f"{user.username}"
-        )
 
     def start_tournament(self):
         self.tournament.status = Tournament.TournamentStatus.ACTIVE
         self.tournament.started_at = timezone.now()
         self.tournament.save()
 
-    def get_url(self, tournament_id=None, user_id=None):
-        if not tournament_id:
-            tournament_id = self.tournament.id
-        if not user_id:
-            user_id = self.user3.id
-        url = reverse("tournaments:save_tournament_stats", args=[tournament_id])
-        return f"{url}?user_id={user_id}"
-
-    def make_request(self, data, url=None):
-        if not url:
-            url = self.url
-        return self.client.post(url, data=data, content_type="application/json")
-
     def test_save_tournament_stats_success(self):
-        response = self.make_request(data=json.dumps({"winner_id": self.user3.id}))
+        response = self.make_request(self.url, json.dumps({"winner_id": self.user3.id}))
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -322,20 +285,20 @@ class TestSaveTournamentStats(BaseTestCase):
         self.assertEqual(self.tournament.winner, self.user3)
 
     def test_save_tournament_stats_tournament_not_found(self):
-        url = self.get_url(4242)
         response = self.make_request(
-            url=url, data=json.dumps({"winner_id": self.user3.id})
+            self.get_url(self.url_name, 4242, self.user3.id),
+            json.dumps({"winner_id": self.user3.id}),
         )
         self.assertEqual(response.status_code, 404)
         self.assertJSONEqual(response.content, {"errors": "Tournament not found."})
 
     def test_save_tournament_stats_invalid_json_input(self):
-        response = self.make_request(data="invalid")
+        response = self.make_request(self.url, "invalid")
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"errors": "Invalid JSON input."})
 
     def test_save_tournament_stats_missing_winner_id(self):
-        response = self.make_request(data=json.dumps({}))
+        response = self.make_request(self.url, json.dumps({}))
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -343,15 +306,17 @@ class TestSaveTournamentStats(BaseTestCase):
         )
 
     def test_save_tournament_winner_not_found(self):
-        response = self.make_request(data=json.dumps({"winner_id": 4242}))
+        response = self.make_request(self.url, json.dumps({"winner_id": 4242}))
         self.assertEqual(response.status_code, 404)
         self.assertJSONEqual(response.content, {"errors": "Winner not found."})
-    
+
     def test_save_tournament__by_non_player(self):
         non_player = User.objects.create(username="non_player")
         self.login(non_player)
-        url = self.get_url(user_id=non_player.id)
-        response = self.make_request(url=url, data=json.dumps({"winner_id": self.user3.id}))
+        response = self.make_request(
+            self.get_url(self.url_name, self.tournament.id, non_player.id),
+            json.dumps({"winner_id": self.user3.id}),
+        )
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -362,13 +327,15 @@ class TestSaveTournamentStats(BaseTestCase):
     def test_save_tournament_stats_tournament_not_active(self):
         self.tournament.status = Tournament.TournamentStatus.PENDING
         self.tournament.save()
-        response = self.make_request(data=json.dumps({"winner_id": self.user3.id}))
+        response = self.make_request(self.url, json.dumps({"winner_id": self.user3.id}))
         self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(response.content, {"errors": "['Tournament is not active.']"})
+        self.assertJSONEqual(
+            response.content, {"errors": "['Tournament is not active.']"}
+        )
 
     def test_save_tournament_stats_winner_not_in_tournament(self):
         user4 = User.objects.create(username="user4")
-        response = self.make_request(data=json.dumps({"winner_id": user4.id}))
+        response = self.make_request(self.url, json.dumps({"winner_id": user4.id}))
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
             response.content,
