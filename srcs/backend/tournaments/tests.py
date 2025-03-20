@@ -37,9 +37,13 @@ class BaseTestCase(TestCase):
 
         self.client.session.clear()
 
-    def make_request(self, url, data=None):
+    def make_request(self, url, data=None, method="PATCH"):
         if not data:
+            if method == "PATCH":
+                return self.client.patch(url)
             return self.client.post(url)
+        if method == "PATCH":
+            return self.client.patch(url, data=data, content_type="application/json")
         return self.client.post(url, data=data, content_type="application/json")
 
     def get_url(self, url_name, tournament_id, user_id):
@@ -110,7 +114,7 @@ class TestCreateTournament(BaseTestCase):
 
     def test_create_tournament_success(self):
         response = self.make_request(
-            self.url, json.dumps({"name": "", "display_name": "player1"})
+            self.url, json.dumps({"name": "", "display_name": "player1"}), "POST"
         )
 
         self.assertEqual(response.status_code, 201)
@@ -127,13 +131,13 @@ class TestCreateTournament(BaseTestCase):
         self.assertEqual(tournament.name, "player1's tournament")
 
     def test_create_tournament_invalid_json_input(self):
-        response = self.make_request(self.url, "invalid")
+        response = self.make_request(self.url, "invalid", "POST")
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"errors": "Invalid JSON input."})
 
     def test_create_tournament_invalid_form(self):
         response = self.make_request(
-            self.url, json.dumps({"name": "", "display_name": ""})
+            self.url, json.dumps({"name": "", "display_name": ""}), "POST"
         )
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(

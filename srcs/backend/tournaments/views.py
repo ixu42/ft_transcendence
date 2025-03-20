@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from functools import wraps
@@ -72,7 +72,7 @@ def create_tournament(request):
     return JsonResponse({"errors": form.errors}, status=400)
 
 
-@require_POST
+@require_http_methods(["PATCH"])
 @custom_login_required
 def join_tournament(request, tournament_id):
     user_id = request.GET.get("user_id")
@@ -102,7 +102,7 @@ def join_tournament(request, tournament_id):
     )
 
 
-@require_POST
+@require_http_methods(["PATCH"])
 @custom_login_required
 def start_tournament(request, tournament_id):
     user_id = request.GET.get("user_id")
@@ -125,7 +125,7 @@ def start_tournament(request, tournament_id):
     )
 
 
-@require_POST
+@require_http_methods(["PATCH"])
 @custom_login_required
 def save_tournament_stats(request, tournament_id):
     user_id = request.GET.get("user_id")
