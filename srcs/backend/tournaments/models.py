@@ -27,6 +27,9 @@ class Tournament(models.Model):
         choices=TournamentStatus.choices,
         default=TournamentStatus.PENDING,
     )
+    winner = models.ForeignKey(
+        CustomUser, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     @property
     def get_players(self):
@@ -64,6 +67,17 @@ class Tournament(models.Model):
             raise ValidationError("Only tournament players can start the tournament.")
         self.status = Tournament.TournamentStatus.ACTIVE
         self.started_at = timezone.now()  # UTC time
+        self.save()
+
+    def save_stats(self, user, winner):
+        if not (user == self.creator or user in self.players.all()):
+            raise ValidationError("Only tournament players can save stats.")
+        if self.status != Tournament.TournamentStatus.ACTIVE:
+            raise ValidationError("Tournament is not active.")
+        if winner not in self.players.all():
+            raise ValidationError("Winner must be a player in the tournament.")
+        self.winner = winner
+        self.status = Tournament.TournamentStatus.COMPLETED
         self.save()
 
     def __str__(self):

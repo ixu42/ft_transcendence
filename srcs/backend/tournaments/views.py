@@ -100,7 +100,6 @@ def join_tournament(request, tournament_id):
             "tournament_id": tournament.id,
             "tournament_name": tournament.name,
         },
-        status=201,
     )
 
 
@@ -124,11 +123,38 @@ def start_tournament(request, tournament_id):
             "tournament_id": tournament.id,
             "tournament_name": tournament.name,
         },
-        status=201,
     )
 
 
 @require_POST
 @custom_login_required
 def save_tournament_stats(request, tournament_id):
-    pass
+    user_id = request.GET.get("user_id")
+    user = User.objects.get(id=int(user_id))
+
+    try:
+        tournament = Tournament.objects.get(id=tournament_id)
+        data = json.loads(request.body)
+        winner_id = data.get("winner_id")
+        winner = User.objects.get(id=winner_id)
+        tournament.save_stats(user, winner)
+    except Tournament.DoesNotExist:
+        return JsonResponse({"errors": "Tournament not found"}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({"errors": "Invalid JSON input."}, status=400)
+    except KeyError:
+        return JsonResponse(
+            {"errors": "Missing winner_id field in request body."}, status=400
+        )
+    except User.DoesNotExist:
+        return JsonResponse({"errors": "Winner not found"}, status=404)
+    except ValidationError as e:
+        return JsonResponse({"errors": str(e)}, status=400)
+
+    return JsonResponse(
+        {
+            "message": "Tournament stats saved.",
+            "tournament_id": tournament.id,
+            "tournament_name": tournament.name,
+        }
+    )
