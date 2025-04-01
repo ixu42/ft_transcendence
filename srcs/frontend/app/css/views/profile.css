@@ -116,6 +116,8 @@
     gap: 10px;
     z-index: 1001;
     justify-content: space-between;
+    max-height: 80vh;      /* Limit modal height to 80% of viewport */
+    overflow-y: auto;
 }.profile-match-history-modal .modal-content h2 {
     margin-bottom: 15px;
     color: var(--primary-text-color);
