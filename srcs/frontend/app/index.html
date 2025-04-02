@@ -69,9 +69,18 @@
                 </div>
             </div>
 
-            <button class="tr-nav-btn" id="tr-auth-btn">
-                <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
-            </button>
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profile-dropdown" style="display: none;">
+                <button class="tr-nav-btn" id="tr-auth-btn">
+                    <img src="static/icons/login32x32.png" alt="Profile" class="tr-navbar-icon"> Login / Register
+                </button>
+                <div class="profile-dropdown-content" id="profile-dropdown-content">
+                    <!-- Current user entry will be a normal profile-item directly here -->
+                    <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px; float: left;">
+                    <!-- Additional content can go below if needed -->
+                </div>
+            </div>
+
         </div>
     </div>
 

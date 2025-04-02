@@ -37,6 +37,10 @@
 }
 
 /* Profile Container */
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+  }
 .profile-container {
     overflow-y: auto; /* Enable vertical scrolling */
     display: flex;

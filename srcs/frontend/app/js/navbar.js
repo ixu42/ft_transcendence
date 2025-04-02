@@ -2,6 +2,7 @@ async function updateNavbar() {
     console.log("Updating navbar...");
 
     const authButton = document.getElementById("tr-auth-btn");
+    const profileDropdown = document.getElementById("profile-dropdown");
     const homeButton = document.getElementById("tr-home-btn");
     const friendsButton = document.getElementById("tr-friends-btn");
     const friendsDropdown = document.getElementById("friends-dropdown");
@@ -12,9 +13,11 @@ async function updateNavbar() {
     if (authButton) {
         if (isLoggedIn) {
             authButton.innerHTML = '<img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile';
-            authButton.onclick = () => (window.location.hash = "#profile");
+            profileDropdown.style.display = "inline-block"; // Show the profile dropdown
+            setupProfileButton(authButton);
         } else {
             authButton.innerHTML = '<img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register';
+            profileDropdown.style.display = "inline-block"; // Show even when not logged in
             authButton.onclick = () => (window.location.hash = "#login");
         }
     }
@@ -28,8 +31,6 @@ async function updateNavbar() {
         if (isLoggedIn) {
             console.log("User is logged in. Enabling friends dropdown...");
             friendsDropdown.style.display = "inline-block";
-
-            // Set up the friends button logic
             setupFriendsButton(friendsButton);
         } else {
             console.log("User is not logged in. Hiding friends dropdown...");
@@ -37,6 +38,101 @@ async function updateNavbar() {
         }
     }
 }
+
+async function setupProfileButton(profileButton) {
+    const profileDropdownContent = document.getElementById("profile-dropdown-content");
+    let isFetching = false;
+    let hideTimer; // Timer to delay hiding the dropdown
+    const userId = localStorage.getItem("user_id");
+
+    profileButton.addEventListener("mouseenter", async () => {
+        // Cancel any pending hide action.
+        if (hideTimer) {
+            clearTimeout(hideTimer);
+        }
+        if (isFetching) return;
+        isFetching = true;
+
+        console.log("Profile button hovered...");
+
+        if (userId) {
+            // Fetch current user data
+            const userData = await fetchProfileDataById(userId);
+            if (userData) {
+                profileDropdownContent.innerHTML = `
+                    <div class="profile-list-container">
+                        <div class="profile-item">
+                            <img src="${fixAvatarURL(userData.avatar)}" alt="${userData.username}" class="profile-avatar">
+                            <span>${userData.username}</span>
+                            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile'">
+                                Go to Profile
+                            </button>
+                        </div>
+                        <div class="profile-item">
+                            <img src="static/icons/empty-avatar.png" alt="Empty Profile" class="profile-avatar">
+                            <span>Other User?</span>
+                            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
+                                Login / Sign Up
+                            </button>
+                        </div>
+                    </div>
+                    <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+                `;
+            } else {
+                // If fetching user data fails, still show the login/signup option.
+                profileDropdownContent.innerHTML = `
+                    <div class="profile-list-container">
+                        <div class="profile-item no-profile">
+                            Failed to load user data
+                        </div>
+                        <div class="profile-item">
+                            <img src="static/icons/empty-avatar.png" alt="Empty Profile" class="profile-avatar">
+                            <span>Other User?</span>
+                            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
+                                Login / Sign Up
+                            </button>
+                        </div>
+                    </div>
+                    <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+                `;
+            }
+        } else {
+            // When no user is logged in, show only the login/signup entry.
+            profileDropdownContent.innerHTML = `
+                <div class="profile-list-container">
+                    <div class="profile-item">
+                        <img src="static/icons/empty-avatar.png" alt="Empty Profile" class="profile-avatar">
+                        <span>Other User?</span>
+                        <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
+                            Login / Sign Up
+                        </button>
+                    </div>
+                </div>
+                <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+            `;
+        }
+
+        profileDropdownContent.style.display = "block";
+        isFetching = false;
+    });
+
+    profileButton.addEventListener("mouseleave", () => {
+        hideTimer = setTimeout(() => {
+            profileDropdownContent.style.display = "none";
+        }, 200);
+    });
+    profileDropdownContent.addEventListener("mouseenter", () => {
+        if (hideTimer) {
+            clearTimeout(hideTimer);
+        }
+        profileDropdownContent.style.display = "block";
+    });
+    profileDropdownContent.addEventListener("mouseleave", () => {
+        profileDropdownContent.style.display = "none";
+    });
+}
+
+
 
 async function setupFriendsButton(friendsButton) {
     const friendsDropdownContent = document.getElementById("friends-dropdown-content");
