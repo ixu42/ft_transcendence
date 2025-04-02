@@ -429,6 +429,45 @@ class TestUpdateAvatar(BaseTestCase):
         )
 
 
+class TestAnonymizeUser(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("users:anonymize_user", args=[self.user.id])
+
+    def test_anonymize_user(self):
+        self.login()
+
+        response = self.client.patch(self.url)
+        self.user.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"message": "Your data has been anonymized. Logging out..."},
+        )
+
+        self.assertTrue(self.user.is_anonymized)
+        self.assertNotEqual(self.user.username, "testuser")
+        self.assertNotEqual(self.user.email, "testuser@example.com")
+        self.assertFalse(self.user.has_usable_password())
+
+        # Check the user is logged out (session cookie marked for deletion)
+        session_cookie = self.client.cookies.get(f"session_{self.user.id}")
+        self.assertIsNotNone(session_cookie)
+        self.assertEqual(session_cookie.value, "")  # Session should be cleared
+        self.assertEqual(session_cookie["expires"], "Thu, 01 Jan 1970 00:00:00 GMT")
+
+    def test_anonymize_already_anonymized_user(self):
+        self.user.anonymize()
+        self.login()
+
+        response = self.client.patch(self.url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content, {"errors": "User is already anonymized."}
+        )
+
+
 class TestMatchHistory(BaseTestCase):
     def setUp(self):
         self.url = reverse("users:match_history", args=[self.user.id])
