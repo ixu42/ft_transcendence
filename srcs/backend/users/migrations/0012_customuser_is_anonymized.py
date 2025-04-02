@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0011_remove_customuser_score'),
+        ("users", "0011_remove_customuser_score"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='is_anonymized',
+            model_name="customuser",
+            name="is_anonymized",
             field=models.BooleanField(default=False),
         ),
     ]

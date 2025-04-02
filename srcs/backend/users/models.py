@@ -106,11 +106,11 @@ class CustomUser(AbstractUser):
         self.avatar = None  # Set avatar to None (it will default to default_avatar)
 
         self.friends.clear()
-        self.set_unusable_password() # Disable user login
+        self.set_unusable_password()  # Disable user login
 
         self.is_anonymized = True
         self.save()
-    
+
     def save(self, *args, **kwargs):
         # Set default avatar if the instance is being created and no avatar is provided
         if not self.pk and not self.avatar:
