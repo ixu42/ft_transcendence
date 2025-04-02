@@ -296,6 +296,18 @@ def update_avatar(request, user_id):
 
 
 @custom_login_required
+@require_http_methods(['PATCH'])
+def anonymize_user(request, user_id):
+    user = User.objects.get(id=user_id)
+
+    if user.is_anonymized:
+        return JsonResponse({'errors': 'User is already anonymized.'}, status=400)
+
+    user.anonymize()
+    return JsonResponse({'message': 'Your data has been anonymized.'})
+
+
+@custom_login_required
 @require_GET
 def participated_tournaments(request, user_id):
     user = User.objects.get(id=user_id)

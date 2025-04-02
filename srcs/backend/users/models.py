@@ -1,4 +1,5 @@
 import os
+import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
@@ -33,6 +34,7 @@ class CustomUser(AbstractUser):
     )
     friends = models.ManyToManyField("self", symmetrical=True, blank=True)
     last_active = models.DateTimeField(null=True, blank=True)
+    is_anonymized = models.BooleanField(default=False)
 
     @property
     def default_avatar(self):
@@ -81,6 +83,34 @@ class CustomUser(AbstractUser):
         self.avatar = new_avatar
         self.save()
 
+    def anonymize(self):
+        """
+        Anonymizes user data to comply with GDPR.
+        """
+        if self.is_anonymized:
+            return
+
+        # Generate a unique anonymous identifier
+        anonymous_id = uuid.uuid4().hex[:8]
+
+        # Replace personally identifiable information
+        self.username = f"anonymous_{anonymous_id}"
+        self.email = f"anonymous_{anonymous_id}@example.com"
+        self.first_name = ""
+        self.last_name = ""
+
+        # Reset avatar to default and delete existing avatar if it exists
+        if self.avatar and self.avatar.name != self.default_avatar:
+            if default_storage.exists(self.avatar.name):
+                default_storage.delete(self.avatar.name)
+        self.avatar = None  # Set avatar to None (it will default to default_avatar)
+
+        self.friends.clear()
+        self.set_unusable_password() # Disable user login
+
+        self.is_anonymized = True
+        self.save()
+    
     def save(self, *args, **kwargs):
         # Set default avatar if the instance is being created and no avatar is provided
         if not self.pk and not self.avatar:
