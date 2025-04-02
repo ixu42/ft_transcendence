@@ -85,9 +85,7 @@ const fetchProfileData = async () => {
 
 // Update profile UI elements
 const updateProfileUI = (data) => {
-    const avatarUrl = data.avatar.startsWith("/") 
-        ? `api/${data.avatar}` 
-        : data.avatar || '/static/avatars/default.png';
+    const avatarUrl = fixAvatarURL(data.avatar);
 
     const elementsToUpdate = [
         { selector: ".profile-avatar", value: avatarUrl, type: "src" },

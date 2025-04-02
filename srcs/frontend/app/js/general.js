@@ -37,3 +37,33 @@ async function apiRequest(endpoint, method, body = null) {
     }
 }
 
+async function fetchProfileDataById(userId) {
+    if (!userId) {
+        console.error("User ID is missing.");
+        return null;
+    }
+    try {
+        const response = await fetch(`/api/users/${userId}/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "X-CSRFToken": await getCSRFCookie(),
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            console.error("Failed to fetch profile data:", data.errors || response.status);
+            return null;
+        }
+        return data;
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+        return null;
+    }
+}
+
+const fixAvatarURL = (avatarPath) => {
+    return `/api/${avatarPath}`;
+};
+

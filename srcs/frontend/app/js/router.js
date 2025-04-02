@@ -24,7 +24,12 @@ const routeHandlers = {
   "#lobby": () => setupLobbyJs(),
   "#menu": () => console.log("Menu loaded"),
   "#leaderboard": () => setupLeaderboardJs(),
-  "#profile": () => setupProfilePageJs(),
+  "#profile": () => {
+    console.log("Profile loaded");
+    console.log("Profile loaded");
+    console.log("Profile loaded");
+    setupProfilePageJs();
+  },
   "#terms": () => {},
   "#about": () => {},
   "#register": () => {},

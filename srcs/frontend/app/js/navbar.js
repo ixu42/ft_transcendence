@@ -2,6 +2,7 @@ async function updateNavbar() {
     console.log("Updating navbar...");
 
     const authButton = document.getElementById("tr-auth-btn");
+    const profileDropdown = document.getElementById("profile-dropdown");
     const homeButton = document.getElementById("tr-home-btn");
     const friendsButton = document.getElementById("tr-friends-btn");
     const friendsDropdown = document.getElementById("friends-dropdown");
@@ -12,9 +13,11 @@ async function updateNavbar() {
     if (authButton) {
         if (isLoggedIn) {
             authButton.innerHTML = '<img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile';
-            authButton.onclick = () => (window.location.hash = "#profile");
+            profileDropdown.style.display = "inline-block"; // Show the profile dropdown
+            setupProfileButton(authButton);
         } else {
             authButton.innerHTML = '<img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register';
+            profileDropdown.style.display = "inline-block"; // Show even when not logged in
             authButton.onclick = () => (window.location.hash = "#login");
         }
     }
@@ -28,8 +31,6 @@ async function updateNavbar() {
         if (isLoggedIn) {
             console.log("User is logged in. Enabling friends dropdown...");
             friendsDropdown.style.display = "inline-block";
-
-            // Set up the friends button logic
             setupFriendsButton(friendsButton);
         } else {
             console.log("User is not logged in. Hiding friends dropdown...");
@@ -37,6 +38,65 @@ async function updateNavbar() {
         }
     }
 }
+
+function populateProfileDropdown(container, userData) {
+    // Build the user entry: either the current user's info or an error message.
+    console.log("Populating profile dropdown with user data:", userData);
+    console.log("Populating profile dropdown with user data:", userData);
+    const userEntry = userData 
+      ? `<div class="profile-item">
+           <img src="${fixAvatarURL(userData.avatar)}" alt="${userData.username}" class="profile-avatar">
+           <span>${userData.username}</span>
+           <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile'">
+             <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
+           </button>
+         </div>`
+      : `<div class="profile-item no-profile">Failed to load user data</div>`;
+    
+    // Always include the login/signup entry with the same icon as the auth button.
+    const otherEntry = `<div class="profile-item">
+                          <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar">
+                          <span>Other User?</span>
+                          <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
+                            <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
+                          </button>
+                        </div>`;
+    
+    container.innerHTML = `
+      <div class="profile-list-container">
+        ${userEntry}
+        ${otherEntry}
+      </div>
+      <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+    `;
+  }
+  
+  
+  async function setupProfileButton(profileButton) {
+    const dropdown = document.getElementById("profile-dropdown-content");
+    let hideTimer;
+    const userId = localStorage.getItem("user_id");
+  
+    profileButton.addEventListener("mouseenter", async () => {
+      if (hideTimer) clearTimeout(hideTimer);
+      const userData = userId ? await fetchProfileDataById(userId) : null;
+      populateProfileDropdown(dropdown, userData);
+      dropdown.style.display = "block";
+    });
+  
+    profileButton.addEventListener("mouseleave", () => {
+      hideTimer = setTimeout(() => dropdown.style.display = "none", 200);
+    });
+  
+    dropdown.addEventListener("mouseenter", () => {
+      if (hideTimer) clearTimeout(hideTimer);
+      dropdown.style.display = "block";
+    });
+  
+    dropdown.addEventListener("mouseleave", () => dropdown.style.display = "none");
+  }
+  
+
 
 async function setupFriendsButton(friendsButton) {
     const friendsDropdownContent = document.getElementById("friends-dropdown-content");
