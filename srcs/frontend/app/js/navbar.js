@@ -39,99 +39,63 @@ async function updateNavbar() {
     }
 }
 
-async function setupProfileButton(profileButton) {
-    const profileDropdownContent = document.getElementById("profile-dropdown-content");
-    let isFetching = false;
-    let hideTimer; // Timer to delay hiding the dropdown
+function populateProfileDropdown(container, userData) {
+    // Build the user entry: either the current user's info or an error message.
+    console.log("Populating profile dropdown with user data:", userData);
+    console.log("Populating profile dropdown with user data:", userData);
+    const userEntry = userData 
+      ? `<div class="profile-item">
+           <img src="${fixAvatarURL(userData.avatar)}" alt="${userData.username}" class="profile-avatar">
+           <span>${userData.username}</span>
+           <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile'">
+             <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
+           </button>
+         </div>`
+      : `<div class="profile-item no-profile">Failed to load user data</div>`;
+    
+    // Always include the login/signup entry with the same icon as the auth button.
+    const otherEntry = `<div class="profile-item">
+                          <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar">
+                          <span>Other User?</span>
+                          <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
+                            <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
+                          </button>
+                        </div>`;
+    
+    container.innerHTML = `
+      <div class="profile-list-container">
+        ${userEntry}
+        ${otherEntry}
+      </div>
+      <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+    `;
+  }
+  
+  
+  async function setupProfileButton(profileButton) {
+    const dropdown = document.getElementById("profile-dropdown-content");
+    let hideTimer;
     const userId = localStorage.getItem("user_id");
-
+  
     profileButton.addEventListener("mouseenter", async () => {
-        // Cancel any pending hide action.
-        if (hideTimer) {
-            clearTimeout(hideTimer);
-        }
-        if (isFetching) return;
-        isFetching = true;
-
-        console.log("Profile button hovered...");
-
-        if (userId) {
-            // Fetch current user data
-            const userData = await fetchProfileDataById(userId);
-            if (userData) {
-                profileDropdownContent.innerHTML = `
-                    <div class="profile-list-container">
-                        <div class="profile-item">
-                            <img src="${fixAvatarURL(userData.avatar)}" alt="${userData.username}" class="profile-avatar">
-                            <span>${userData.username}</span>
-                            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile'">
-                                Go to Profile
-                            </button>
-                        </div>
-                        <div class="profile-item">
-                            <img src="static/icons/empty-avatar.png" alt="Empty Profile" class="profile-avatar">
-                            <span>Other User?</span>
-                            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
-                                Login / Sign Up
-                            </button>
-                        </div>
-                    </div>
-                    <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
-                `;
-            } else {
-                // If fetching user data fails, still show the login/signup option.
-                profileDropdownContent.innerHTML = `
-                    <div class="profile-list-container">
-                        <div class="profile-item no-profile">
-                            Failed to load user data
-                        </div>
-                        <div class="profile-item">
-                            <img src="static/icons/empty-avatar.png" alt="Empty Profile" class="profile-avatar">
-                            <span>Other User?</span>
-                            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
-                                Login / Sign Up
-                            </button>
-                        </div>
-                    </div>
-                    <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
-                `;
-            }
-        } else {
-            // When no user is logged in, show only the login/signup entry.
-            profileDropdownContent.innerHTML = `
-                <div class="profile-list-container">
-                    <div class="profile-item">
-                        <img src="static/icons/empty-avatar.png" alt="Empty Profile" class="profile-avatar">
-                        <span>Other User?</span>
-                        <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
-                            Login / Sign Up
-                        </button>
-                    </div>
-                </div>
-                <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
-            `;
-        }
-
-        profileDropdownContent.style.display = "block";
-        isFetching = false;
+      if (hideTimer) clearTimeout(hideTimer);
+      const userData = userId ? await fetchProfileDataById(userId) : null;
+      populateProfileDropdown(dropdown, userData);
+      dropdown.style.display = "block";
     });
-
+  
     profileButton.addEventListener("mouseleave", () => {
-        hideTimer = setTimeout(() => {
-            profileDropdownContent.style.display = "none";
-        }, 200);
+      hideTimer = setTimeout(() => dropdown.style.display = "none", 200);
     });
-    profileDropdownContent.addEventListener("mouseenter", () => {
-        if (hideTimer) {
-            clearTimeout(hideTimer);
-        }
-        profileDropdownContent.style.display = "block";
+  
+    dropdown.addEventListener("mouseenter", () => {
+      if (hideTimer) clearTimeout(hideTimer);
+      dropdown.style.display = "block";
     });
-    profileDropdownContent.addEventListener("mouseleave", () => {
-        profileDropdownContent.style.display = "none";
-    });
-}
-
+  
+    dropdown.addEventListener("mouseleave", () => dropdown.style.display = "none");
+  }
+  
 
 
 async function setupFriendsButton(friendsButton) {

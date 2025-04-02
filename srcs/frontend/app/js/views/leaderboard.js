@@ -53,14 +53,3 @@ const renderLeaderboard = (playersData, currentPage) => {
     prevButton.onclick = () => renderLeaderboard(playersData, currentPage - 1);
     nextButton.onclick = () => renderLeaderboard(playersData, currentPage + 1);
 };
-
-const fixAvatarURL = (avatarPath) => {
-
-    if (avatarPath.startsWith("avatars/")){
-        return `api/media/${avatarPath}`;
-    }
-    else if (avatarPath.startsWith("/static/")) {
-        return `/api/${avatarPath}`;
-    }
-    return avatarPath;
-};

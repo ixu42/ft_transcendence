@@ -63,3 +63,7 @@ async function fetchProfileDataById(userId) {
     }
 }
 
+const fixAvatarURL = (avatarPath) => {
+    return `/api/${avatarPath}`;
+};
+
