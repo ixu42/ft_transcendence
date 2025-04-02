@@ -341,6 +341,35 @@ For the authenticated user to delete its account. In this case, user object and 
 
 ---
 
+### Anonymization
+
+Enable users to request anonymization of their personal data, ensuring that their identity and sensitive information are protected. The following actions are taken upon a successful request:
+- username and email anonymized;
+- first and last names become empty strings;
+- avatar reset to default and existing avatar deleted if it exists;
+- friends removed;
+- user is logged out and may not log in again.
+
+<details>
+    <summary><code>PATCH</code><code><b>users/{user_id}/anonymize/</b></code></summary>
+
+- **Response** 
+    - **200**
+        ```json
+        {"message": "Your data has been anonymized. Logging out..."}
+    - **400**
+        ```json
+        {"errors": "User is already anonymized."}
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+
+</details>
+
+---
+
 ### Participated tournaments
 
 For the authenticated user to view their participated tournaments related info, including id, name, status, started_at, players.
