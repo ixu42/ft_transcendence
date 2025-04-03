@@ -1,4 +1,5 @@
 import os
+import shutil
 import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
@@ -99,10 +100,11 @@ class CustomUser(AbstractUser):
         self.first_name = ""
         self.last_name = ""
 
-        # Reset avatar to default and delete existing avatar if it exists
-        if self.avatar and self.avatar.name != self.default_avatar:
-            if default_storage.exists(self.avatar.name):
-                default_storage.delete(self.avatar.name)
+        # Delete the entire user avatar folder if it exists
+        user_avatar_folder = os.path.join(settings.MEDIA_ROOT, "avatars", str(self.id))
+        if os.path.exists(user_avatar_folder):
+            shutil.rmtree(user_avatar_folder)
+
         self.avatar = None  # Set avatar to None (it will default to default_avatar)
 
         self.friends.clear()
