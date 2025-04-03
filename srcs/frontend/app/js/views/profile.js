@@ -558,7 +558,7 @@ const setupAvatarUpload = () => {
         try {
             const csrfToken = await getCSRFCookie();
             const response = await fetch(`api/users/${userId}/avatar/`, {
-                method: "PATCH",
+                method: "DELETE",
                 headers: { "X-CSRFToken": csrfToken },
                 credentials: "include",
             });

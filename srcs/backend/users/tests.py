@@ -343,7 +343,7 @@ class TestUpdatePassword(BaseTestCase):
 )  # Uploaded test files are removed on container removal
 class TestUpdateAvatar(BaseTestCase):
     def setUp(self):
-        self.url = reverse("users:update_avatar", args=[self.user.id])
+        self.url = reverse("users:handle_avatar", args=[self.user.id])
         self.login()
 
     def make_request(self, request_body={}):

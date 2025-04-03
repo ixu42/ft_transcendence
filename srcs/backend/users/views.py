@@ -272,8 +272,8 @@ def update_password(request, user_id):
 
 
 @custom_login_required
-@require_http_methods(["POST", "PATCH"])
-def update_avatar(request, user_id):
+@require_http_methods(["POST", "DELETE"])
+def handle_avatar(request, user_id):
     user = User.objects.get(id=user_id)
 
     if (request.method == "POST"):
@@ -294,9 +294,10 @@ def update_avatar(request, user_id):
               }
           )
       return JsonResponse({"errors": form.errors}, status=400)
-    elif (request.method == "PATCH"):
+    elif (request.method == "DELETE"):
         user.reset_avatar()
-        return JsonResponse({
+        return JsonResponse(
+            {
                 "id": user.id,
                 "username": user.username,
                 "message": "Avatar reset.",

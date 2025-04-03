@@ -175,6 +175,32 @@ Allow users to upload a new avatar image.
 
 ---
 
+### User avatar reset
+
+Allow users to reset their avatar to default one.
+
+<details>
+    <summary><code>DELETE</code><code><b>users/{user_id}/avatar/</b></code></summary>
+
+- **Response**
+    - **200**
+      ```json
+        {
+            "id": 1,
+            "username": "user1",
+            "message": "Avatar reset.",
+            "avatar_url": "/static/avatars/default.png"
+        }
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+
+</details>
+
+---
+
 ### User profile info
 
 Get details of the authenticated user's profile.
