@@ -77,11 +77,22 @@ class CustomUser(AbstractUser):
         """
         Updates the user's avatar and handles file cleanup.
         """
-        if old_file_path != self.default_avatar:
+        if old_file_path and old_file_path != self.default_avatar:
             if default_storage.exists(old_file_path):
                 default_storage.delete(old_file_path)
 
         self.avatar = new_avatar
+        self.save()
+    
+    def reset_avatar(self):
+        """
+        Resets the user's avatar to default and handles file cleanup.
+        """
+        user_avatar_folder = os.path.join(settings.MEDIA_ROOT, "avatars", str(self.id))
+        if os.path.exists(user_avatar_folder):
+            shutil.rmtree(user_avatar_folder)
+
+        self.avatar = None
         self.save()
 
     def anonymize(self):
@@ -105,7 +116,7 @@ class CustomUser(AbstractUser):
         if os.path.exists(user_avatar_folder):
             shutil.rmtree(user_avatar_folder)
 
-        self.avatar = None  # Set avatar to None (it will default to default_avatar)
+        self.avatar = None
 
         self.friends.clear()
 

@@ -547,9 +547,35 @@ const setupAvatarUpload = () => {
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
-            fetchProfileData(); 
+            fetchProfileData();
         } catch (error) {
             console.error("❌ Error updating avatar:", error);
+        }
+    };
+
+    const handleAvatarReset = async () => {
+        const userId = localStorage.getItem("user_id");
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`api/users/${userId}/avatar/`, {
+                method: "PATCH",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include",
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                console.error("❌ Failed to reset avatar:", data.errors);
+                return;
+            }
+
+            console.log("✅ Avatar reset:", data.message);
+            const newAvatarUrl = `api/${data.avatar_url}`;
+            document.querySelector(".profile-avatar").src = newAvatarUrl;
+            localStorage.setItem("user_avatar", newAvatarUrl);
+            fetchProfileData();
+        } catch (error) {
+            console.error("❌ Error resetting avatar:", error);
         }
     };
 
@@ -559,6 +585,11 @@ const setupAvatarUpload = () => {
             const file = event.target.files[0];
             if (file) handleAvatarUpload(file);
         });
+    }
+
+    const avatarResetButton = document.getElementById("avatar-reset");
+    if (avatarResetButton) {
+        avatarResetButton.addEventListener("click", handleAvatarReset);
     }
 };
 
