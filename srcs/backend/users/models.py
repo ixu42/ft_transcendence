@@ -106,7 +106,9 @@ class CustomUser(AbstractUser):
         self.avatar = None  # Set avatar to None (it will default to default_avatar)
 
         self.friends.clear()
-        self.set_unusable_password()  # Disable user login
+
+        self.set_unusable_password()
+        self.is_active = False
 
         self.is_anonymized = True
         self.save()

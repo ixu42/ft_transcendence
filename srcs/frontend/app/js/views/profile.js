@@ -316,6 +316,38 @@ const handleAccountDeactivation = async () => {
     }
 };
 
+const handleAnonymization  = async () => {
+  const userId = localStorage.getItem("user_id");
+  if (!userId) {
+      console.error("⚠️ User ID not found.");
+      alert("Error: Unable to deactivate account.");
+      return;
+  }
+
+  const confirmation = confirm("Are you sure you want to anonymize your personal data? Your account would be unusable after anonymization.");
+  if (!confirmation) return;
+
+  try {
+      const response = await fetch(`api/users/${userId}/anonymize/`, {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "X-CSRFToken": await getCSRFCookie(), }
+      });
+
+      if (response.ok) {
+          const data = await response.json();
+          alert(`✅ ${data.message}`);
+          localStorage.clear();
+          window.location.hash = "#login";
+      } else {
+          const errorData = await response.json();
+          alert(`❌ Error: ${errorData.errors || "Failed to anonymize personal data."}`);
+      }
+  } catch (error) {
+      console.error("⚠️ Network or server error:", error);
+      alert("An error occurred while anonymizing personal data.");
+  }
+};
 
 // Button callbacks for profile page
 const setupButtons = () => {
@@ -330,7 +362,8 @@ const setupButtons = () => {
             console.log("📌 Edit Profile button clicked");
             document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
         }, message: "✅ Found edit profile button" },
-        { selector: "#deactivate-account-btn", callback: handleAccountDeactivation, message: "✅ Found deactivate account button" }
+        { selector: "#deactivate-account-btn", callback: handleAccountDeactivation, message: "✅ Found deactivate account button" },
+        { selector: "#anonymize-personal-data-btn", callback: handleAnonymization, message: "✅ Found anonymization button" }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
