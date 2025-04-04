@@ -16,7 +16,8 @@ const routes = {
 };
 
 const protectedRoutes = ["#profile"];
-const isUserLoggedIn = () => localStorage.getItem("isLoggedIn") === "true";
+const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+const isAnyUserLoggedIn = loggedInUsers.some(user => user.loggedIn);
 const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
@@ -41,7 +42,7 @@ const routeHandlers = {
 let heartbeatInterval = null; // Store interval ID
 
 const startHeartbeat = async () => {
-  if (!isUserLoggedIn()) {
+  if (!isAnyUserLoggedIn) {
     console.log("User is not logged in, skipping heartbeat.");
     return;
   }
@@ -80,7 +81,7 @@ const handleLocation = async () => {
 
   if (!window.location.hash)
   {
-    const defaultRoute = isUserLoggedIn() ? "#menu" : "#login";
+    const defaultRoute = isAnyUserLoggedIn ? "#menu" : "#login";
     console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
     console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
     history.replaceState(null, null, defaultRoute);
@@ -89,7 +90,7 @@ const handleLocation = async () => {
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
-  const isLoggedIn = isUserLoggedIn();
+  const isLoggedIn = isAnyUserLoggedIn;
   const hideNavbarAndFooter = ["#login", "#register", "", "#game", "#profile"].includes(path) || window.location.hash === "";
 
   const navbar = document.getElementById("tr-navbar-container");

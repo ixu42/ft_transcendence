@@ -1,7 +1,6 @@
 
-const logout = async () => {
-    console.log("Logout button clicked");
-    const userId = localStorage.getItem("user_id");
+const logoutUser = async (userId) => {
+    console.log("Logout button clicked for user:", userId);
     const csrfToken = await getCSRFCookie();
     if (!csrfToken) {
         return console.error("❌ CSRF Token is missing.");
@@ -19,6 +18,7 @@ const logout = async () => {
         console.log("✅ Logout successful");
         document.cookie = "csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         localStorage.setItem("isLoggedIn", "false");
+        removeLoggedInUser(userId);
         updateNavbar();
         window.location.hash = "#login";
     } else {
@@ -26,6 +26,7 @@ const logout = async () => {
         console.error("❌ Logout failed:", errors);
     }
 };
+
 
 const setupProfilePageJs = () => {
     console.log("⚡ setupProfilePage() called!");
@@ -352,7 +353,7 @@ const handleAnonymization  = async () => {
 // Button callbacks for profile page
 const setupButtons = () => {
     [
-        { selector: "#profile-logout-btn", callback: logout, message: "✅ Found logout button" },
+        { selector: "#profile-logout-btn", callback: logoutUser, message: "✅ Found logout button" },
         { selector: "#profile-menu-btn", callback: () => {
             console.log("📌 Menu button clicked");
             window.location.hash = "#menu";

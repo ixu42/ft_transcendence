@@ -6,20 +6,11 @@ async function updateNavbar() {
     const homeButton = document.getElementById("tr-home-btn");
     const friendsButton = document.getElementById("tr-friends-btn");
     const friendsDropdown = document.getElementById("friends-dropdown");
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-
-    console.log("Is logged in?", isLoggedIn);
 
     if (authButton) {
-        if (isLoggedIn) {
-            authButton.innerHTML = '<img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile';
-            profileDropdown.style.display = "inline-block"; // Show the profile dropdown
-            setupProfileButton(authButton);
-        } else {
-            authButton.innerHTML = '<img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register';
-            profileDropdown.style.display = "inline-block"; // Show even when not logged in
-            authButton.onclick = () => (window.location.hash = "#login");
-        }
+        authButton.innerHTML = '<img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Users';
+        profileDropdown.style.display = "inline-block";
+        setupProfileButton(authButton);
     }
 
     if (homeButton) {
@@ -27,75 +18,102 @@ async function updateNavbar() {
         homeButton.onclick = () => (window.location.hash = "#menu");
     }
 
+    const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+    const isAnyUserLoggedIn = loggedInUsers.some(user => user.loggedIn);
+
     if (friendsButton) {
-        if (isLoggedIn) {
-            console.log("User is logged in. Enabling friends dropdown...");
+        if (isAnyUserLoggedIn) {
+            console.log("At least one user is logged in. Enabling friends dropdown...");
             friendsDropdown.style.display = "inline-block";
             setupFriendsButton(friendsButton);
         } else {
-            console.log("User is not logged in. Hiding friends dropdown...");
+            console.log("No users logged in. Hiding friends dropdown...");
             friendsDropdown.style.display = "none";
         }
     }
 }
 
-function populateProfileDropdown(container, userData) {
-    // Build the user entry: either the current user's info or an error message.
-    console.log("Populating profile dropdown with user data:", userData);
-    console.log("Populating profile dropdown with user data:", userData);
-    const userEntry = userData 
-      ? `<div class="profile-item">
-           <img src="${fixAvatarURL(userData.avatar)}" alt="${userData.username}" class="profile-avatar">
-           <span>${userData.username}</span>
-           <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile'">
-             <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
-           </button>
-         </div>`
-      : `<div class="profile-item no-profile">Failed to load user data</div>`;
-    
-    // Always include the login/signup entry with the same icon as the auth button.
-    const otherEntry = `<div class="profile-item">
-                          <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar">
-                          <span>Other User?</span>
-                          <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
-                            <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
-                          </button>
-                        </div>`;
-    
-    container.innerHTML = `
-      <div class="profile-list-container">
-        ${userEntry}
-        ${otherEntry}
-      </div>
-      <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+
+function populateProfileDropdown(container, userDataArray) {
+    console.log("Populating profile dropdown with user data:", userDataArray);
+
+    const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+    const activeUsers = loggedInUsers.filter(user => user.loggedIn);
+
+    console.log("Active users:", activeUsers);
+
+    const userEntries = activeUsers.length > 0
+    ? activeUsers.map(user => {
+        const userData = userDataArray && userDataArray.find(data => data && data.id === user.id);
+        const avatar = userData ? fixAvatarURL(userData.avatar) : "api/static/avatars/default.png";
+        return `
+            <div class="profile-item">
+                <img src="${avatar}" alt="${user.username}" class="profile-avatar">
+                <span>${user.username}</span>
+                <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile/${user.id}'">
+                    <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
+                </button>
+                <button class="profile-link-btn tr-nav-btn" onclick="logoutUser('${user.id}')">
+                    Logout
+                </button>
+            </div>
+        `;
+    }).join("")
+    : `<div class="profile-item no-profile">No logged-in users</div>`;
+
+    // Login/signup entry
+    const otherEntry = `
+        <div class="profile-item">
+            <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar">
+            <span>Other User?</span>
+            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
+                <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
+            </button>
+        </div>
     `;
-  }
+
+    container.innerHTML = `
+        <div class="profile-list-container">
+            ${userEntries}
+            ${otherEntry}
+        </div>
+        <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+    `;
+}
+
+
   
   
-  async function setupProfileButton(profileButton) {
+async function setupProfileButton(profileButton) {
     const dropdown = document.getElementById("profile-dropdown-content");
     let hideTimer;
-    const userId = localStorage.getItem("user_id");
-  
+
     profileButton.addEventListener("mouseenter", async () => {
-      if (hideTimer) clearTimeout(hideTimer);
-      const userData = userId ? await fetchProfileDataById(userId) : null;
-      populateProfileDropdown(dropdown, userData);
-      dropdown.style.display = "block";
+        if (hideTimer) clearTimeout(hideTimer);
+
+        const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+        const loggedInUserIds = loggedInUsers
+            .filter(user => user.loggedIn && user.user_id)
+            .map(user => user.user_id);
+        const userDataArray = loggedInUserIds.length > 0
+            ? await Promise.all(loggedInUserIds.map(userId => fetchProfileDataById(userId)))
+            : [];
+
+        populateProfileDropdown(dropdown, userDataArray);
+        dropdown.style.display = "block";
     });
-  
+
     profileButton.addEventListener("mouseleave", () => {
-      hideTimer = setTimeout(() => dropdown.style.display = "none", 200);
+        hideTimer = setTimeout(() => dropdown.style.display = "none", 200);
     });
-  
+
     dropdown.addEventListener("mouseenter", () => {
-      if (hideTimer) clearTimeout(hideTimer);
-      dropdown.style.display = "block";
+        if (hideTimer) clearTimeout(hideTimer);
+        dropdown.style.display = "block";
     });
-  
+
     dropdown.addEventListener("mouseleave", () => dropdown.style.display = "none");
-  }
-  
+}
 
 
 async function setupFriendsButton(friendsButton) {
