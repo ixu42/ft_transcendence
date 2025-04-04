@@ -47,40 +47,39 @@ const routeHandlers = {
 let heartbeatInterval = null; // Store interval ID
 
 const startHeartbeat = async () => {
-  if (!isAnyUserLoggedIn) {
-    console.log("User is not logged in, skipping heartbeat.");
-    return;
+  const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+  if (loggedInUsers.length === 0) {
+      console.log("No logged in users, skipping heartbeat.");
+      return;
   }
-
   if (heartbeatInterval) {
-    console.log("Heartbeat already running.");
-    return; // Prevent multiple intervals
+      console.log("Heartbeat already running.");
+      return;
   }
 
-  const userId = localStorage.getItem("user_id");
   async function sendHeartbeat() {
-    try {
-      await apiRequest(`users/${userId}/heartbeat/`, "GET");
-      console.log("Heartbeat updated");
-    } catch (error) {
-      console.error("Heartbeat error:", error);
-      if (error.response?.status === 401) {
-        stopHeartbeat();
+      const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+      for (const user of loggedInUsers) {
+          try {
+              await apiRequest(`users/${user.id}/heartbeat/`, "GET");
+              console.log(`Heartbeat updated for user ${user.id}`);
+          } catch (error) {
+              console.error(`Heartbeat error for user ${user.id}:`, error);
+          }
       }
-    }
   }
 
   await sendHeartbeat();
   heartbeatInterval = setInterval(sendHeartbeat, 10000);
-}
+};
 
 const stopHeartbeat = () => {
   if (heartbeatInterval) {
-    clearInterval(heartbeatInterval);
-    heartbeatInterval = null;
-    console.log("Heartbeat stopped.");
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
+      console.log("Heartbeat stopped.");
   }
-}
+};
 
 const handleLocation = async () => {
 
