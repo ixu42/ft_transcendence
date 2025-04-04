@@ -1,4 +1,4 @@
-const initializeAIGame = (gameId) => {
+const initializeAIGame = (gameId, userId) => {
     const canvas = document.getElementById('pong');
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");
@@ -6,7 +6,7 @@ const initializeAIGame = (gameId) => {
         return;
     }
     const game = createGame(true);
-    setupControls(game.player, game.player2, game, gameId);
+    setupControls(game.player, game.player2, game, gameId, userId);
     setupAILevelControls(game);
     console.log("Starting game loop");
     gameLoop(game);
