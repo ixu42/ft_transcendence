@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from users.models import CustomUser
+from backend.utils import get_deleted_user
 
 
 class Tournament(models.Model):
@@ -15,7 +16,7 @@ class Tournament(models.Model):
 
     name = models.CharField(max_length=50, blank=True)  # Name of the tournament
     creator = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="created_tournaments"
+        CustomUser, on_delete=models.SET(get_deleted_user), related_name="created_tournaments"
     )
     players = models.ManyToManyField(
         CustomUser, through="TournamentPlayer", related_name="participated_tournaments"
@@ -27,7 +28,7 @@ class Tournament(models.Model):
         default=TournamentStatus.PENDING,
     )
     winner = models.ForeignKey(
-        CustomUser, on_delete=models.SET_NULL, null=True, blank=True
+        CustomUser, on_delete=models.SET(get_deleted_user), null=True, blank=True
     )
 
     @property
@@ -90,7 +91,7 @@ class Tournament(models.Model):
 
 class TournamentPlayer(models.Model):
     tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET(get_deleted_user))
     display_name = models.CharField(max_length=50)
 
     class Meta:

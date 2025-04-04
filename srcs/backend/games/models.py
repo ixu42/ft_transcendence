@@ -1,26 +1,27 @@
 from django.db import models
 from django.conf import settings
+from backend.utils import get_deleted_user
 
 
 class Game(models.Model):
     player1 = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="games_as_player1",
-        on_delete=models.CASCADE,
+        on_delete=models.SET(get_deleted_user),
         null=True,
         blank=True,
     )
     player2 = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="games_as_player2",
-        on_delete=models.CASCADE,
+        on_delete=models.SET(get_deleted_user),
         null=True,
         blank=True,
     )
     winner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="games_won",
-        on_delete=models.SET_NULL,
+        on_delete=models.SET(get_deleted_user),
         null=True,
         blank=True,
     )
