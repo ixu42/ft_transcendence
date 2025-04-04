@@ -19,7 +19,7 @@ function waitForRegisterForm() {
     }, checkInterval);
 }
 
-async function register({ username, email, password1, password2 }) {
+async function register({ username, password1, password2 }) {
     const csrfToken = await getCSRFCookie();
     console.log("CSRF Token:", csrfToken);
 
@@ -30,10 +30,10 @@ async function register({ username, email, password1, password2 }) {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({ username, email, password1, password2 }),
+        body: JSON.stringify({ username, password1, password2 }),
     });
 
-    console.log("Sending request with body:", JSON.stringify({ username, email, password1, password2 }));
+    console.log("Sending request with body:", JSON.stringify({ username, password1, password2 }));
 
     if (!response.ok) {
         const errorData = await response.json();
@@ -52,14 +52,13 @@ function attachRegisterEvent(form) {
 
         const userData = {
             username: document.getElementById("username")?.value.trim(),
-            email: document.getElementById("register-email")?.value.trim(),
-            password1: document.getElementById("register-password")?.value.trim(),
-            password2: document.getElementById("register-password")?.value.trim(),
+            password1: document.getElementById("register-password1")?.value.trim(),
+            password2: document.getElementById("register-password2")?.value.trim(),
         };
 
         console.log("Collected user data:", userData);
 
-        if (!userData.username || !userData.email || !userData.password1 || !userData.password2) {
+        if (!userData.username || !userData.password1 || !userData.password2) {
             console.warn("⚠️ Missing required fields. User data:", userData);
             alert("⚠️ Please fill in all required fields.");
             return;
