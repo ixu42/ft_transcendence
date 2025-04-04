@@ -20,7 +20,6 @@ const logoutUser = async (userId) => {
         localStorage.setItem("isLoggedIn", "false");
         removeLoggedInUser(userId);
         updateNavbar();
-        window.location.hash = "#login";
     } else {
         const { errors } = await response.json();
         console.error("❌ Logout failed:", errors);
@@ -351,7 +350,7 @@ const setupButtons = (userId) => {
     [
         { 
             selector: "#profile-logout-btn", 
-            callback: () => logoutUser(userId),
+            callback: () => { logoutUser(userId); window.location.hash = "#login";},
             message: "✅ Found logout button" 
         },
         { 
