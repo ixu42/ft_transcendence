@@ -5,7 +5,8 @@ const routes = {
   "#about": "/views/about.html",
   "#leaderboard": "/views/leaderboard.html",
   "#lobby": "/views/lobby.html",
-  "#terms": "/views/terms-privacy.html",
+  "#terms-of-service": "/views/terms-of-service.html",
+  "#privacy-policy": "/views/privacy-policy.html",
   "#login": "/views/login.html",
   "#register": "/views/register.html",
   "#game": "/views/game.html",
@@ -30,7 +31,8 @@ const routeHandlers = {
     console.log("Profile loaded");
     setupProfilePageJs();
   },
-  "#terms": () => {},
+  "#terms-of-service": () => {},
+  "#privacy-policy": () => {},
   "#about": () => {},
   "#register": () => {},
   "#login": () => setupLoginPageJs(),

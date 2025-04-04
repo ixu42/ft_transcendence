@@ -271,7 +271,7 @@ const handleAccountDeletion = async () => {
                 return;
             }
 
-            alert("✅ Account deleted successfully.");
+            alert("✅ Account deleted successfully. Logging out...");
             localStorage.clear();
             window.location.hash = "#login";
         } catch (error) {
@@ -324,7 +324,7 @@ const handleAnonymization  = async () => {
       return;
   }
 
-  const confirmation = confirm("Are you sure you want to anonymize your personal data? Your account would be unusable after anonymization.");
+  const confirmation = confirm("Are you sure you want to anonymize your personal data? This cannot be undone, and your account will be unusable.");
   if (!confirmation) return;
 
   try {
