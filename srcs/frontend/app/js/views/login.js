@@ -9,6 +9,7 @@ function setupLoginPageJs()
     else{
         console.error("Login button not found!");
     }
+    displayLoggedInUsers();
 }
 
 function checkAndShowSplash() {
@@ -76,3 +77,41 @@ function handleLogin(loginButton) {
         }
     });
 }
+
+function displayLoggedInUsers() {
+    const loggedInUsers = getLoggedInUsers();
+    const loggedInSessionsDiv = document.getElementById("loggedInSessions");
+    loggedInSessionsDiv.innerHTML = ""; // Clear previous content
+
+    if (loggedInUsers.length > 0) {
+        const sessionsTitle = document.createElement("p");
+        sessionsTitle.textContent = "Existing Sessions:";
+        loggedInSessionsDiv.appendChild(sessionsTitle);
+
+        loggedInUsers.forEach(user => {
+            const sessionParagraph = document.createElement("p");
+            sessionParagraph.textContent = `You're logged in as: ${user.username} `;
+
+            const continueLink = document.createElement("a");
+            continueLink.href = "#menu";
+            continueLink.textContent = "(Continue)";
+            continueLink.style.cursor = "pointer";
+
+            sessionParagraph.appendChild(continueLink);
+            loggedInSessionsDiv.appendChild(sessionParagraph);
+        });
+    } else {
+        const guestParagraph = document.createElement("p");
+        guestParagraph.textContent = "Continue as Guest ";
+
+        const continueLink = document.createElement("a");
+        continueLink.href = "#menu";
+        continueLink.textContent = "(Continue)";
+        continueLink.style.cursor = "pointer";
+
+        guestParagraph.appendChild(continueLink);
+        loggedInSessionsDiv.appendChild(guestParagraph);
+    }
+}
+
+
