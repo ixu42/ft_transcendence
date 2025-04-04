@@ -6,26 +6,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tournaments', '0004_alter_tournament_status'),
+        ("tournaments", "0004_alter_tournament_status"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='tournament',
-            name='creator',
-            field=models.ForeignKey(on_delete=models.SET(backend.utils.get_deleted_user), related_name='created_tournaments', to=settings.AUTH_USER_MODEL),
+            model_name="tournament",
+            name="creator",
+            field=models.ForeignKey(
+                on_delete=models.SET(backend.utils.get_deleted_user),
+                related_name="created_tournaments",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='tournament',
-            name='winner',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(backend.utils.get_deleted_user), to=settings.AUTH_USER_MODEL),
+            model_name="tournament",
+            name="winner",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=models.SET(backend.utils.get_deleted_user),
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='tournamentplayer',
-            name='user',
-            field=models.ForeignKey(on_delete=models.SET(backend.utils.get_deleted_user), to=settings.AUTH_USER_MODEL),
+            model_name="tournamentplayer",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=models.SET(backend.utils.get_deleted_user),
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

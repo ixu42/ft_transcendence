@@ -6,26 +6,43 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('games', '0003_game_completed'),
+        ("games", "0003_game_completed"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='game',
-            name='player1',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(backend.utils.get_deleted_user), related_name='games_as_player1', to=settings.AUTH_USER_MODEL),
+            model_name="game",
+            name="player1",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=models.SET(backend.utils.get_deleted_user),
+                related_name="games_as_player1",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='game',
-            name='player2',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(backend.utils.get_deleted_user), related_name='games_as_player2', to=settings.AUTH_USER_MODEL),
+            model_name="game",
+            name="player2",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=models.SET(backend.utils.get_deleted_user),
+                related_name="games_as_player2",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='game',
-            name='winner',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.SET(backend.utils.get_deleted_user), related_name='games_won', to=settings.AUTH_USER_MODEL),
+            model_name="game",
+            name="winner",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=models.SET(backend.utils.get_deleted_user),
+                related_name="games_won",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

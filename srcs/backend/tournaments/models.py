@@ -16,7 +16,9 @@ class Tournament(models.Model):
 
     name = models.CharField(max_length=50, blank=True)  # Name of the tournament
     creator = models.ForeignKey(
-        CustomUser, on_delete=models.SET(get_deleted_user), related_name="created_tournaments"
+        CustomUser,
+        on_delete=models.SET(get_deleted_user),
+        related_name="created_tournaments",
     )
     players = models.ManyToManyField(
         CustomUser, through="TournamentPlayer", related_name="participated_tournaments"

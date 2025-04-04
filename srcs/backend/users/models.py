@@ -83,7 +83,7 @@ class CustomUser(AbstractUser):
 
         self.avatar = new_avatar
         self.save()
-    
+
     def reset_avatar(self):
         """
         Resets the user's avatar to default and handles file cleanup.
