@@ -1,7 +1,6 @@
 
-const logout = async () => {
-    console.log("Logout button clicked");
-    const userId = localStorage.getItem("user_id");
+const logoutUser = async (userId) => {
+    console.log("Logout button clicked for user:", userId);
     const csrfToken = await getCSRFCookie();
     if (!csrfToken) {
         return console.error("❌ CSRF Token is missing.");
@@ -19,6 +18,7 @@ const logout = async () => {
         console.log("✅ Logout successful");
         document.cookie = "csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         localStorage.setItem("isLoggedIn", "false");
+        removeLoggedInUser(userId);
         updateNavbar();
         window.location.hash = "#login";
     } else {
@@ -27,23 +27,26 @@ const logout = async () => {
     }
 };
 
-const setupProfilePageJs = () => {
-    console.log("⚡ setupProfilePage() called!");
 
+const setupProfilePageJs = (userId) => {
+    console.log("⚡ setupProfilePage() called!");
+    console.log("🔑 User ID:", userId);
+    console.log("🔑 User ID:", userId);
+    console.log("🔑 User ID:", userId);
+    console.log("🔑 User ID:", userId);
     try {
-        fetchProfileData(); // Ensure this does not overwrite the whole page
-        setupAvatarUpload();
-        setupButtons();
-        setupEditProfile();
-        setupMatchHistoryModal();
+        fetchProfileData(userId);
+        setupAvatarUpload(userId);
+        setupButtons(userId);
+        setupEditProfile(userId);
+        setupMatchHistoryModal(userId);
     } catch (error) {
         console.error("❌ Error in setupProfilePage:", error);
     }
 };
 
 
-const fetchProfileData = async () => {
-    const userId = localStorage.getItem("user_id");
+const fetchProfileData = async (userId) => {
 
     if (!userId) {
         console.error("❌ User ID not found in localStorage. Redirecting to login...");
@@ -68,8 +71,7 @@ const fetchProfileData = async () => {
             
             if (response.status === 403 || response.status === 401) {
                 alert("❌ You are not authorized. Redirecting to login.");
-                localStorage.removeItem("user_id");
-                localStorage.removeItem("isLoggedIn");
+                removeLoggedInUser(userId);
                 window.location.hash = "#login";
             }
             return;
@@ -108,7 +110,7 @@ const updateProfileUI = (data) => {
 };
 
 
-const setupMatchHistoryModal = () => {
+const setupMatchHistoryModal = (userId) => {
     const matchHistoryModal = document.getElementById("profile-match-history-modal");
     const closeMatchHistoryModalButton = document.getElementById("close-match-history-modal");
     const matchHistoryContainer = document.querySelector(".profile-match-history");
@@ -144,7 +146,6 @@ const setupMatchHistoryModal = () => {
     });
 
     const fetchMatchHistory = async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             console.error("❌ User ID not found in localStorage.");
             return;
@@ -177,7 +178,6 @@ const setupMatchHistoryModal = () => {
     };
 
     const fetchTournaments = async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             console.error("❌ User ID not found in localStorage.");
             return;
@@ -245,8 +245,7 @@ const setupMatchHistoryModal = () => {
 };
 
 // Function to handle account deletion
-const handleAccountDeletion = async () => {
-    const userId = localStorage.getItem("user_id");
+const handleAccountDeletion = async (userId) => {
 
     if (!userId) {
         alert("User not logged in.");
@@ -271,8 +270,8 @@ const handleAccountDeletion = async () => {
                 return;
             }
 
-            alert("✅ Account deleted successfully. Logging out...");
-            localStorage.clear();
+            alert("✅ Account deleted successfully.");
+            removeLoggedInUser(userId);
             window.location.hash = "#login";
         } catch (error) {
             console.error("❌ Error deleting account:", error);
@@ -282,8 +281,7 @@ const handleAccountDeletion = async () => {
 };
 
 
-const handleAccountDeactivation = async () => {
-    const userId = localStorage.getItem("user_id");
+const handleAccountDeactivation = async (userId) => {
     if (!userId) {
         console.error("⚠️ User ID not found.");
         alert("Error: Unable to deactivate account.");
@@ -304,7 +302,7 @@ const handleAccountDeactivation = async () => {
         if (response.ok) {
             const data = await response.json();
             alert(`✅ ${data.message}`);
-            localStorage.clear();
+            removeLoggedInUser(userId);
             window.location.hash = "#login";
         } else {
             const errorData = await response.json();
@@ -316,8 +314,7 @@ const handleAccountDeactivation = async () => {
     }
 };
 
-const handleAnonymization  = async () => {
-  const userId = localStorage.getItem("user_id");
+const handleAnonymization  = async (userId) => {
   if (!userId) {
       console.error("⚠️ User ID not found.");
       alert("Error: Unable to deactivate account.");
@@ -350,20 +347,44 @@ const handleAnonymization  = async () => {
 };
 
 // Button callbacks for profile page
-const setupButtons = () => {
+const setupButtons = (userId) => {
     [
-        { selector: "#profile-logout-btn", callback: logout, message: "✅ Found logout button" },
-        { selector: "#profile-menu-btn", callback: () => {
-            console.log("📌 Menu button clicked");
-            window.location.hash = "#menu";
-        }, message: "✅ Found menu button" },
-        { selector: "#delete-account-btn", callback: handleAccountDeletion, message: "✅ Found delete account button" },
-        { selector: "#edit-profile-btn", callback: () => {
-            console.log("📌 Edit Profile button clicked");
-            document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
-        }, message: "✅ Found edit profile button" },
-        { selector: "#deactivate-account-btn", callback: handleAccountDeactivation, message: "✅ Found deactivate account button" },
-        { selector: "#anonymize-personal-data-btn", callback: handleAnonymization, message: "✅ Found anonymization button" }
+        { 
+            selector: "#profile-logout-btn", 
+            callback: () => logoutUser(userId),
+            message: "✅ Found logout button" 
+        },
+        { 
+            selector: "#profile-menu-btn", 
+            callback: () => {
+                console.log("📌 Menu button clicked");
+                window.location.hash = "#menu";
+            }, 
+            message: "✅ Found menu button" 
+        },
+        { 
+            selector: "#delete-account-btn", 
+            callback: () => handleAccountDeletion(userId), 
+            message: "✅ Found delete account button" 
+        },
+        { 
+            selector: "#edit-profile-btn", 
+            callback: () => {
+                console.log("📌 Edit Profile button clicked");
+                document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
+            }, 
+            message: "✅ Found edit profile button" 
+        },
+        { 
+            selector: "#deactivate-account-btn", 
+            callback: () => handleAccountDeactivation(userId), 
+            message: "✅ Found deactivate account button" 
+        },
+        { 
+            selector: "#anonymize-personal-data-btn", 
+            callback: () => handleAnonymization(userId), 
+            message: "✅ Found anonymization button" 
+        }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -380,8 +401,9 @@ const setupButtons = () => {
 
 
 
+
 // Setup for edit profile modal
-const setupEditProfile = () => {
+const setupEditProfile = (userId) => {
     const editProfileBtn = document.getElementById("edit-profile-btn");
     const profileEditModal = document.getElementById("profile-edit-modal");
     const closeProfileModal = document.getElementById("close-profile-modal");
@@ -415,7 +437,6 @@ const setupEditProfile = () => {
 
     // Save password button --
     savePasswordBtn.addEventListener("click", async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             alert("User ID not found. Please log in again.");
             return;
@@ -475,7 +496,6 @@ const setupEditProfile = () => {
 
     // Save profile button --
     saveProfileBtn.addEventListener("click", async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             alert("User ID not found. Please log in again.");
             return;
@@ -510,7 +530,7 @@ const setupEditProfile = () => {
 
             console.log("✅ Profile updated successfully:", data);
             alert("✅ Profile updated successfully!");
-            fetchProfileData();
+            fetchProfileData(userId);
         } catch (error) {
             console.error("❌ Error updating profile:", error);
             alert("❌ Error updating profile.");
@@ -519,12 +539,11 @@ const setupEditProfile = () => {
 };
 
 // Function to handle avatar upload
-const setupAvatarUpload = () => {
+const setupAvatarUpload = (userId) => {
 
     const handleAvatarUpload = async (file) => {
         const formData = new FormData();
         formData.append("avatar", file);
-        const userId = localStorage.getItem("user_id");
     
         try {
             const csrfToken = await getCSRFCookie();
@@ -547,14 +566,13 @@ const setupAvatarUpload = () => {
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
-            fetchProfileData();
+            fetchProfileData(userId);
         } catch (error) {
             console.error("❌ Error updating avatar:", error);
         }
     };
 
     const handleAvatarReset = async () => {
-        const userId = localStorage.getItem("user_id");
         try {
             const csrfToken = await getCSRFCookie();
             const response = await fetch(`api/users/${userId}/avatar/`, {
