@@ -50,7 +50,7 @@ function populateProfileDropdown(container, userDataArray) {
             <div class="profile-item">
                 <img src="${avatar}" alt="${user.username}" class="profile-avatar">
                 <span>${user.username}</span>
-                <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile/${user.id}'">
+                <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile?user_id=${user.id}'">
                     <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
                 </button>
                 <button class="profile-link-btn tr-nav-btn" onclick="logoutUser('${user.id}')">
@@ -93,8 +93,8 @@ async function setupProfileButton(profileButton) {
 
         const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
         const loggedInUserIds = loggedInUsers
-            .filter(user => user.loggedIn && user.user_id)
-            .map(user => user.user_id);
+            .filter(user => user.loggedIn && user.id)
+            .map(user => user.id);
         const userDataArray = loggedInUserIds.length > 0
             ? await Promise.all(loggedInUserIds.map(userId => fetchProfileDataById(userId)))
             : [];
@@ -114,6 +114,7 @@ async function setupProfileButton(profileButton) {
 
     dropdown.addEventListener("mouseleave", () => dropdown.style.display = "none");
 }
+
 
 
 async function setupFriendsButton(friendsButton) {

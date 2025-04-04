@@ -78,6 +78,7 @@ function handleLogin(loginButton) {
     });
 }
 
+
 function displayLoggedInUsers() {
     const loggedInUsers = getLoggedInUsers();
     const loggedInSessionsDiv = document.getElementById("loggedInSessions");

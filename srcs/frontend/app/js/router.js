@@ -15,7 +15,7 @@ const routes = {
   404: "/views/404.html",
 };
 
-const protectedRoutes = ["#profile"];
+const protectedRoutes = [/*"#profile"*/];
 const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
 const isAnyUserLoggedIn = loggedInUsers.some(user => user.loggedIn);
 const routeToMenu = () => { history.replaceState(null, null, "#menu");};
@@ -26,10 +26,15 @@ const routeHandlers = {
   "#menu": () => console.log("Menu loaded"),
   "#leaderboard": () => setupLeaderboardJs(),
   "#profile": () => {
-    console.log("Profile loaded");
-    console.log("Profile loaded");
-    console.log("Profile loaded");
-    setupProfilePageJs();
+    const hash = window.location.hash;
+    const queryString = hash.split("?")[1];
+    const userId = queryString ? new URLSearchParams(queryString).get("user_id") : null;
+    if (userId) {
+      console.log(`Profile loaded for user ID: ${userId}`);
+      setupProfilePageJs(userId);
+    } else {
+      console.warn("No user ID provided; profile not loaded.");
+    }
   },
   "#terms": () => {},
   "#about": () => {},
@@ -103,8 +108,7 @@ const handleLocation = async () => {
   // Check for protected routes.
   if (protectedRoutes.includes(path) && !isLoggedIn) {
     console.warn(`🚨 Access denied: ${path} requires authentication.`);
-    showRegisterPopup();
-    routeToMenu();
+    alert("You must be logged in to access this page.");
     return;
   }
 
