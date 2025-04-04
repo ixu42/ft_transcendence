@@ -70,7 +70,7 @@ const startHeartbeat = async () => {
   }
 
   await sendHeartbeat();
-  heartbeatInterval = setInterval(sendHeartbeat, 10000);
+  heartbeatInterval = setInterval(sendHeartbeat, 40000);
 };
 
 const stopHeartbeat = () => {

@@ -119,6 +119,10 @@ async function fetchProfileDataById(userId) {
 }
 
 const fixAvatarURL = (avatarPath) => {
+
+    if (avatarPath.startsWith("avatars/")) {
+        return `/api/media/${avatarPath}`;
+    }
     return `/api/${avatarPath}`;
 };
 
