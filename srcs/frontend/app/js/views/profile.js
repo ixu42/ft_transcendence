@@ -566,7 +566,6 @@ const setupAvatarUpload = (userId) => {
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
-            fetchProfileData(userId);
         } catch (error) {
             console.error("❌ Error updating avatar:", error);
         }
@@ -591,7 +590,6 @@ const setupAvatarUpload = (userId) => {
             const newAvatarUrl = `api/${data.avatar_url}`;
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
-            fetchProfileData();
         } catch (error) {
             console.error("❌ Error resetting avatar:", error);
         }
