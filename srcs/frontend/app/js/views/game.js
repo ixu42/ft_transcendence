@@ -8,6 +8,7 @@ const setupGameJs = async () => {
         let currentUserId = localStorage.getItem("user_id");
         const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
 
+        
         const selectUserForGame = () => {
             const userOptions = loggedInUsers
                 .map(user => `${user.id}: ${user.username}`)
@@ -21,6 +22,14 @@ const setupGameJs = async () => {
             }
             return selected.trim();
         };
+
+
+
+        if (loggedInUsers.length === 0) {
+            alert("Please log in to play a game 🏓");
+            window.location.href = "#login";
+            return;
+        }
 
         if (loggedInUsers.length === 1) {
             currentUserId = loggedInUsers[0].id;
