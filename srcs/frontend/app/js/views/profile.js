@@ -567,10 +567,14 @@ const setupAvatarUpload = (userId) => {
                 let errorMessage = "An error occurred while updating your avatar.";
 
                 if (response.status === 400) {
-                    errorMessage = JSON.stringify(data.errors) || "Bad Request: Invalid data provided.";
+                    if (data.errors && data.errors.avatar) {
+                        errorMessage = data.errors.avatar[0];
+                    } else {
+                        errorMessage = "Bad Request: Invalid data provided.";
+                    }
                 }
 
-                alert(errorMessage);
+                alert(`❌ ${errorMessage}`);
                 return;
             }
 
