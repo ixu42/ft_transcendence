@@ -64,16 +64,13 @@ def register_user(request):
 
     form = CustomUserCreationForm(data)
     if form.is_valid():
-        try:
-            form.save()
-            user_id = form.instance.id
-            username = form.cleaned_data.get("username")
-            return JsonResponse(
-                {"id": user_id, "username": username, "message": "User created."},
-                status=201,
-            )
-        except Exception as e:
-            return JsonResponse({"errors": str(e)}, status=500)
+        form.save()
+        user_id = form.instance.id
+        username = form.cleaned_data.get("username")
+        return JsonResponse(
+            {"id": user_id, "username": username, "message": "User created."},
+            status=201,
+        )
     else:
         return JsonResponse({"errors": form.errors}, status=400)
 

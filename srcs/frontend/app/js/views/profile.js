@@ -553,19 +553,35 @@ const setupAvatarUpload = (userId) => {
                 credentials: "include",
             });
     
-            const data = await response.json();
-    
-            if (!response.ok) {
-                console.error("❌ Failed to update avatar:", data.errors);
+            
+            if (!response.ok && response.status === 413) {
+                // nginx handles this error instead of django
+                alert("❌ File size is too large. Please upload a smaller file.");
                 return;
             }
-    
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                let errorMessage = "An error occurred while updating your avatar.";
+
+                if (response.status === 400) {
+                    if (data.errors && data.errors.avatar) {
+                        errorMessage = data.errors.avatar[0];
+                    } else {
+                        errorMessage = "Bad Request: Invalid data provided.";
+                    }
+                }
+
+                alert(`❌ ${errorMessage}`);
+                return;
+            }
+
             console.log("✅ Avatar updated:", data.message);
             const newAvatarUrl = `api/${data.avatar_url}`;
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
-            fetchProfileData(userId);
         } catch (error) {
             console.error("❌ Error updating avatar:", error);
         }
@@ -590,7 +606,6 @@ const setupAvatarUpload = (userId) => {
             const newAvatarUrl = `api/${data.avatar_url}`;
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
-            fetchProfileData();
         } catch (error) {
             console.error("❌ Error resetting avatar:", error);
         }
