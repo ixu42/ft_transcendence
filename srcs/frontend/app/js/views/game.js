@@ -6,10 +6,18 @@ const setupGameJs = async () => {
       const type = params.get("type") || "local";  // Default: Local game
       const mode = params.get("mode") || "1v1";      // Default: 1v1 mode
   
-      let currentUserId = localStorage.getItem("user_id");
+      let currentUserId;
       const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
-  
-      if (loggedInUsers.length > 1) {
+
+      if (loggedInUsers.length === 0) {
+        alert("Please log in to play a game 🏓");
+        window.location.href = "#login";
+        return;
+      }
+      else if (loggedInUsers.length === 1) {
+        currentUserId = loggedInUsers[0].id;
+      }
+      else if (loggedInUsers.length > 1) {
         const userOptions = loggedInUsers
           .map(user => `${user.id}: ${user.username}`)
           .join("\n");

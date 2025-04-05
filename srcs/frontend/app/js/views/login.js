@@ -30,7 +30,7 @@ function checkAndShowSplash() {
 
 function handleLogin(loginButton) {
     loginButton.addEventListener("click", async () => {
-        const username = document.getElementById("login-username-email").value.trim();
+        const username = document.getElementById("login-username").value.trim();
         const password = document.getElementById("login-password").value.trim();
 
         if (!username || !password) {
