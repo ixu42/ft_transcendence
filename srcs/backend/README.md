@@ -44,6 +44,20 @@ Register a new user in the system.
         ```json
         {"errors": {"username": ["A user with that username already exists."]}}
         ```
+        ```json
+        {"errors":{"password2":["The two password fields didn’t match."]}}
+        ```
+        ```json
+        {
+            "errors": {
+                "password2": [
+                    "This password is too short. It must contain at least 8 characters.",
+                    "This password is too common.",
+                    "This password is entirely numeric."
+                ]
+            }
+        }
+        ```
 
 </details>
 

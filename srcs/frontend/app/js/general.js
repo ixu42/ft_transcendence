@@ -126,3 +126,13 @@ const fixAvatarURL = (avatarPath) => {
     return `/api/${avatarPath}`;
 };
 
+const safeParseJSON = async response => {
+    try {
+        const clonedResponse = response.clone();
+        data = await clonedResponse.json();
+    } catch (err) {
+        console.warn("⚠️ Failed to parse JSON, returning text:", err);
+        data = await response.text(); // Fallback to plain text
+    }
+    return data;
+};
