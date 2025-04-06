@@ -87,26 +87,28 @@ const fetchProfileData = async (userId) => {
 // Update profile UI elements
 const updateProfileUI = (data) => {
     const avatarUrl = fixAvatarURL(data.avatar);
+    const avatarEl = document.querySelector(".profile-avatar");
+    const usernameEl = document.querySelector(".profile-username");
+    const oldEmailEl = document.querySelector(".profile-email");
 
-    const elementsToUpdate = [
-        { selector: ".profile-avatar", value: avatarUrl, type: "src" },
-        { selector: ".profile-username", value: data.username || "Username", type: "text" },
-        { selector: ".profile-email", value: data.email || "Email", type: "text" },
-        { selector: ".profile-first-name", value: data.first_name || "First Name", type: "text" },
-        { selector: ".profile-last-name", value: data.last_name || "Last Name", type: "text" }
-    ];
+    console.log("🔑 Avatar URL:", avatarUrl);
+    console.log("🔑 Avatar URL:", avatarUrl);
+    console.log("🔑 Avatar URL:", avatarUrl);
+    console.log("🔑 Avatar URL:", avatarUrl);
 
-    elementsToUpdate.forEach(({ selector, value, type }) => {
-        const element = document.querySelector(selector);
-        if (element) {
-            if (type === "src") {
-                element.src = value;
-            } else if (type === "text") {
-                element.textContent = value;
-            }
-        }
-    });
+    if (avatarEl) {avatarEl.src = avatarUrl;}
+    if (usernameEl) {usernameEl.textContent = data.username || "Username";}
+    if (oldEmailEl) {oldEmailEl.remove();}
+
+    // Conditionally insert email if it exists
+    if (data.email && usernameEl) {
+        const emailEl = document.createElement("p");
+        emailEl.classList.add("profile-email");
+        emailEl.textContent = data.email;
+        usernameEl.insertAdjacentElement("afterend", emailEl);
+    }
 };
+
 
 
 const setupMatchHistoryModal = (userId) => {

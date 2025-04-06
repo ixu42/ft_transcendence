@@ -123,7 +123,7 @@ const fixAvatarURL = (avatarPath) => {
     if (avatarPath.startsWith("avatars/")) {
         return `/api/media/${avatarPath}`;
     }
-    return `/api/${avatarPath}`;
+    return `/api${avatarPath}`;
 };
 
 const safeParseJSON = async response => {
