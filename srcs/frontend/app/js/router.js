@@ -16,9 +16,8 @@ const routes = {
   404: "/views/404.html",
 };
 
-const protectedRoutes = [/*"#profile"*/];
-const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
-const isAnyUserLoggedIn = loggedInUsers.some(user => user.loggedIn);
+const protectedRoutes = ["#profile"];
+let isAnyUserLoggedIn =  getLoggedInUsers().some(user => user.loggedIn);
 const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
@@ -92,11 +91,11 @@ const handleLocation = async () => {
     console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
     history.replaceState(null, null, defaultRoute);
   }
-  
+
+  isAnyUserLoggedIn =  getLoggedInUsers().some(user => user.loggedIn);
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
-  const isLoggedIn = isAnyUserLoggedIn;
   const hideNavbarAndFooter = ["#login", "#register", "", "#game", "#profile"].includes(path) || window.location.hash === "";
 
   const navbar = document.getElementById("tr-navbar-container");
@@ -107,7 +106,7 @@ const handleLocation = async () => {
   if (footer) footer.classList.toggle("hidden", hideNavbarAndFooter);
 
   // Check for protected routes.
-  if (protectedRoutes.includes(path) && !isLoggedIn) {
+  if (protectedRoutes.includes(path) && !isAnyUserLoggedIn) {
     console.warn(`🚨 Access denied: ${path} requires authentication.`);
     alert("You must be logged in to access this page.");
     return;
@@ -125,7 +124,7 @@ const handleLocation = async () => {
     console.log(`Updating navbar...`);
     updateNavbar(); // Update the navbar after loading the route content
 
-    if (isLoggedIn) {
+    if (isAnyUserLoggedIn) {
       startHeartbeat();
     } else {
       stopHeartbeat();
