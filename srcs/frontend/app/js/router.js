@@ -40,7 +40,7 @@ const routeHandlers = {
   "#terms-of-service": () => {},
   "#privacy-policy": () => {},
   "#about": () => {},
-  "#register": () => {},
+  "#register": () => setupRegisterPageJs(),
   "#login": () => setupLoginPageJs(),
   "#chat": () => {},
 

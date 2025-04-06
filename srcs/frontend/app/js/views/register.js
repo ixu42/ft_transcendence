@@ -1,23 +1,15 @@
-document.addEventListener("DOMContentLoaded", () => {
-    waitForRegisterForm();
-});
 
-function waitForRegisterForm() {
-    let attempts = 0;
-    const maxAttempts = 10;
-    const checkInterval = 500;
 
-    const interval = setInterval(() => {
-        const registerForm = document.getElementById("register-form");
-        if (registerForm) {
-            clearInterval(interval);
-            attachRegisterEvent(registerForm);
-        } else if (attempts >= maxAttempts) {
-            clearInterval(interval);
-        }
-        attempts++;
-    }, checkInterval);
+function setupRegisterPageJs() {
+    console.log("Register page loaded");
+    const registerForm = document.getElementById("register-form");
+    if (registerForm) {
+        attachRegisterEvent(registerForm);
+    } else {
+        console.warn("Register form not found on setup");
+    }
 }
+
 
 async function register({ username, password1, password2 }) {
     const csrfToken = await getCSRFCookie();
