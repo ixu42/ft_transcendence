@@ -503,17 +503,17 @@ Get basic user info and game stats for all users.
                 "id": 1,
                 "username": "user1",
                 "avatar": "/media/avatars/1/<filename>",
-                "score": 100,
+                "total_wins": 10,
+                "win_rate": 75.0,
                 "rank": 1,
-                "extra_fields": "..."
             },
             {
                 "id": 2,
                 "username": "user2",
                 "avatar": "/media/avatars/2/<filename>",
-                "score": 80,
+                "total_wins": 10,
+                "win_rate": 50.0,
                 "rank": 2,
-                "extra_fields": "..."
             }
             "... more items ..."
         ]

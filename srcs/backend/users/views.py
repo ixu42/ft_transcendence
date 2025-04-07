@@ -370,7 +370,7 @@ def leaderboard(request):
 
     data = []
     for user in users:
-        if user.username == "admin" or user.username == "guest_player":
+        if user.username == "admin" or not user.is_active:
             continue
 
         data.append(
