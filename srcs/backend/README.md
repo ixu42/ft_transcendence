@@ -327,35 +327,6 @@ Update the password of the authenticated user.
 
 ---
 
-### User account deactivation
-
-For the authenticated user to deactivate their account. Recommended by Django instead of deleting user account, as the related data to the user won't be affected.
-
-<details>
-    <summary><code>PATCH</code><code><b>users/{user_id}/</b></code></summary>
-
-- **Expected Request Body**:
-    ```json
-    {"deactivate": true}
-    ```
-- **Response**
-    - **200**
-        ```json
-        {
-            "id": 1,
-            "username": "user1",
-            "message": "Account deactivated."
-        }
-        ```
-    - **401**
-        ```json
-        {"errors": "User is not authenticated."}
-        ```
-
-</details>
-
----
-
 ### User account deletion
 
 For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.

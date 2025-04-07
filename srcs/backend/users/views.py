@@ -193,17 +193,6 @@ def update_profile(request, user_id):
         return JsonResponse({"errors": form.errors}, status=400)
 
 
-@require_http_methods(["PATCH"])
-def deactivate_user_account(request, user_id):
-    User.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
-
-    username = User.objects.get(id=user_id).username
-    response = JsonResponse(
-        {"id": user_id, "username": username, "message": "Account deactivated."}
-    )
-    return custom_logout(request, user_id, response)
-
-
 @require_http_methods(["DELETE"])
 def delete_user_account(request, user_id):
     user = User.objects.get(id=user_id)
@@ -228,18 +217,8 @@ def delete_user_account(request, user_id):
 def user_profile(request, user_id):
     if request.method == "GET":
         return get_profile(request, user_id)
-
     elif request.method == "PATCH":
-        try:
-            body = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"errors", "Invalid JSON input."}, status=400)
-
-        if body.get("deactivate") is True:
-            return deactivate_user_account(request, user_id)
-
         return update_profile(request, user_id)
-
     elif request.method == "DELETE":
         return delete_user_account(request, user_id)
 

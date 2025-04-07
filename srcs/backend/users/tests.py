@@ -198,7 +198,6 @@ class TestUserProfile(BaseTestCase):
 
     def test_update_user_profile_success(self):
         request_body = {
-            "deactivate": False,
             "username": "user42",
         }
         response = self.client.patch(
@@ -219,7 +218,6 @@ class TestUserProfile(BaseTestCase):
     def test_update_user_profile_errors(self):
         User.objects.create_user(username="existinguser", password="securepassword123")
         request_body = {
-            "deactivate": False,
             "username": "existinguser",
         }
         response = self.client.patch(
@@ -236,23 +234,6 @@ class TestUserProfile(BaseTestCase):
         self.assertEqual(
             data["errors"]["username"], ["A user with that username already exists."]
         )
-
-    def test_deactivate_user_profile_success(self):
-        request_body = {"deactivate": True}
-        response = self.client.patch(
-            self.valid_url,
-            data=json.dumps(request_body),
-            content_type="application/json",
-        )
-        self.user.refresh_from_db()
-
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
-        self.assertIn("id", data)
-        self.assertIn("username", data)
-        self.assertIn("message", data)
-        self.assertEqual(data["message"], "Account deactivated.")
-        self.assertEqual(self.user.is_active, False)
 
     def test_delete_user_profile_success(self):
         response = self.client.delete(self.valid_url)

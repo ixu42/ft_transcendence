@@ -281,44 +281,10 @@ const handleAccountDeletion = async (userId) => {
     }
 };
 
-
-const handleAccountDeactivation = async (userId) => {
-    if (!userId) {
-        console.error("⚠️ User ID not found.");
-        alert("Error: Unable to deactivate account.");
-        return;
-    }
-
-    const confirmation = confirm("Are you sure you want to deactivate your account?");
-    if (!confirmation) return;
-
-    try {
-        const response = await fetch(`api/users/${userId}/`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: { "X-CSRFToken": await getCSRFCookie(), },
-            body: JSON.stringify({ deactivate: true })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            alert(`✅ ${data.message}`);
-            removeLoggedInUser(userId);
-            window.location.hash = "#login";
-        } else {
-            const errorData = await response.json();
-            alert(`❌ Error: ${errorData.errors || "Failed to deactivate account."}`);
-        }
-    } catch (error) {
-        console.error("⚠️ Network or server error:", error);
-        alert("An error occurred while deactivating your account.");
-    }
-};
-
 const handleAnonymization  = async (userId) => {
   if (!userId) {
       console.error("⚠️ User ID not found.");
-      alert("Error: Unable to deactivate account.");
+      alert("Error: Unable to anonymize personal data.");
       return;
   }
 
@@ -377,12 +343,7 @@ const setupButtons = (userId) => {
             message: "✅ Found edit profile button" 
         },
         { 
-            selector: "#deactivate-account-btn", 
-            callback: () => handleAccountDeactivation(userId), 
-            message: "✅ Found deactivate account button" 
-        },
-        { 
-            selector: "#anonymize-personal-data-btn", 
+            selector: "#anonymize-data-btn", 
             callback: () => handleAnonymization(userId), 
             message: "✅ Found anonymization button" 
         }

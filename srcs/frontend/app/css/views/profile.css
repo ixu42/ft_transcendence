@@ -230,8 +230,7 @@
 #profile-view-match-history-btn,
 #profile-logout-btn,
 .delete-account-btn,
-.deactivate-account-btn,
-.anonymize-personal-data-btn,
+.anonymize-data-btn,
 #edit-profile-btn,
 #save-profile-btn,
 #save-password-btn,
@@ -257,8 +256,7 @@
 #profile-menu-btn:hover,
 #profile-logout-btn:hover,
 .delete-account-btn:hover,
-.deactivate-account-btn:hover,
-.anonymize-personal-data-btn:hover,
+.anonymize-data-btn:hover,
 #edit-profile-btn:hover,
 #save-profile-btn:hover,
 #save-password-btn:hover,
@@ -286,15 +284,13 @@
     background-color: var(--link-hover-color);
 }
 
-.anonymize-personal-data-btn,
-.deactivate-account-btn,
+.anonymize-data-btn,
 .delete-account-btn {
     background-color: #f44336;
     color: white;
 }
 
-.anonymize-personal-data-btn:hover,
-.deactivate-account-btn:hover,
+.anonymize-data-btn:hover,
 .delete-account-btn:hover {
     background-color: #d32f2f;
 }
