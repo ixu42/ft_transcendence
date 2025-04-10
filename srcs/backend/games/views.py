@@ -1,32 +1,37 @@
+import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods, require_POST
-from users.views import login_required_json
-import json
+from users.views import custom_login_required
+from django.contrib.auth import get_user_model
 from .models import Game
 from .forms import GameStatsForm, LocalGameForm
 
+User = get_user_model()
 
-@login_required_json
+
+@custom_login_required
 @require_POST
-def create_local_game(request):
-    game = LocalGameForm().save(user=request.user, opponent="guest_player")
+def create_local_game(request, user_id):
+    user = User.objects.get(id=user_id)
+    game = LocalGameForm().save(user=user, opponent="guest_player")
 
     return JsonResponse(
         {"message": "Local game created.", "game_id": game.id}, status=201
     )
 
 
-@login_required_json
+@custom_login_required
 @require_POST
-def create_ai_game(request):
-    game = LocalGameForm().save(user=request.user, opponent="AI")
+def create_ai_game(request, user_id):
+    user = User.objects.get(id=user_id)
+    game = LocalGameForm().save(user=user, opponent="AI")
 
     return JsonResponse({"message": "AI game created.", "game_id": game.id}, status=201)
 
 
-@login_required_json
+@custom_login_required
 @require_http_methods(["PATCH"])
-def save_game_stats(request, game_id):
+def save_game_stats(request, game_id, user_id):
     """
     Endpoint to save the stats for a completed game.
     Expects a PATCH request with player1_score and player2_score.
@@ -37,7 +42,9 @@ def save_game_stats(request, game_id):
 
     game = game.first()  # queryset -> object
 
-    if request.user != game.player1 and request.user != game.player2:
+    user = User.objects.get(id=user_id)
+
+    if user != game.player1 and user != game.player2:
         return JsonResponse({"errors": "You are not part of this game."}, status=403)
 
     try:

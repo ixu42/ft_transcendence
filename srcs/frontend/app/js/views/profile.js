@@ -1,12 +1,11 @@
 
-const logout = async () => {
-    console.log("Logout button clicked");
-
+const logoutUser = async (userId) => {
+    console.log("Logout button clicked for user:", userId);
     const csrfToken = await getCSRFCookie();
     if (!csrfToken) {
         return console.error("❌ CSRF Token is missing.");
     }
-    const response = await fetch("api/users/logout/", {
+    const response = await fetch(`api/users/${userId}/logout/`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -19,31 +18,34 @@ const logout = async () => {
         console.log("✅ Logout successful");
         document.cookie = "csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         localStorage.setItem("isLoggedIn", "false");
+        removeLoggedInUser(userId);
         updateNavbar();
-        window.location.hash = "#login";
     } else {
         const { errors } = await response.json();
         console.error("❌ Logout failed:", errors);
     }
 };
 
-const setupProfilePageJs = () => {
-    console.log("⚡ setupProfilePage() called!");
 
+const setupProfilePageJs = (userId) => {
+    console.log("⚡ setupProfilePage() called!");
+    console.log("🔑 User ID:", userId);
+    console.log("🔑 User ID:", userId);
+    console.log("🔑 User ID:", userId);
+    console.log("🔑 User ID:", userId);
     try {
-        fetchProfileData(); // Ensure this does not overwrite the whole page
-        setupAvatarUpload();
-        setupButtons();
-        setupEditProfile();
-        setupMatchHistoryModal();
+        fetchProfileData(userId);
+        setupAvatarUpload(userId);
+        setupButtons(userId);
+        setupEditProfile(userId);
+        setupMatchHistoryModal(userId);
     } catch (error) {
         console.error("❌ Error in setupProfilePage:", error);
     }
 };
 
 
-const fetchProfileData = async () => {
-    const userId = localStorage.getItem("user_id");
+const fetchProfileData = async (userId) => {
 
     if (!userId) {
         console.error("❌ User ID not found in localStorage. Redirecting to login...");
@@ -68,8 +70,7 @@ const fetchProfileData = async () => {
             
             if (response.status === 403 || response.status === 401) {
                 alert("❌ You are not authorized. Redirecting to login.");
-                localStorage.removeItem("user_id");
-                localStorage.removeItem("isLoggedIn");
+                removeLoggedInUser(userId);
                 window.location.hash = "#login";
             }
             return;
@@ -85,32 +86,32 @@ const fetchProfileData = async () => {
 
 // Update profile UI elements
 const updateProfileUI = (data) => {
-    const avatarUrl = data.avatar.startsWith("/") 
-        ? `api/${data.avatar}` 
-        : data.avatar || '/static/avatars/default.png';
+    const avatarUrl = fixAvatarURL(data.avatar);
+    const avatarEl = document.querySelector(".profile-avatar");
+    const usernameEl = document.querySelector(".profile-username");
+    const oldEmailEl = document.querySelector(".profile-email");
 
-    const elementsToUpdate = [
-        { selector: ".profile-avatar", value: avatarUrl, type: "src" },
-        { selector: ".profile-username", value: data.username || "Username", type: "text" },
-        { selector: ".profile-email", value: data.email || "Email", type: "text" },
-        { selector: ".profile-first-name", value: data.first_name || "First Name", type: "text" },
-        { selector: ".profile-last-name", value: data.last_name || "Last Name", type: "text" }
-    ];
+    console.log("🔑 Avatar URL:", avatarUrl);
+    console.log("🔑 Avatar URL:", avatarUrl);
+    console.log("🔑 Avatar URL:", avatarUrl);
+    console.log("🔑 Avatar URL:", avatarUrl);
 
-    elementsToUpdate.forEach(({ selector, value, type }) => {
-        const element = document.querySelector(selector);
-        if (element) {
-            if (type === "src") {
-                element.src = value;
-            } else if (type === "text") {
-                element.textContent = value;
-            }
-        }
-    });
+    if (avatarEl) {avatarEl.src = avatarUrl;}
+    if (usernameEl) {usernameEl.textContent = data.username || "Username";}
+    if (oldEmailEl) {oldEmailEl.remove();}
+
+    // Conditionally insert email if it exists
+    if (data.email && usernameEl) {
+        const emailEl = document.createElement("p");
+        emailEl.classList.add("profile-email");
+        emailEl.textContent = data.email;
+        usernameEl.insertAdjacentElement("afterend", emailEl);
+    }
 };
 
 
-const setupMatchHistoryModal = () => {
+
+const setupMatchHistoryModal = (userId) => {
     const matchHistoryModal = document.getElementById("profile-match-history-modal");
     const closeMatchHistoryModalButton = document.getElementById("close-match-history-modal");
     const matchHistoryContainer = document.querySelector(".profile-match-history");
@@ -146,7 +147,6 @@ const setupMatchHistoryModal = () => {
     });
 
     const fetchMatchHistory = async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             console.error("❌ User ID not found in localStorage.");
             return;
@@ -179,7 +179,6 @@ const setupMatchHistoryModal = () => {
     };
 
     const fetchTournaments = async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             console.error("❌ User ID not found in localStorage.");
             return;
@@ -187,7 +186,7 @@ const setupMatchHistoryModal = () => {
 
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch(`api/users/${userId}/tournaments/`, {
+            const response = await fetch(`api/users/${userId}/tournaments-history/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -247,8 +246,7 @@ const setupMatchHistoryModal = () => {
 };
 
 // Function to handle account deletion
-const handleAccountDeletion = async () => {
-    const userId = localStorage.getItem("user_id");
+const handleAccountDeletion = async (userId) => {
 
     if (!userId) {
         alert("User not logged in.");
@@ -274,7 +272,7 @@ const handleAccountDeletion = async () => {
             }
 
             alert("✅ Account deleted successfully.");
-            localStorage.clear();
+            removeLoggedInUser(userId);
             window.location.hash = "#login";
         } catch (error) {
             console.error("❌ Error deleting account:", error);
@@ -283,56 +281,72 @@ const handleAccountDeletion = async () => {
     }
 };
 
+const handleAnonymization  = async (userId) => {
+  if (!userId) {
+      console.error("⚠️ User ID not found.");
+      alert("Error: Unable to anonymize personal data.");
+      return;
+  }
 
-const handleAccountDeactivation = async () => {
-    const userId = localStorage.getItem("user_id");
-    if (!userId) {
-        console.error("⚠️ User ID not found.");
-        alert("Error: Unable to deactivate account.");
-        return;
-    }
+  const confirmation = confirm("Are you sure you want to anonymize your personal data? This cannot be undone, and your account will be unusable.");
+  if (!confirmation) return;
 
-    const confirmation = confirm("Are you sure you want to deactivate your account?");
-    if (!confirmation) return;
+  try {
+      const response = await fetch(`api/users/${userId}/anonymize/`, {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "X-CSRFToken": await getCSRFCookie(), }
+      });
 
-    try {
-        const response = await fetch(`api/users/${userId}/`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: { "X-CSRFToken": await getCSRFCookie(), },
-            body: JSON.stringify({ deactivate: true })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            alert(`✅ ${data.message}`);
-            localStorage.clear();
-            window.location.hash = "#login";
-        } else {
-            const errorData = await response.json();
-            alert(`❌ Error: ${errorData.errors || "Failed to deactivate account."}`);
-        }
-    } catch (error) {
-        console.error("⚠️ Network or server error:", error);
-        alert("An error occurred while deactivating your account.");
-    }
+      if (response.ok) {
+          const data = await response.json();
+          alert(`✅ ${data.message}`);
+          localStorage.clear();
+          window.location.hash = "#login";
+      } else {
+          const errorData = await response.json();
+          alert(`❌ Error: ${errorData.errors || "Failed to anonymize personal data."}`);
+      }
+  } catch (error) {
+      console.error("⚠️ Network or server error:", error);
+      alert("An error occurred while anonymizing personal data.");
+  }
 };
 
-
 // Button callbacks for profile page
-const setupButtons = () => {
+const setupButtons = (userId) => {
     [
-        { selector: "#profile-logout-btn", callback: logout, message: "✅ Found logout button" },
-        { selector: "#profile-menu-btn", callback: () => {
-            console.log("📌 Menu button clicked");
-            window.location.hash = "#menu";
-        }, message: "✅ Found menu button" },
-        { selector: "#delete-account-btn", callback: handleAccountDeletion, message: "✅ Found delete account button" },
-        { selector: "#edit-profile-btn", callback: () => {
-            console.log("📌 Edit Profile button clicked");
-            document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
-        }, message: "✅ Found edit profile button" },
-        { selector: "#deactivate-account-btn", callback: handleAccountDeactivation, message: "✅ Found deactivate account button" }
+        { 
+            selector: "#profile-logout-btn", 
+            callback: () => { logoutUser(userId); window.location.hash = "#login";},
+            message: "✅ Found logout button" 
+        },
+        { 
+            selector: "#profile-menu-btn", 
+            callback: () => {
+                console.log("📌 Menu button clicked");
+                window.location.hash = "#menu";
+            }, 
+            message: "✅ Found menu button" 
+        },
+        { 
+            selector: "#delete-account-btn", 
+            callback: () => handleAccountDeletion(userId), 
+            message: "✅ Found delete account button" 
+        },
+        { 
+            selector: "#edit-profile-btn", 
+            callback: () => {
+                console.log("📌 Edit Profile button clicked");
+                document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
+            }, 
+            message: "✅ Found edit profile button" 
+        },
+        { 
+            selector: "#anonymize-data-btn", 
+            callback: () => handleAnonymization(userId), 
+            message: "✅ Found anonymization button" 
+        }
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -349,8 +363,9 @@ const setupButtons = () => {
 
 
 
+
 // Setup for edit profile modal
-const setupEditProfile = () => {
+const setupEditProfile = (userId) => {
     const editProfileBtn = document.getElementById("edit-profile-btn");
     const profileEditModal = document.getElementById("profile-edit-modal");
     const closeProfileModal = document.getElementById("close-profile-modal");
@@ -384,7 +399,6 @@ const setupEditProfile = () => {
 
     // Save password button --
     savePasswordBtn.addEventListener("click", async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             alert("User ID not found. Please log in again.");
             return;
@@ -444,7 +458,6 @@ const setupEditProfile = () => {
 
     // Save profile button --
     saveProfileBtn.addEventListener("click", async () => {
-        const userId = localStorage.getItem("user_id");
         if (!userId) {
             alert("User ID not found. Please log in again.");
             return;
@@ -479,7 +492,7 @@ const setupEditProfile = () => {
 
             console.log("✅ Profile updated successfully:", data);
             alert("✅ Profile updated successfully!");
-            fetchProfileData();
+            fetchProfileData(userId);
         } catch (error) {
             console.error("❌ Error updating profile:", error);
             alert("❌ Error updating profile.");
@@ -488,7 +501,7 @@ const setupEditProfile = () => {
 };
 
 // Function to handle avatar upload
-const setupAvatarUpload = () => {
+const setupAvatarUpload = (userId) => {
 
     const handleAvatarUpload = async (file) => {
         const formData = new FormData();
@@ -496,28 +509,68 @@ const setupAvatarUpload = () => {
     
         try {
             const csrfToken = await getCSRFCookie();
-            const response = await fetch("api/users/avatar/", {
+            const response = await fetch(`api/users/${userId}/avatar/`, {
                 method: "POST",
                 headers: { "X-CSRFToken": csrfToken },
                 body: formData,
                 credentials: "include",
             });
     
-            const data = await response.json();
-    
-            if (!response.ok) {
-                console.error("❌ Failed to update avatar:", data.errors);
+            
+            if (!response.ok && response.status === 413) {
+                // nginx handles this error instead of django
+                alert("❌ File size is too large. Please upload a smaller file.");
                 return;
             }
-    
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                let errorMessage = "An error occurred while updating your avatar.";
+
+                if (response.status === 400) {
+                    if (data.errors && data.errors.avatar) {
+                        errorMessage = data.errors.avatar[0];
+                    } else {
+                        errorMessage = "Bad Request: Invalid data provided.";
+                    }
+                }
+
+                alert(`❌ ${errorMessage}`);
+                return;
+            }
+
             console.log("✅ Avatar updated:", data.message);
             const newAvatarUrl = `api/${data.avatar_url}`;
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);
-            fetchProfileData(); 
         } catch (error) {
             console.error("❌ Error updating avatar:", error);
+        }
+    };
+
+    const handleAvatarReset = async () => {
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`api/users/${userId}/avatar/`, {
+                method: "DELETE",
+                headers: { "X-CSRFToken": csrfToken },
+                credentials: "include",
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                console.error("❌ Failed to reset avatar:", data.errors);
+                return;
+            }
+
+            console.log("✅ Avatar reset:", data.message);
+            const newAvatarUrl = `api/${data.avatar_url}`;
+            document.querySelector(".profile-avatar").src = newAvatarUrl;
+            localStorage.setItem("user_avatar", newAvatarUrl);
+        } catch (error) {
+            console.error("❌ Error resetting avatar:", error);
         }
     };
 
@@ -527,6 +580,11 @@ const setupAvatarUpload = () => {
             const file = event.target.files[0];
             if (file) handleAvatarUpload(file);
         });
+    }
+
+    const avatarResetButton = document.getElementById("avatar-reset");
+    if (avatarResetButton) {
+        avatarResetButton.addEventListener("click", handleAvatarReset);
     }
 };
 

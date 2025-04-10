@@ -21,14 +21,8 @@ html, body {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: auto;
 }
-
-
-
-
-
-
 
 
 /* NAVBAR */
@@ -40,7 +34,7 @@ html, body {
   z-index: 1000;
   background-color: var(--primary-color);
   color: var(--text-color);
-  padding: 10px 20px;
+  padding: 25px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -199,3 +193,61 @@ html, body {
   background-color: #da190b;
 }
 
+
+
+
+/* NAVBAR DROPDOWN PROFILES*/
+/* Profile Dropdown Container remains unchanged */
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Adjust the dropdown content */
+.profile-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--primary-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  min-width: 250px;
+  min-height: 350px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Make the profile items the same size as friend entries */
+.profile-dropdown-content .profile-item {
+  padding: 10px;
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover state */
+.profile-dropdown-content .profile-item:hover {
+  background-color: var(--accent-color);
+}
+
+/* Set profile avatar same as friend avatar */
+.profile-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+/* Style for no-profile entries */
+.profile-dropdown-content .profile-item.no-profile {
+  justify-content: center;
+  font-style: italic;
+  color: var(--text-color);
+}

@@ -1,100 +1,85 @@
+import json
 from datetime import timedelta
+from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from users.views import login_required_json
-import json
+from django.contrib.auth import get_user_model
+from users.views import custom_login_required
 from friends.models import FriendRequest
-from users.models import CustomUser
-from django.utils import timezone
+
+User = get_user_model()
 
 
-# Send a friend request to the user with id specified in the url
-@login_required_json
+@custom_login_required
+@require_GET
+def list_friends(request, user_id):
+    user = User.objects.get(id=user_id)
+    friends = list(user.friends.values("id", "username", "avatar", "last_active"))
+    threshold = timezone.now() - timedelta(minutes=1)
+    for friend in friends:
+        friend["online"] = friend["last_active"] and friend["last_active"] >= threshold
+    return JsonResponse({"friends": friends})
+
+
+# Target user id passed as a query parameter
 @require_POST
 def send_friend_request(request, user_id):
+    recipient_username = request.GET.get("recipient_username")
+
+    if not recipient_username:
+        return JsonResponse(
+            {"errors": "Missing recipient_username query parameter."}, status=400
+        )
+
     try:
-        target_user = CustomUser.objects.get(id=user_id)
-    except CustomUser.DoesNotExist:
+        recipient = User.objects.get(username=recipient_username)
+    except User.DoesNotExist:
         return JsonResponse(
             {"errors": "Recipient of the friend request not found."}, status=404
         )
 
-    if target_user == request.user:
+    if recipient.friends.filter(id=user_id).exists():
+        return JsonResponse({"errors": "Already friends with this user."}, status=400)
+
+    user = User.objects.get(id=user_id)
+
+    if recipient == user:
         return JsonResponse(
             {"errors": "You cannot send a friend request to yourself."}, status=400
         )
 
     existing_request = FriendRequest.objects.filter(
-        sender=request.user, receiver=target_user, status="pending"
+        sender=user, receiver=recipient, status="pending"
     ).first()
     if existing_request:
         return JsonResponse({"errors": "Friend request already sent."}, status=400)
 
-    friend_request = FriendRequest(sender=request.user, receiver=target_user)
+    friend_request = FriendRequest(sender=user, receiver=recipient)
     friend_request.save()
 
     return JsonResponse({"message": "Friend request sent."}, status=201)
 
 
-# List all the friends of the user with id specified in the url
-@login_required_json
-@require_http_methods(["GET", "POST"])
-def friend_list_create(request, user_id):
-    if request.method == "GET":
-        if request.user.id != user_id:
-            return JsonResponse(
-                {"errors": "You do not have permission to view friends of this user."},
-                status=403,
-            )
-        friends = list(
-            request.user.friends.values("id", "username", "avatar", "last_active")
-        )
-        threshold = timezone.now() - timedelta(minutes=1)
-        for friend in friends:
-            friend["online"] = (
-                friend["last_active"] and friend["last_active"] >= threshold
-            )
-        return JsonResponse({"friends": friends})
-    else:
+@custom_login_required
+@require_http_methods(["POST", "GET"])
+def send_or_list_friend_request(request, user_id):
+    user = User.objects.get(id=user_id)
+
+    if request.method == "POST":
         return send_friend_request(request, user_id)
+    else:
+        requests = FriendRequest.objects.filter(receiver=user, status="pending")
+        request_list = [
+            {"id": req.id, "sender": req.sender.username, "sent at": req.created_at}
+            for req in requests
+        ]
+
+        return JsonResponse({"friend_requests": request_list}, safe=False)
 
 
-# List all the pending friend requests received by the logged-in user
-@login_required_json
-@require_GET
-def list_friend_requests(request, user_id):
-    user = request.user
-
-    if user.id != user_id:
-        return JsonResponse(
-            {
-                "errors": "You do not have permission to view another user's friend requests."
-            },
-            status=403,
-        )
-
-    requests = FriendRequest.objects.filter(receiver=user, status="pending")
-    request_list = [
-        {"id": req.id, "sender": req.sender.username, "sent at": req.created_at}
-        for req in requests
-    ]
-
-    return JsonResponse({"friend_requests": request_list}, safe=False)
-
-
-@login_required_json
+@custom_login_required
 @require_POST
 def handle_friend_request(request, user_id, request_id):
-    user = request.user
-
-    if user.id != user_id:
-        return JsonResponse(
-            {
-                "errors": "You do not have permission to handle another user's friend request."
-            },
-            status=403,
-        )
-
     req = FriendRequest.objects.filter(id=request_id, status="pending")
     if not req:
         return JsonResponse({"errors": "friend request not found"}, status=404)
@@ -115,18 +100,12 @@ def handle_friend_request(request, user_id, request_id):
 
 
 # Remove a Friend
-@login_required_json
+@custom_login_required
 @require_http_methods(["DELETE"])
 def remove_friend(request, user_id, friend_id):
-    user = request.user
+    user = User.objects.get(id=user_id)
 
-    if not user.id == user_id:
-        return JsonResponse(
-            {"errors": "You do not have permission to remove any friend of this user."},
-            status=403,
-        )
-
-    friend = CustomUser.objects.filter(id=friend_id)
+    friend = User.objects.filter(id=friend_id)
 
     if not friend:
         return JsonResponse(

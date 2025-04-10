@@ -1,5 +1,6 @@
 from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.urls import reverse
 import json
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -19,10 +20,20 @@ class BaseTestCase(TestCase):
         )
 
     def login(self):
-        self.client.force_login(self.user)
+        # Manually create a session for the user
+        session = self.client.session
+        session["user_id"] = self.user.id
+        session.save()
+
+        # Set the custom session cookie
+        self.client.cookies[f"session_{self.user.id}"] = session.session_key
 
     def tearDown(self):
-        self.client.logout()
+        # Manually clear the custom session cookie
+        self.client.cookies.pop(f"session_{self.user.id}", None)
+
+        # Clear session-related data
+        self.client.session.clear()
 
 
 class TestRegisterUser(TestCase):
@@ -140,7 +151,7 @@ class TestLoginUser(BaseTestCase):
 
 class TestLogoutUser(BaseTestCase):
     def setUp(self):
-        self.url = reverse("users:logout_user")
+        self.url = reverse("users:logout_user", args=[self.user.id])
 
     def make_request(self):
         return self.client.post(self.url)
@@ -171,16 +182,6 @@ class TestUserProfile(BaseTestCase):
         self.invalid_url = reverse("users:user_profile", args=[self.user.id + 1])
         self.login()
 
-    def test_user_profile_not_found(self):
-        response = self.client.get(self.invalid_url)
-
-        self.assertEqual(response.status_code, 403)
-        data = response.json()
-        self.assertIn("errors", data)
-        self.assertEqual(
-            data["errors"], "You do not have permission to access this user's profile."
-        )
-
     def test_get_user_profile_success(self):
         response = self.client.get(self.valid_url)
 
@@ -197,7 +198,6 @@ class TestUserProfile(BaseTestCase):
 
     def test_update_user_profile_success(self):
         request_body = {
-            "deactivate": False,
             "username": "user42",
         }
         response = self.client.patch(
@@ -218,7 +218,6 @@ class TestUserProfile(BaseTestCase):
     def test_update_user_profile_errors(self):
         User.objects.create_user(username="existinguser", password="securepassword123")
         request_body = {
-            "deactivate": False,
             "username": "existinguser",
         }
         response = self.client.patch(
@@ -235,23 +234,6 @@ class TestUserProfile(BaseTestCase):
         self.assertEqual(
             data["errors"]["username"], ["A user with that username already exists."]
         )
-
-    def test_deactivate_user_profile_success(self):
-        request_body = {"deactivate": True}
-        response = self.client.patch(
-            self.valid_url,
-            data=json.dumps(request_body),
-            content_type="application/json",
-        )
-        self.user.refresh_from_db()
-
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
-        self.assertIn("id", data)
-        self.assertIn("username", data)
-        self.assertIn("message", data)
-        self.assertEqual(data["message"], "Account deactivated.")
-        self.assertEqual(self.user.is_active, False)
 
     def test_delete_user_profile_success(self):
         response = self.client.delete(self.valid_url)
@@ -342,7 +324,7 @@ class TestUpdatePassword(BaseTestCase):
 )  # Uploaded test files are removed on container removal
 class TestUpdateAvatar(BaseTestCase):
     def setUp(self):
-        self.url = reverse("users:update_avatar")
+        self.url = reverse("users:handle_avatar", args=[self.user.id])
         self.login()
 
     def make_request(self, request_body={}):
@@ -425,6 +407,45 @@ class TestUpdateAvatar(BaseTestCase):
         self.assertEqual(
             data["errors"]["avatar"],
             ["File size exceeds the limit 3.0 MB."],
+        )
+
+
+class TestAnonymizeUser(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("users:anonymize_user", args=[self.user.id])
+
+    def test_anonymize_user(self):
+        self.login()
+
+        response = self.client.patch(self.url)
+        self.user.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"message": "Your data has been anonymized. Logging out..."},
+        )
+
+        self.assertTrue(self.user.is_anonymized)
+        self.assertNotEqual(self.user.username, "testuser")
+        self.assertNotEqual(self.user.email, "testuser@example.com")
+        self.assertFalse(self.user.has_usable_password())
+
+        # Check the user is logged out (session cookie marked for deletion)
+        session_cookie = self.client.cookies.get(f"session_{self.user.id}")
+        self.assertIsNotNone(session_cookie)
+        self.assertEqual(session_cookie.value, "")  # Session should be cleared
+        self.assertEqual(session_cookie["expires"], "Thu, 01 Jan 1970 00:00:00 GMT")
+
+    def test_anonymize_already_anonymized_user(self):
+        self.user.anonymize()
+        self.login()
+
+        response = self.client.patch(self.url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content, {"errors": "User is already anonymized."}
         )
 
 
@@ -541,3 +562,20 @@ class TestLeaderboard(BaseTestCase):
         self.assertEqual(len(data), 2)
         self.assert_leaderboard_entry(data[0], "testuser2", 1, 100.0, 1)
         self.assert_leaderboard_entry(data[1], "testuser", 1, 50.0, 2)
+
+
+class TestHeartbeat(BaseTestCase):
+    def setUp(self):
+        self.url = reverse("users:heartbeat", args=[self.user.id])
+        self.login()
+
+    def test_heartbeat_success(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"message": "Heartbeat updated."})
+
+        # Check if the last_active field has been updated
+        self.user.refresh_from_db()
+        self.assertIsNotNone(self.user.last_active)
+        self.assertTrue(self.user.last_active <= timezone.now())

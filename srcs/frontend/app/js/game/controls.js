@@ -1,4 +1,4 @@
-const setupControls = async (player, player2, game, gameId) => {
+const setupControls = async (player, player2, game, gameId, userId) => {
     document.addEventListener('keydown', async (event) => {
         const key = event.key.toLowerCase();
         key === 'arrowup' ? player2.keyboardUp = true :
@@ -49,14 +49,8 @@ const setupControls = async (player, player2, game, gameId) => {
         // Game Over state handling
         if (game.state === 'gameOver') {
             if (key === 'x') {
-                if (localStorage.getItem("isLoggedIn") === "true") {
-                    console.log("Game Over! Player 1: " + game.player.score + " Player 2: " + game.player2.score);
-                    const requestBody = {
-                        player1_score: game.player.score,
-                        player2_score: game.player2.score
-                    };
-                    const response = await apiRequest(`games/${gameId}/stats/`, 'PATCH', requestBody);
-                    console.log(response.message || response);
+                if (getLoggedInUsers().length > 0) {
+                   await saveGameStats(gameId, player.score, player2.score, userId);
                 }
                 window.location.href = "/#lobby"; // Adjust the URL to your lobby page
             }

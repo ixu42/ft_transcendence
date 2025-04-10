@@ -1,4 +1,6 @@
 import os
+import shutil
+import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
@@ -33,6 +35,7 @@ class CustomUser(AbstractUser):
     )
     friends = models.ManyToManyField("self", symmetrical=True, blank=True)
     last_active = models.DateTimeField(null=True, blank=True)
+    is_anonymized = models.BooleanField(default=False)
 
     @property
     def default_avatar(self):
@@ -74,13 +77,53 @@ class CustomUser(AbstractUser):
         """
         Updates the user's avatar and handles file cleanup.
         """
-        print(old_file_path)
-        print(self.default_avatar)
-        if old_file_path != self.default_avatar:
+        if old_file_path and old_file_path != self.default_avatar:
             if default_storage.exists(old_file_path):
                 default_storage.delete(old_file_path)
 
         self.avatar = new_avatar
+        self.save()
+
+    def reset_avatar(self):
+        """
+        Resets the user's avatar to default and handles file cleanup.
+        """
+        user_avatar_folder = os.path.join(settings.MEDIA_ROOT, "avatars", str(self.id))
+        if os.path.exists(user_avatar_folder):
+            shutil.rmtree(user_avatar_folder)
+
+        self.avatar = None
+        self.save()
+
+    def anonymize(self):
+        """
+        Anonymizes user data to comply with GDPR.
+        """
+        if self.is_anonymized:
+            return
+
+        # Generate a unique anonymous identifier
+        anonymous_id = uuid.uuid4().hex[:8]
+
+        # Replace personally identifiable information
+        self.username = f"anonymous_{anonymous_id}"
+        self.email = f"anonymous_{anonymous_id}@example.com"
+        self.first_name = ""
+        self.last_name = ""
+
+        # Delete the entire user avatar folder if it exists
+        user_avatar_folder = os.path.join(settings.MEDIA_ROOT, "avatars", str(self.id))
+        if os.path.exists(user_avatar_folder):
+            shutil.rmtree(user_avatar_folder)
+
+        self.avatar = None
+
+        self.friends.clear()
+
+        self.set_unusable_password()
+        self.is_active = False
+
+        self.is_anonymized = True
         self.save()
 
     def save(self, *args, **kwargs):

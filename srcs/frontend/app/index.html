@@ -56,7 +56,7 @@
                 </button>
                 <div class="friends-dropdown-content" id="friends-dropdown-content">
                     <div class="add-friend-bar">
-                        <input type="text" id="friend-id-input" placeholder="Enter User ID">
+                        <input type="text" id="friend-username-input" placeholder="Enter Username">
                         <button id="send-friend-request-btn">
                             <img src="static/icons/add-friend.png" alt="Add Friend" class="add-friend-icon">
                         </button>
@@ -69,9 +69,18 @@
                 </div>
             </div>
 
-            <button class="tr-nav-btn" id="tr-auth-btn">
-                <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
-            </button>
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profile-dropdown" style="display: none;">
+                <button class="tr-nav-btn" id="tr-auth-btn">
+                    <img src="static/icons/login32x32.png" alt="Profile" class="tr-navbar-icon"> Login / Register
+                </button>
+                <div class="profile-dropdown-content" id="profile-dropdown-content">
+                    <!-- Current user entry will be a normal profile-item directly here -->
+                    <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px; float: left;">
+                    <!-- Additional content can go below if needed -->
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -85,7 +94,8 @@
                 <div class="col-md-auto">
                     <ul class="footer-links list-inline text-center mb-2">
                         <li class="list-inline-item"><a href="#about" class="text-white">About Us</a></li>
-                        <li class="list-inline-item"><a href="#terms" class="text-white">Privacy Policy & Terms of Service</a></li>
+                        <li class="list-inline-item"><a href="#terms-of-service" class="text-white">Terms of Service</a></li>
+                        <li class="list-inline-item"><a href="#privacy-policy" class="text-white">Privacy Policy</a></li>
                         <li class="list-inline-item"><a href="#contact" class="text-white">Contact Us</a></li>
                     </ul>
                 </div>

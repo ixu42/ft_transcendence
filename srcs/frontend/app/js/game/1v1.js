@@ -136,7 +136,7 @@ const gameLoop = (game) => {
     requestAnimationFrame(() => gameLoop(game));
 };
 
-const initializeGame = (gameId) => {
+const initializeGame = (gameId, userId) => {
         const canvas = document.getElementById('pong');
         if (!canvas) {
             console.error("Canvas element '#pong' not found.");
@@ -144,7 +144,7 @@ const initializeGame = (gameId) => {
             return;
         }
         const game = createGame(false);
-        setupControls(game.player, game.player2, game, gameId);
+        setupControls(game.player, game.player2, game, gameId, userId);
         console.log("Starting game loop");
         gameLoop(game);
 };

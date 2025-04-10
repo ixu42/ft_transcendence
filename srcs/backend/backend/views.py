@@ -17,13 +17,13 @@ def get_csrf_token(request):
 
 def lockout(request, credentials, *args, **kwargs):
     return JsonResponse(
-        {"error": "Locked out due to too many login failures."}, status=403
+        {"errors": "Locked out due to too many login failures."}, status=403
     )
 
 
 def custom_404(request, exception):
-    return JsonResponse({"error": "Page not found."}, status=404)
+    return JsonResponse({"errors": "Page not found."}, status=404)
 
 
 def custom_500(request):
-    return JsonResponse({"error": "Internal server error."}, status=500)
+    return JsonResponse({"errors": "Internal server error."}, status=500)

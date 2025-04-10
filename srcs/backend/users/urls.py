@@ -7,14 +7,16 @@ urlpatterns = [
     # Authentication routes
     path("register/", views.register_user, name="register_user"),
     path("login/", views.login_user, name="login_user"),
-    path("logout/", views.logout_user, name="logout_user"),
+    path("<int:user_id>/logout/", views.logout_user, name="logout_user"),
     # Profile routes
     path("<int:user_id>/", views.user_profile, name="user_profile"),
     path("<int:user_id>/password/", views.update_password, name="update_password"),
-    path("avatar/", views.update_avatar, name="update_avatar"),
+    path("<int:user_id>/avatar/", views.handle_avatar, name="handle_avatar"),
+    # Anonymization
+    path("<int:user_id>/anonymize/", views.anonymize_user, name="anonymize_user"),
     # Participated tournaments
     path(
-        "<int:user_id>/tournaments/",
+        "<int:user_id>/tournaments-history/",
         views.participated_tournaments,
         name="participated_tournaments",
     ),
@@ -25,5 +27,7 @@ urlpatterns = [
     # Friends
     path("<int:user_id>/friends/", include("friends.urls")),
     # Online status
-    path("heartbeat/", views.heartbeat, name="heartbeat"),
+    path("<int:user_id>/heartbeat/", views.heartbeat, name="heartbeat"),
+    # Game routes
+    path("<int:user_id>/games/", include("games.urls")),
 ]

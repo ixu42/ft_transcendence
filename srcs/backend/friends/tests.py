@@ -1,7 +1,7 @@
-from django.test import TestCase, override_settings
+import json
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-import json
 from .models import FriendRequest
 
 User = get_user_model()
@@ -10,97 +10,119 @@ User = get_user_model()
 class BaseTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user1 = User.objects.create_user(username="user1", password="password1")
-        cls.user2 = User.objects.create_user(username="user2", password="password2")
+        cls.user1 = User.objects.create_user(
+            username="user1", password="securepassword123"
+        )
+        cls.user2 = User.objects.create_user(
+            username="user2", password="securepassword123"
+        )
 
-    def login(self, user, password=None):
-        if password is None:
-            password = "password1" if user == self.user1 else "password2"
-        self.client.login(username=user.username, password=password)
+    def login(self, user):
+        session = self.client.session
+        session["user_id"] = user.id
+        session.save()
+        self.client.cookies[f"session_{user.id}"] = session.session_key
 
     def tearDown(self):
-        self.client.logout()
+        session_cookies = [
+            key for key in self.client.cookies.keys() if key.startswith("session_")
+        ]
+
+        for key in session_cookies:
+            self.client.cookies.pop(key, None)
+
+        self.client.session.clear()
 
 
-@override_settings(AXES_ENABLED=False)
-class TestFriendListCreate(BaseTestCase):
+class TestListFriends(BaseTestCase):
     def setUp(self):
         self.login(self.user1)
-        self.url1 = reverse("users:friends:friend_list_create", args=[self.user1.id])
-        self.url2 = reverse("users:friends:friend_list_create", args=[self.user2.id])
+        self.url = reverse("users:friends:list_friends", args=[self.user1.id])
 
     def test_list_friend_list_success(self):
         self.user1.friends.add(self.user2)
-        response = self.client.get(self.url1)
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(len(data["friends"]), 1)
         self.assertEqual(data["friends"][0]["username"], "user2")
 
-    def test_list_another_user_friends(self):
-        self.user1.friends.add(self.user2)
-        response = self.client.get(self.url2)
-
-        self.assertEqual(response.status_code, 403)
-        data = response.json()
-        self.assertEqual(
-            data["errors"], "You do not have permission to view friends of this user."
-        )
-
-    def test_send_request_success(self):
-        response = self.client.post(self.url2)
-
-        self.assertEqual(response.status_code, 201)
-        data = response.json()
-        self.assertEqual(data["message"], "Friend request sent.")
-
-    def test_send_request_to_self(self):
-        response = self.client.post(self.url1)
-
-        self.assertEqual(response.status_code, 400)
-        data = response.json()
-        self.assertEqual(
-            data["errors"], "You cannot send a friend request to yourself."
-        )
-
-    def test_send_request_to_nonexistent_user(self):
-        url_invalid_id = reverse("users:friends:friend_list_create", args=[4242])
-        response = self.client.post(url_invalid_id)
-
-        self.assertEqual(response.status_code, 404)
-        data = response.json()
-        self.assertEqual(data["errors"], "Recipient of the friend request not found.")
-
     def test_no_friends(self):
-        """Test response when the user has no friends."""
-        response = self.client.get(self.url1)
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["friends"], [])
 
     def test_unauthenticated_access(self):
         self.client.logout()
-        response = self.client.get(self.url1)
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 401)
 
 
-@override_settings(AXES_ENABLED=False)
-class TestListFriendRequests(BaseTestCase):
+class TestSendOrListFriendRequest(BaseTestCase):
     def setUp(self):
         self.login(self.user1)
-
-        url_send_request = reverse(
-            "users:friends:friend_list_create", args=[self.user2.id]
+        url1 = reverse(
+            "users:friends:send_or_list_friend_request", args=[self.user1.id]
         )
-        self.client.post(url_send_request)
+        self.url1 = f"{url1}?recipient_username={self.user2.username}"
+        self.url1_self = f"{url1}?recipient_username={self.user1.username}"
+        self.url1_nonexistent = f"{url1}?recipient_username=nonexistent_user"
 
-        self.url1 = reverse("users:friends:list_friend_requests", args=[self.user1.id])
-        self.url2 = reverse("users:friends:list_friend_requests", args=[self.user2.id])
+        self.url2 = reverse(
+            "users:friends:send_or_list_friend_request", args=[self.user2.id]
+        )
+
+    def test_send_request_success(self):
+        response = self.client.post(self.url1)
+
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+        self.assertEqual(data["message"], "Friend request sent.")
+
+    def test_send_request_to_self(self):
+        response = self.client.post(self.url1_self)
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertEqual(
+            data["errors"], "You cannot send a friend request to yourself."
+        )
+
+    def test_send_request_to_nonexistent_user(self):
+        response = self.client.post(self.url1_nonexistent)
+
+        self.assertEqual(response.status_code, 404)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertEqual(data["errors"], "Recipient of the friend request not found.")
+
+    def test_send_request_to_a_friend(self):
+        self.user1.friends.add(self.user2)
+        response = self.client.post(self.url1)
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertEqual(data["errors"], "Already friends with this user.")
+
+    def test_send_request_already_sent(self):
+        FriendRequest.objects.create(sender=self.user1, receiver=self.user2)
+        response = self.client.post(self.url1)
+
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("errors", data)
+        self.assertEqual(data["errors"], "Friend request already sent.")
 
     def test_list_friend_requests_success(self):
-        self.client.login(username="user2", password="password2")
+        # Create a friend request (user1 -> user2)
+        FriendRequest.objects.create(sender=self.user1, receiver=self.user2)
+
+        self.login(self.user2)
         response = self.client.get(self.url2)
 
         self.assertEqual(response.status_code, 200)
@@ -108,28 +130,11 @@ class TestListFriendRequests(BaseTestCase):
         self.assertEqual(len(data["friend_requests"]), 1)
         self.assertEqual(data["friend_requests"][0]["sender"], "user1")
 
-    def test_list_friend_requests_no_perm(self):
-        self.client.login(username="user2", password="password2")
-        response = self.client.get(self.url1)
 
-        self.assertEqual(response.status_code, 403)
-        data = response.json()
-        self.assertEqual(
-            data["errors"],
-            "You do not have permission to view another user's friend requests.",
-        )
-
-
-@override_settings(AXES_ENABLED=False)
 class TestHandleFriendRequest(BaseTestCase):
     def setUp(self):
-        # Log in user1 to send a request to user2
-        self.login(self.user1)
-        url_send_request = reverse(
-            "users:friends:friend_list_create", args=[self.user2.id]
-        )
-        self.client.post(url_send_request)
-        self.client.logout()
+        # Create a friend request (user1 -> user2)
+        FriendRequest.objects.create(sender=self.user1, receiver=self.user2)
 
         # Fetch request id from database
         request = FriendRequest.objects.get(
@@ -181,7 +186,6 @@ class TestHandleFriendRequest(BaseTestCase):
         self.assertEqual(data["errors"], "friend request not found")
 
 
-@override_settings(AXES_ENABLED=False)
 class TestRemoveFriend(BaseTestCase):
     def setUp(self):
         self.login(self.user1)
