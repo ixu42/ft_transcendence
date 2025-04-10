@@ -55,34 +55,39 @@ const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
         drawMatch(tournament.players, game.canvas, currentMatchIndex);
         if (tournament.keyboardEnter) {
             tournament.state = 'playing';
-            game.state = 'prepare';
+            game.state = 'wallSelection';
             tournament.keyboardEnter = false;
         }
     }
     if (tournament.state === 'playing') {
-        updateGame(game);
-        drawGame(game);
-        if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
-            let winner, loser;
-            if (game.player.score > game.player2.score) {
-                winner = tournament.players[currentMatchIndex];
-                loser = tournament.players[currentMatchIndex + 1];
-            } else {
-                winner = tournament.players[currentMatchIndex + 1];
-                loser = tournament.players[currentMatchIndex];
+        if (game.state === "wallSelection") {
+            drawWallSelection(game);
+        }
+        else {
+            updateGame(game);
+            drawGame(game);
+            if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
+                let winner, loser;
+                if (game.player.score > game.player2.score) {
+                    winner = tournament.players[currentMatchIndex];
+                    loser = tournament.players[currentMatchIndex + 1];
+                } else {
+                    winner = tournament.players[currentMatchIndex + 1];
+                    loser = tournament.players[currentMatchIndex];
+                }
+                winner.score++;
+                tournament.players = tournament.players.filter(player => player !== loser);
+                currentMatchIndex++;
+                if (currentMatchIndex >= tournament.players.length - 1)
+                    currentMatchIndex = 0;
+                if (tournament.players.length === 1) {
+                    game.state = 'gameOver';
+                    drawWinner(tournament.players[0], game.canvas);
+                    return;
+                }
+                tournament.state = 'table';
+                resetGame(game);
             }
-            winner.score++;
-            tournament.players = tournament.players.filter(player => player !== loser);
-            currentMatchIndex++;
-            if (currentMatchIndex >= tournament.players.length - 1)
-                currentMatchIndex = 0;
-            if (tournament.players.length === 1) {
-                game.state = 'gameOver';
-                drawWinner(tournament.players[0], game.canvas);
-                return;
-            }
-            tournament.state = 'table';
-            resetGame(game);
         }
     }
     requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex));
