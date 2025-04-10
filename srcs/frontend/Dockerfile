@@ -5,6 +5,7 @@ RUN apk update && \
     apk add --no-cache \
     openssl \
     git \
+    bash \
     g++ \
     libtool \
     m4 \
@@ -13,9 +14,12 @@ RUN apk update && \
     pcre \
     pcre-dev \
     make \
-    linux-headers
+    linux-headers \
+    zlib \ 
+    zlib-dev
 
 ADD https://github.com/owasp-modsecurity/ModSecurity/releases/download/v3.0.14/modsecurity-v3.0.14.tar.gz .
+ADD https://nginx.org/download/nginx-1.27.4.tar.gz .
 COPY tools/install.sh .
 RUN /install.sh
 
