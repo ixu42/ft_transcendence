@@ -229,8 +229,11 @@ Get details of the authenticated user's profile.
             "id": 1,
             "username": "user1",
             "avatar": "/media/avatars/1/<filename>",
-            "email": "<email>",
-            "extra_fields": "..."
+            "email": "...",
+            "first_name": "...",
+            "last_name": "...",
+            "total_wins": 10,
+            "total_losses": 5
         }
         ```
     - **401**
