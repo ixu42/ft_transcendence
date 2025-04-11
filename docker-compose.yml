@@ -16,8 +16,8 @@ services:
     volumes:
         - ./srcs/frontend:/app
     environment:
-      - NGINX_PORT=${NGINX_PORT}
-      - DJANGO_PORT=${DJANGO_PORT}
+      - HCP_CLIENT_ID=${HCP_CLIENT_ID}
+      - HCP_CLIENT_SECRET=${HCP_CLIENT_SECRET}
       - TZ=UTC
     networks:
       tr_network:
