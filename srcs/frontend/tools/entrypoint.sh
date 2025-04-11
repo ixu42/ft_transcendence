@@ -25,7 +25,7 @@ if [ ! -f "/app/tools/ssl/nginx.crt" ] || [ ! -f "/app/tools/ssl/nginx.key" ]; t
 fi
 
 # Substitute NGINX_PORT and DJANGO_PORT in config file with port numbers
-envsubst '$NGINX_PORT $DJANGO_PORT' < tools/nginx.conf > /etc/nginx/conf.d/default.conf
+envsubst '$NGINX_PORT $DJANGO_PORT' < tools/nginx.conf > /etc/nginx/nginx.conf
 
 echo "Starting NGINX..."
 exec nginx -g "daemon off;"
