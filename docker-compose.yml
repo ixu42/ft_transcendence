@@ -16,8 +16,8 @@ services:
     volumes:
         - ./srcs/frontend:/app
     environment:
-      - HCP_CLIENT_ID=${HCP_CLIENT_ID}
-      - HCP_CLIENT_SECRET=${HCP_CLIENT_SECRET}
+      - NGINX_PORT=${NGINX_PORT}
+      - DJANGO_PORT=${DJANGO_PORT}
       - TZ=UTC
     networks:
       tr_network:
@@ -33,9 +33,9 @@ services:
     volumes:
         - ./srcs/backend:/app
     environment:
-      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
-      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
-      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - HCP_CLIENT_ID=${HCP_CLIENT_ID}
+      - HCP_CLIENT_SECRET=${HCP_CLIENT_SECRET}
+      - DEBUG=${DEBUG}
       - DJANGO_PORT=${DJANGO_PORT}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
