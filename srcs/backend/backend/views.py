@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET
+from users.views import custom_login_required
 
 
 @ensure_csrf_cookie
@@ -13,6 +14,12 @@ def homepage(request):
 @require_GET
 def get_csrf_token(request):
     return JsonResponse({"message": "CSRF cookie set."})
+
+
+@custom_login_required
+@require_GET
+def session_check(request, user_id):
+    return JsonResponse({"status": "ok", "user_id": user_id})
 
 
 def lockout(request, credentials, *args, **kwargs):

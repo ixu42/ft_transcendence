@@ -36,19 +36,23 @@ def custom_login_required(view_func):
                 {"errors": "user_id is required in the route."}, status=400
             )
 
-        try:
-            User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return JsonResponse(
-                {"errors": f"User not found with user_id {user_id}."}, status=404
-            )
-
         cookie_name = f"session_{user_id}"
         session_cookie = request.COOKIES.get(cookie_name)
 
         # Check if the custom session cookie exists
         if not session_cookie:
-            return JsonResponse({"errors": "User is not authenticated."}, status=401)
+            response = JsonResponse({"errors": "User is not authenticated."}, status=401)
+            response.delete_cookie(cookie_name, path="/", domain="localhost")
+            return response
+
+        try:
+            User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            response =  JsonResponse(
+                {"errors": f"User not found with user_id {user_id}."}, status=404
+            )
+            response.delete_cookie(cookie_name, path="/", domain="localhost")
+            return response
 
         return view_func(request, *args, **kwargs)
 

@@ -136,3 +136,37 @@ const safeParseJSON = async response => {
     }
     return data;
 };
+
+const session_check = async () => {
+    const users = getLoggedInUsers();
+    const validUsers = [];
+
+    for (const user of users) {
+        const userId = user.id;
+        if (!userId) continue;
+
+        try {
+            const response = await fetch(`/api/session-check/${userId}/`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("✅ Session valid for user:", data.user_id);
+                validUsers.push(user);
+            } else {
+                console.warn(`⚠️ Session expired for user ${userId}`);
+            }
+        } catch (err) {
+            console.error(`❌ Error checking session for user ${userId}:`, err);
+        }
+    }
+    console.log("users:", users);
+    console.log("validUsers:", validUsers);
+    if (users.length !== validUsers.length) {
+        localStorage.setItem('loggedInUsers', JSON.stringify(validUsers));
+    }
+}
+
+document.addEventListener("DOMContentLoaded", session_check);
