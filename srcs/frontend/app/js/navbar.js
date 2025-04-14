@@ -34,6 +34,14 @@ async function updateNavbar() {
 }
 
 
+function handleLogout(userId) {
+    logoutUser(userId);
+    const dropdown = document.querySelector('.profile-list-container');
+    if (dropdown) {
+        dropdown.parentElement.style.display = 'none';
+    }
+}
+
 function populateProfileDropdown(container, userDataArray) {
     console.log("Populating profile dropdown with user data:", userDataArray);
 
@@ -43,25 +51,24 @@ function populateProfileDropdown(container, userDataArray) {
     console.log("Active users:", activeUsers);
 
     const userEntries = activeUsers.length > 0
-    ? activeUsers.map(user => {
-        const userData = userDataArray && userDataArray.find(data => data && data.id === user.id);
-        const avatar = userData ? fixAvatarURL(userData.avatar) : "api/static/avatars/default.png";
-        return `
-            <div class="profile-item">
-                <img src="${avatar}" alt="${user.username}" class="profile-avatar-dropdown">
-                <span>${user.username}</span>
-                <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile?user_id=${user.id}'">
-                    <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
-                </button>
-                <button class="profile-link-btn tr-nav-btn" onclick="logoutUser('${user.id}')">
-                    Logout
-                </button>
-            </div>
-        `;
-    }).join("")
-    : `<div class="profile-item no-profile">No logged-in users</div>`;
+        ? activeUsers.map(user => {
+            const userData = userDataArray && userDataArray.find(data => data && data.id === user.id);
+            const avatar = userData ? fixAvatarURL(userData.avatar) : "api/static/avatars/default.png";
+            return `
+                <div class="profile-item">
+                    <img src="${avatar}" alt="${user.username}" class="profile-avatar-dropdown">
+                    <span>${user.username}</span>
+                    <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile?user_id=${user.id}'">
+                        <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
+                    </button>
+                    <button class="profile-link-btn tr-nav-btn" onclick="handleLogout('${user.id}')">
+                        Logout
+                    </button>
+                </div>
+            `;
+        }).join("")
+        : `<div class="profile-item no-profile">No logged-in users</div>`;
 
-    // Login/signup entry
     const otherEntry = `
         <div class="profile-item">
             <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar-dropdown">
@@ -81,8 +88,7 @@ function populateProfileDropdown(container, userDataArray) {
     `;
 }
 
-
-  
+ 
   
 async function setupProfileButton(profileButton) {
     const dropdown = document.getElementById("profile-dropdown-content");

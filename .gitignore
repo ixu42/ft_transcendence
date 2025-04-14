@@ -1,3 +1,4 @@
+.env
 # Ignore all but not default avatar
 /srcs/backend/media/avatars/*
 !/srcs/backend/media/avatars/default.png

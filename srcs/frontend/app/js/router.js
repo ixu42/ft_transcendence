@@ -5,11 +5,14 @@ const routes = {
   "#about": "/views/about.html",
   "#leaderboard": "/views/leaderboard.html",
   "#lobby": "/views/lobby.html",
+  "#dashy": "/views/dashy.html",
   "#terms-of-service": "/views/terms-of-service.html",
   "#privacy-policy": "/views/privacy-policy.html",
   "#login": "/views/login.html",
   "#register": "/views/register.html",
   "#game": "/views/game.html",
+  "#userstats": "/views/userstats.html",
+  "#gamestats": "/views/gamestats.html",
   "#profile": "/views/profile.html",
   '#chat': "/views/chat.html",
   '#contact': "/views/contact.html",
@@ -22,7 +25,15 @@ const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
   "#game": () => setupGameJs(),
+  "#userstats": () => setupUserDashboardJs(),
+  "#gamestats": () => setupGameDashboardJs(),
+//   "#gamestats": async () => {
+//   const mod = await import("./views/gamedashboards.js");
+//   mod.setupGameDashboardJs();
+// },
+
   "#lobby": () => setupLobbyJs(),
+  "#dashy": () => setupDashyJs(),
   "#menu": () => console.log("Menu loaded"),
   "#leaderboard": () => setupLeaderboardJs(),
   "#profile": () => {
@@ -96,7 +107,7 @@ const handleLocation = async () => {
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
-  const hideNavbarAndFooter = ["#login", "#register", "", "#game", "#profile"].includes(path) || window.location.hash === "";
+  const hideNavbarAndFooter = ["#login", "#register", "", "#game", "#userstats", "#gamestats", "#profile"].includes(path) || window.location.hash === "";
 
   const navbar = document.getElementById("tr-navbar-container");
   const footer = document.getElementById("tr-footer-container");

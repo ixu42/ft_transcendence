@@ -1,0 +1,37 @@
+<!-- This only for debugging -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Stats Debug</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        #userstats-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #pong {
+            display: block;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div id="userstats-container">
+        <canvas id="pong" width="800" height="400"></canvas>
+    </div>
+
+    <script src="overview.js"></script>
+    <script src="history.js"></script>
+    <script src="modes.js"></script>
+</body>
+</html>
+
