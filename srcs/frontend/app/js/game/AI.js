@@ -8,7 +8,7 @@ const initializeAIGame = (gameId, userId) => {
     setupControls(game.player, game.player2, game, gameId, userId);
     setupAILevelControls(game);
     console.log("Starting game loop");
-    gameLoop(game);
+    startGameLoop(game);
 };
 
 const moveAIPaddle = (paddle, ball, canvas, aiLevel) => {

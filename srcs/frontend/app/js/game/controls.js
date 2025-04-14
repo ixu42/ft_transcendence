@@ -91,3 +91,21 @@ const setupAILevelControls = (game) => {
         }
     });
 }
+
+const setupWindowEvents = (game) => {
+    window.addEventListener('beforeunload', () => {
+        game.isGameRunning = false;
+    });
+    window.addEventListener('popstate', () => {
+        game.isGameRunning = false;
+    });
+}
+
+const setupWindowEventsTournament = (tournament) => {
+    window.addEventListener('beforeunload', () => {
+        tournament.isTournamentRunning = false;
+    });
+    window.addEventListener('popstate', () => {
+        tournament.isTournamentRunning = false;
+    });
+}

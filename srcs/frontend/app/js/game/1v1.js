@@ -10,8 +10,9 @@ const createGame = (isAI = false) => {
     const winningScore = -1;
     const options = {walls: 0};
     const walls = {player: 0, player2: 0};
+    const isGameRunning = false;
 
-    return { player, player2, ball, canvas, context, state, lastState, isAI, aiLevel, winningScore, options, walls };
+    return { player, player2, ball, canvas, context, state, lastState, isAI, aiLevel, winningScore, options, walls, isGameRunning };
 };
 
 const updateGame = (game) => {
@@ -115,7 +116,18 @@ const resetGame = (game) => {
     resetBall(game.ball, game.canvas);
 };
 
+const startGameLoop = (game) => {
+    game.isGameRunning = true;
+    gameLoop(game);
+}
+
+const stopGameLoop = (game) => {
+    game.isGameRunning = false;
+}
+
 const gameLoop = (game) => {
+    if (game.isGameRunning == false)
+        return;
     console.log("game state: " + game.state);
     if (game.state === "game" || game.state === "pause" || game.state === "prepare") {
         updateGame(game);
@@ -132,6 +144,7 @@ const gameLoop = (game) => {
     }
     if (game.state === "gameOver") {
         drawGameOver(game);
+        return;
     }
     requestAnimationFrame(() => gameLoop(game));
 };
@@ -144,6 +157,7 @@ const initializeGame = (gameId, userId) => {
         }
         const game = createGame(false);
         setupControls(game.player, game.player2, game, gameId, userId);
+        setupWindowEvents(game);
         console.log("Starting game loop");
-        gameLoop(game);
+        startGameLoop(game);
 };

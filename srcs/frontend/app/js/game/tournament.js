@@ -23,7 +23,8 @@ const setupTournament = () => {
     }
 
     console.log("Tournament initialized with players:", players);
-    return { players, winningScore, keyboardEnter: false, state: 'table' };
+    isTournamentRunning = false;
+    return { players, winningScore, keyboardEnter: false, state: 'table', isTournamentRunning };
 };
 
 const initializeTournament = (gameId) => {
@@ -40,10 +41,18 @@ const initializeTournament = (gameId) => {
     setupControls(game.player, game.player2, game, gameId);
     
     let currentMatchIndex = 0;
+    tournament.isTournamentRunning = true;
     tournamentLoop(tournament, game, currentMatchIndex, gameId);
 };
 
+
+const stopTournamentLoop = (tournament) => {
+    tournament.isTournamentRunning = false;
+}
+
 const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
+    if (tournament.isTournamentRunning == false)
+        return;
     if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
