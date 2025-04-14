@@ -156,8 +156,12 @@ const initializeGame = (gameId, userId) => {
             return;
         }
         const game = createGame(false);
+<<<<<<< Updated upstream
         setupControls(game.player, game.player2, game, gameId, userId);
         setupWindowEvents(game);
+=======
+        setupControls(game.player, game.player2, game, gameId, userId, false);
+>>>>>>> Stashed changes
         console.log("Starting game loop");
         startGameLoop(game);
 };

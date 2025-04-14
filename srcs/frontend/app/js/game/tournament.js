@@ -1,45 +1,155 @@
-const setupTournament = () => {
-    const numberOfPlayers = parseInt(prompt("Enter the number of players:"));
-    if (isNaN(numberOfPlayers) || numberOfPlayers <= 2) {
-        alert("Invalid number of players. Please enter a positive integer of least 3.");
+const setupTournament = async (response) => {
+    const tournamentId = response.tournament_id;
+    const creatorUsername = response.tournament_name.split("'")[0];
+    const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+
+    // Step 1: Check if there are at least 3 logged-in users (including creator)
+    if (loggedInUsers.length < 3) {
+        alert("❌ Tournament requires exactly 3 logged-in users. Found: " + loggedInUsers.length);
         return null;
     }
 
-    const players = [];
-    for (let i = 0; i < numberOfPlayers; i++) {
-        const playerName = prompt(`Enter the name of player ${i + 1}:`);
-        if (playerName) {
-            players.push({ name: playerName, score: 0, matches: 0 });
-        } else {
-            alert("Player name cannot be empty. Please enter a valid name.");
-            i--; // Retry for the same player index
-        }
+    // Step 2: Verify the creator is logged in
+    const creator = loggedInUsers.find(user => user.username === creatorUsername);
+    if (!creator) {
+        alert("❌ Tournament creator must be logged in.");
+        return null;
     }
 
-    const winningScore = parseInt(prompt("Enter the winning match score:"));
+    // Step 3: Initialize players with the creator
+    const players = [
+        {
+            name: creatorUsername,
+            userId: creator.id,
+            score: 0,
+            matches: 0
+        }
+    ];
+
+    // Step 4: Prompt to select exactly 2 additional logged-in players
+    const potentialPlayers = loggedInUsers.filter(
+        user => user.username !== creatorUsername
+    );
+    let playerOptions = potentialPlayers
+        .map(user => `${user.id}: ${user.username}`)
+        .join("\n");
+
+    while (players.length < 3 && potentialPlayers.length > 0) {
+        const selectedPlayer = window.prompt(
+            `Select a logged-in user to join the tournament (need ${3 - players.length} more):\n${playerOptions}`
+        );
+        if (!selectedPlayer) {
+            alert("❌ Tournament requires exactly 3 players. Selection cancelled.");
+            return null;
+        }
+
+        const playerId = selectedPlayer.trim();
+        const player = potentialPlayers.find(p => p.id.toString() === playerId);
+        if (!player) {
+            alert("❌ Invalid player selection.");
+            continue;
+        }
+
+        // Join player via API
+        const joinResponse = await apiRequest(
+            `tournaments/${tournamentId}/players/?user_id=${playerId}`,
+            "PATCH",
+            {
+                display_name: player.username
+            }
+        );
+        if (joinResponse.errors) {
+            alert(`❌ Failed to add ${player.username}: ${JSON.stringify(joinResponse.errors)}`);
+            continue;
+        }
+
+        // Add player to tournament
+        players.push({
+            name: player.username,
+            userId: player.id,
+            score: 0,
+            matches: 0
+        });
+        console.log(`✅ ${player.username} joined tournament ${tournamentId}`);
+
+        // Remove selected player from potential players
+        potentialPlayers.splice(potentialPlayers.indexOf(player), 1);
+        playerOptions = potentialPlayers
+            .map(user => `${user.id}: ${user.username}`)
+            .join("\n");
+    }
+
+    // Step 5: Verify exactly 3 players
+    if (players.length !== 3) {
+        alert("❌ Tournament requires exactly 3 players. Selected: " + players.length);
+        return null;
+    }
+
+    // Step 6: Set winning score
+    const winningScore = parseInt(prompt("Enter the winning match score (e.g., 10):"));
     if (isNaN(winningScore) || winningScore <= 0) {
         alert("Invalid winning score. Please enter a positive integer.");
         return null;
     }
 
+<<<<<<< Updated upstream
     console.log("Tournament initialized with players:", players);
     isTournamentRunning = false;
     return { players, winningScore, keyboardEnter: false, state: 'table', isTournamentRunning };
+=======
+    console.log("Tournament initialized with 3 players:", players);
+    return {
+        players,
+        allPlayers: [...players],
+        winningScore,
+        keyboardEnter: false,
+        state: "table",
+        tournamentId
+    };
+>>>>>>> Stashed changes
 };
 
-const initializeTournament = (gameId) => {
-    const canvas = document.getElementById('pong');
+const startTournament = async (tournament) => {
+    const creator = tournament.allPlayers.find(player => player.name === tournament.allPlayers[0].name);
+    if (!creator || !creator.userId) {
+        console.error("Cannot start tournament: Creator not found or not logged in");
+        alert("❌ Cannot start tournament: Creator not logged in.");
+        return;
+    }
+
+    console.log(`Attempting to start tournament ${tournament.tournamentId} for creator user_id=${creator.userId}`);
+    const startResponse = await apiRequest(
+        `tournaments/${tournament.tournamentId}/start/?user_id=${creator.userId}`,
+        "PATCH",
+        {}
+    );
+    if (startResponse.errors) {
+        console.error(
+            `Failed to start tournament for ${creator.name} (user_id=${creator.userId}):`,
+            startResponse.errors
+        );
+        alert(
+            `❌ Failed to start tournament: ${JSON.stringify(startResponse.errors)}`
+        );
+    } else {
+        console.log(`✅ Tournament started for ${creator.name} (user_id=${creator.userId})`);
+    }
+};
+
+const initializeTournament = async (response) => {
+    const canvas = document.getElementById("pong");
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");
         return;
     }
-    const tournament = setupTournament();
+    const tournament = await setupTournament(response);
     if (!tournament) return;
+    await startTournament(tournament);
     const game = createGame();
     game.winningScore = tournament.winningScore;
     setupTournamentControls(tournament);
-    setupControls(game.player, game.player2, game, gameId);
-    
+    setupControls(game.player, game.player2, game, tournament.tournamentId, true);
+
     let currentMatchIndex = 0;
     tournament.isTournamentRunning = true;
     tournamentLoop(tournament, game, currentMatchIndex, gameId);
@@ -53,6 +163,12 @@ const stopTournamentLoop = (tournament) => {
 const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
     if (tournament.isTournamentRunning == false)
         return;
+=======
+    tournamentLoop(tournament, game, currentMatchIndex);
+};
+
+const tournamentLoop = async (tournament, game, currentMatchIndex) => {
+>>>>>>> Stashed changes
     if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
@@ -71,8 +187,7 @@ const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
     if (tournament.state === 'playing') {
         if (game.state === "wallSelection") {
             drawWallSelection(game);
-        }
-        else {
+        } else {
             updateGame(game);
             drawGame(game);
             if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
@@ -87,11 +202,49 @@ const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
                 winner.score++;
                 tournament.players = tournament.players.filter(player => player !== loser);
                 currentMatchIndex++;
-                if (currentMatchIndex >= tournament.players.length - 1)
+                if (currentMatchIndex >= tournament.players.length - 1) {
                     currentMatchIndex = 0;
+                }
                 if (tournament.players.length === 1) {
                     game.state = 'gameOver';
                     drawWinner(tournament.players[0], game.canvas);
+
+                    const winner = tournament.players[0];
+                    const creator = tournament.allPlayers[0];
+
+                    if (!creator.userId) {
+                        console.warn("No valid userId for creator; skipping stats save");
+                        alert("❌ Cannot save stats: Creator not logged in.");
+                    } else {
+                        const winnerId = winner.userId;
+                        if (!winnerId) {
+                            console.warn("No valid winner_id; skipping stats save");
+                            alert("❌ Cannot save stats: Winner has no valid userId.");
+                        } else {
+                            console.log(
+                                `Saving stats for creator user_id=${creator.userId}, winner_id=${winnerId}`
+                            );
+                            const statsResponse = await apiRequest(
+                                `tournaments/${tournament.tournamentId}/stats/?user_id=${creator.userId}`,
+                                "PATCH",
+                                {
+                                    winner_id: winnerId
+                                }
+                            );
+                            if (statsResponse.errors) {
+                                console.error(
+                                    `Failed to save stats for ${creator.name} (user_id=${creator.userId}):`,
+                                    statsResponse.errors
+                                );
+                                alert(
+                                    `❌ Failed to save stats for ${creator.name}: ${JSON.stringify(statsResponse.errors)}`
+                                );
+                            } else {
+                                console.log(`✅ Stats saved for ${creator.name}`);
+                            }
+                        }
+                    }
+
                     return;
                 }
                 tournament.state = 'table';

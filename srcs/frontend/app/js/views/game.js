@@ -69,9 +69,12 @@ const setupGameJs = async () => {
         } else if (type === "local") {
             switch (mode) {
                 case "tournament":
-                    response = await apiRequest(`users/${currentUserId}/games/local/`, 'POST');
+                    response = await apiRequest(`tournaments/?user_id=${currentUserId}`, "POST", {
+                        tournament_name: `${loggedInUsers.find(u => u.id == currentUserId).username}'s tournament`,
+                        display_name: loggedInUsers.find(u => u.id == currentUserId).username
+                    })
                     if (response.error) { throw new Error(response.error); }
-                    initializeTournament(response.game_id);
+                    initializeTournament(response);
                     break;
                 case "1v1":
                     response = await apiRequest(`users/${currentUserId}/games/local/`, 'POST');
