@@ -107,7 +107,6 @@ const handleLocation = async () => {
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
-  const isLoggedIn = isUserLoggedIn();
   const hideNavbarAndFooter = ["#login", "#register", "", "#game", "#userstats", "#gamestats", "#profile"].includes(path) || window.location.hash === "";
 
   const navbar = document.getElementById("tr-navbar-container");
