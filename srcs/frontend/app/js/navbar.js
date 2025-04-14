@@ -48,7 +48,7 @@ function populateProfileDropdown(container, userDataArray) {
         const avatar = userData ? fixAvatarURL(userData.avatar) : "api/static/avatars/default.png";
         return `
             <div class="profile-item">
-                <img src="${avatar}" alt="${user.username}" class="profile-avatar">
+                <img src="${avatar}" alt="${user.username}" class="profile-avatar-dropdown">
                 <span>${user.username}</span>
                 <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile?user_id=${user.id}'">
                     <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
@@ -64,7 +64,7 @@ function populateProfileDropdown(container, userDataArray) {
     // Login/signup entry
     const otherEntry = `
         <div class="profile-item">
-            <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar">
+            <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar-dropdown">
             <span>Other User?</span>
             <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
                 <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register

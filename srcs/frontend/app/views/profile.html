@@ -2,11 +2,10 @@
 <div id="profile-view" class="profile-container">
     <!-- Existing profile content -->
     <div class="avatar-container">
-        <img class="profile-avatar" alt="Player Avatar" onerror="this.src='/static/avatars/default.png'">
-        <!-- Upload avatar -->
+        <img class="profile-avatar" alt="Player Avatar">
+        <div class="avatar-loading-spinner" style="display: none;">Loading...</div>
         <label for="avatar-upload" class="avatar-upload-label">Upload</label>
         <input type="file" id="avatar-upload" accept="image/jpeg, image/png">
-        <!-- Reset avatar -->
         <button id="avatar-reset" class="avatar-reset-btn">Reset</button>
     </div>
 

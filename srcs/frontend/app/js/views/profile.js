@@ -27,14 +27,14 @@ const logoutUser = async (userId) => {
 };
 
 
-const setupProfilePageJs = (userId) => {
+const setupProfilePageJs = async (userId) => {
     console.log("⚡ setupProfilePage() called!");
     console.log("🔑 User ID:", userId);
     console.log("🔑 User ID:", userId);
     console.log("🔑 User ID:", userId);
     console.log("🔑 User ID:", userId);
     try {
-        fetchProfileData(userId);
+        await fetchProfileData(userId);
         setupAvatarUpload(userId);
         setupButtons(userId);
         setupEditProfile(userId);
@@ -84,17 +84,28 @@ const fetchProfileData = async (userId) => {
 };
 
 
+
 // Update profile UI elements
 const updateProfileUI = (data) => {
-    const avatarUrl = fixAvatarURL(data.avatar);
+    const fixieAvatarURL = (avatarPath) => {
+        console.log("🔑 Raw Avatar Path:", avatarPath);
+        if (!avatarPath) {
+            return "api/static/avatars/default.png";
+        }
+        if (avatarPath.startsWith("/media/")) {
+            return `api${avatarPath}`;
+        }
+        return `api/${avatarPath}`;
+    };
+    const avatarUrl = fixieAvatarURL(data.avatar);
     const avatarEl = document.querySelector(".profile-avatar");
     const usernameEl = document.querySelector(".profile-username");
     const oldEmailEl = document.querySelector(".profile-email");
 
-    console.log("🔑 Avatar URL:", avatarUrl);
-    console.log("🔑 Avatar URL:", avatarUrl);
-    console.log("🔑 Avatar URL:", avatarUrl);
-    console.log("🔑 Avatar URL:", avatarUrl);
+    // console.log("🔑 Avatar URL:", avatarUrl);
+    // console.log("🔑 Avatar URL:", avatarUrl);
+    // console.log("🔑 Avatar URL:", avatarUrl);
+    // console.log("🔑 Avatar URL:", avatarUrl);
 
     if (avatarEl) {avatarEl.src = avatarUrl;}
     if (usernameEl) {usernameEl.textContent = data.username || "Username";}
