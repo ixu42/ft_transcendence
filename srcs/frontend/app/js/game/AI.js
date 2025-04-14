@@ -2,7 +2,6 @@ const initializeAIGame = (gameId, userId) => {
     const canvas = document.getElementById('pong');
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");
-        resolve([0, 0]);
         return;
     }
     const game = createGame(true);

@@ -50,6 +50,7 @@ const moveBall = (ball, player, player2, canvas, game) => {
 
     if (ball.x < 0 || ball.x > canvas.width) {
 
+        ball.x < 0 ? player2.score++ : player.score++;
         if (game.options.walls)
         {
             ball.x < 0 ? game.walls.player-- : game.walls.player2--;
@@ -59,7 +60,6 @@ const moveBall = (ball, player, player2, canvas, game) => {
             ball.dx *= -1;
             return;
         }
-        ball.x < 0 ? player2.score++ : player.score++;
         if (game.winningScore > 0 && (game.player.score >= game.winningScore || game.player2.score >= game.winningScore))
             game.state = "gameOver";
         resetBall(ball, canvas);

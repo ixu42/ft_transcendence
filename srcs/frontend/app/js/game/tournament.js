@@ -1,7 +1,7 @@
 const setupTournament = () => {
     const numberOfPlayers = parseInt(prompt("Enter the number of players:"));
-    if (isNaN(numberOfPlayers) || numberOfPlayers <= 0) {
-        alert("Invalid number of players. Please enter a positive integer.");
+    if (isNaN(numberOfPlayers) || numberOfPlayers <= 2) {
+        alert("Invalid number of players. Please enter a positive integer of least 3.");
         return null;
     }
 
