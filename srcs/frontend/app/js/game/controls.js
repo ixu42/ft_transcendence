@@ -1,4 +1,4 @@
-const setupControls = async (player, player2, game, gameId) => {
+const setupControls = async (player, player2, game, gameId, userId) => {
     document.addEventListener('keydown', async (event) => {
         const key = event.key.toLowerCase();
         key === 'arrowup' ? player2.keyboardUp = true :
@@ -23,23 +23,38 @@ const setupControls = async (player, player2, game, gameId) => {
         if (game.state === 'scoreSelection') {
             if (key === '1') {
                 game.winningScore = 3;
-                game.state = 'prepare';
+                game.state = 'wallSelection';
             } else if (key === '2') {
                 game.winningScore = 7;
-                game.state = 'prepare';
+                game.state = 'wallSelection';
             } else if (key === '3') {
                 game.winningScore = -1;
+                game.state = 'wallSelection';
+            }
+            return;
+        }
+         // Wall selection
+         if (game.state === 'wallSelection') {
+            if (key === '1') {
+                game.options.walls = 1; // Enable walls
+                if (game.winningScore < 0) game.winningScore = 100; // Set default score if not set
+                game.walls = { player: game.winningScore, player2: game.winningScore }; // Initialize wall HP
+                game.state = 'prepare';
+            } else if (key === '2') {
+                game.options.walls = 0; // Disable walls
                 game.state = 'prepare';
             }
+            return;
         }
-
+        // Game Over state handling
         if (game.state === 'gameOver') {
             if (key === 'x') {
-                if (localStorage.getItem("isLoggedIn") === "true") {
-                   await saveGameStats(gameId, player.score, player2.score);
+                if (getLoggedInUsers().length > 0) {
+                   await saveGameStats(gameId, player.score, player2.score, userId);
                 }
                 window.location.href = "/#lobby"; // Adjust the URL to your lobby page
             }
+            return;
         }
         
     });
@@ -73,7 +88,6 @@ const setupAILevelControls = (game) => {
                 game.aiLevel = 'hard';
                 game.state = 'scoreSelection';
             }
-            console.log("AI Level: " + game.aiLevel);
         }
     });
 }

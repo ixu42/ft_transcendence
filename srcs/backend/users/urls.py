@@ -11,7 +11,9 @@ urlpatterns = [
     # Profile routes
     path("<int:user_id>/", views.user_profile, name="user_profile"),
     path("<int:user_id>/password/", views.update_password, name="update_password"),
-    path("<int:user_id>/avatar/", views.update_avatar, name="update_avatar"),
+    path("<int:user_id>/avatar/", views.handle_avatar, name="handle_avatar"),
+    # Anonymization
+    path("<int:user_id>/anonymize/", views.anonymize_user, name="anonymize_user"),
     # Participated tournaments
     path(
         "<int:user_id>/tournaments-history/",

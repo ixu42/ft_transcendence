@@ -32,15 +32,15 @@ const renderLeaderboard = (playersData, currentPage) => {
     leaderboardList.innerHTML = `
         <li class="leaderboard-header">
             <span class="rank-header">Rank</span>
-            <span class="score-header">Score</span>
+            <span class="score-header">Wins</span>
         </li>
         ${playersToShow.map(player => `
             <li class="leaderboard-item">
-                <span class="rank">${player.score > 0 ? `#${player.rank}` : '?'}</span>
+                <span class="rank">${player.total_wins > 0 ? `#${player.rank}` : '?'}</span>
                 <span class="player-id">ID: ${player.id}</span>
                 <img src="${fixAvatarURL(player.avatar)}" alt="${player.username}'s avatar" class="avatar">
                 <span class="username">${player.username}</span>
-                <span class="score">${player.score} points</span>
+                <span class="score">${player.total_wins}</span>
             </li>
         `).join('')}
     `;
@@ -52,15 +52,4 @@ const renderLeaderboard = (playersData, currentPage) => {
 
     prevButton.onclick = () => renderLeaderboard(playersData, currentPage - 1);
     nextButton.onclick = () => renderLeaderboard(playersData, currentPage + 1);
-};
-
-const fixAvatarURL = (avatarPath) => {
-
-    if (avatarPath.startsWith("avatars/")){
-        return `api/media/${avatarPath}`;
-    }
-    else if (avatarPath.startsWith("/static/")) {
-        return `/api/${avatarPath}`;
-    }
-    return avatarPath;
 };

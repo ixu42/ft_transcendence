@@ -8,7 +8,7 @@
     <p class="mb-4">Please log in to continue</p>
     <form id="login-form" class="text-center w-50">
         <div class="mb-3">
-            <input type="text" id="login-username-email" class="form-control form-control-lg" placeholder="Username or Email" required>
+            <input type="text" id="login-username" class="form-control form-control-lg" placeholder="Username" required>
         </div>
         <div class="mb-3">
             <input type="password" id="login-password" class="form-control form-control-lg" placeholder="Password" required>
@@ -18,15 +18,11 @@
         Login <img src="static/icons/login32x32.png" alt="Login" class="login-btn-icon">
     </button>
     <p>Or</p>
-    <button id="login-42" class="btn btn-success btn-lg w-50 mb-3">
-        Login with <img src="static/icons/42-logo-white48x48.png" alt="42 Login" class="login-btn-icon">
-    </button>
     <button id="register-btn" class="btn btn-secondary btn-lg w-50 mb-3" onclick="window.location.hash='#register'">
         Register <img src="static/icons/profile30x30.png" alt="Register" class="login-btn-icon">
     </button>
-    <p class="mt-4">
-        <a href="#menu" class="text-white">Continue as Guest</a>
-    </p>
+    <div id="loggedInSessions" class="mt-4">
+    </div>
 </div>
 
 

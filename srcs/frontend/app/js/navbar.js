@@ -2,21 +2,15 @@ async function updateNavbar() {
     console.log("Updating navbar...");
 
     const authButton = document.getElementById("tr-auth-btn");
+    const profileDropdown = document.getElementById("profile-dropdown");
     const homeButton = document.getElementById("tr-home-btn");
     const friendsButton = document.getElementById("tr-friends-btn");
     const friendsDropdown = document.getElementById("friends-dropdown");
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-
-    console.log("Is logged in?", isLoggedIn);
 
     if (authButton) {
-        if (isLoggedIn) {
-            authButton.innerHTML = '<img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile';
-            authButton.onclick = () => (window.location.hash = "#profile");
-        } else {
-            authButton.innerHTML = '<img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register';
-            authButton.onclick = () => (window.location.hash = "#login");
-        }
+        authButton.innerHTML = '<img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Users';
+        profileDropdown.style.display = "inline-block";
+        setupProfileButton(authButton);
     }
 
     if (homeButton) {
@@ -24,90 +18,232 @@ async function updateNavbar() {
         homeButton.onclick = () => (window.location.hash = "#menu");
     }
 
-    if (friendsButton) {
-        if (isLoggedIn) {
-            console.log("User is logged in. Enabling friends dropdown...");
-            friendsDropdown.style.display = "inline-block";
+    const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+    const isAnyUserLoggedIn = loggedInUsers.some(user => user.loggedIn);
 
-            // Set up the friends button logic
+    if (friendsButton) {
+        if (isAnyUserLoggedIn) {
+            console.log("At least one user is logged in. Enabling friends dropdown...");
+            friendsDropdown.style.display = "inline-block";
             setupFriendsButton(friendsButton);
         } else {
-            console.log("User is not logged in. Hiding friends dropdown...");
+            console.log("No users logged in. Hiding friends dropdown...");
             friendsDropdown.style.display = "none";
         }
     }
 }
 
-async function setupFriendsButton(friendsButton) {
-    const friendsDropdownContent = document.getElementById("friends-dropdown-content");
-    const sendFriendRequestBtn = document.getElementById("send-friend-request-btn");
-    let isFetching = false;
-    const userId = localStorage.getItem("user_id");
 
-    // Fetch friends on hover
-    friendsButton.addEventListener("mouseenter", async () => {
-        if (isFetching) return;
-        isFetching = true;
-
-        console.log("Friends button hovered. Fetching friends and requests...");
-        console.log("User ID:", userId);
-
-        if (userId) {
-            // Fetch friends
-            const friendsSection = document.getElementById("friends-section");
-            const friends = await fetchFriends(userId);
-            console.log("Fetched friends:", friends);
-            populateFriendsDropdown(friendsSection, friends);
-
-            // Fetch friend requests
-            const friendRequestsSection = document.getElementById("friend-requests-section");
-            const friendRequests = await fetchFriendRequests(userId);
-            console.log("Fetched friend requests:", friendRequests);
-            populateFriendRequests(friendRequestsSection, friendRequests);
-        }
-        isFetching = false;
-    });
-
-    // Send friend request
-    if (sendFriendRequestBtn) {
-        sendFriendRequestBtn.replaceWith(sendFriendRequestBtn.cloneNode(true));
-        const newSendFriendRequestBtn = document.getElementById("send-friend-request-btn");
-
-        newSendFriendRequestBtn.addEventListener("click", async () => {
-            const userNameInput = document.getElementById("friend-username-input");
-            const friendUsername = userNameInput.value.trim();
-
-            if (!friendUsername) {
-                alert("Please enter a valid username.");
-                return;
-            }
-        
-            try {
-                const response = await fetch(`api/users/${userId}/friends/requests/?recipient_username=${encodeURIComponent(friendUsername)}`, {  // ✅ Pass recipient_username as a query parameter
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "X-CSRFToken": await getCSRFCookie(),
-                    },
-                });
-        
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Error:", errorData);
-                    alert(`Error: ${errorData.errors || response.statusText}`);
-                    return;
-                }
-        
-                console.log("Friend request sent successfully!");
-                alert("Friend request sent!");
-            } catch (error) {
-                console.error("Friend request error:", error);
-                alert("Something went wrong. Please try again.");
-            }
-        });
-        
+function handleLogout(userId) {
+    logoutUser(userId);
+    const dropdown = document.querySelector('.profile-list-container');
+    if (dropdown) {
+        dropdown.parentElement.style.display = 'none';
     }
 }
+
+function populateProfileDropdown(container, userDataArray) {
+    console.log("Populating profile dropdown with user data:", userDataArray);
+
+    const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+    const activeUsers = loggedInUsers.filter(user => user.loggedIn);
+
+    console.log("Active users:", activeUsers);
+
+    const userEntries = activeUsers.length > 0
+        ? activeUsers.map(user => {
+            const userData = userDataArray && userDataArray.find(data => data && data.id === user.id);
+            const avatar = userData ? fixAvatarURL(userData.avatar) : "api/static/avatars/default.png";
+            return `
+                <div class="profile-item">
+                    <img src="${avatar}" alt="${user.username}" class="profile-avatar-dropdown">
+                    <span>${user.username}</span>
+                    <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#profile?user_id=${user.id}'">
+                        <img src="static/icons/profile30x30.png" alt="Profile" class="tr-navbar-icon"> Profile
+                    </button>
+                    <button class="profile-link-btn tr-nav-btn" onclick="handleLogout('${user.id}')">
+                        Logout
+                    </button>
+                </div>
+            `;
+        }).join("")
+        : `<div class="profile-item no-profile">No logged-in users</div>`;
+
+    const otherEntry = `
+        <div class="profile-item">
+            <img src="api/static/avatars/default.png" alt="Empty Profile" class="profile-avatar-dropdown">
+            <span>Other User?</span>
+            <button class="profile-link-btn tr-nav-btn" onclick="window.location.hash='#login'">
+                <img src="static/icons/login32x32.png" alt="Login" class="tr-navbar-icon"> Login / Register
+            </button>
+        </div>
+    `;
+
+    container.innerHTML = `
+        <div class="profile-list-container">
+            ${userEntries}
+            ${otherEntry}
+        </div>
+        <hr style="width: 90%; height: 2px; background-color: #ccc; margin: 0 5px;">
+    `;
+}
+
+ 
+  
+async function setupProfileButton(profileButton) {
+    const dropdown = document.getElementById("profile-dropdown-content");
+    let hideTimer;
+
+    profileButton.addEventListener("mouseenter", async () => {
+        if (hideTimer) clearTimeout(hideTimer);
+
+        const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
+        const loggedInUserIds = loggedInUsers
+            .filter(user => user.loggedIn && user.id)
+            .map(user => user.id);
+        const userDataArray = loggedInUserIds.length > 0
+            ? await Promise.all(loggedInUserIds.map(userId => fetchProfileDataById(userId)))
+            : [];
+
+        populateProfileDropdown(dropdown, userDataArray);
+        dropdown.style.display = "block";
+    });
+
+    profileButton.addEventListener("mouseleave", () => {
+        hideTimer = setTimeout(() => dropdown.style.display = "none", 200);
+    });
+
+    dropdown.addEventListener("mouseenter", () => {
+        if (hideTimer) clearTimeout(hideTimer);
+        dropdown.style.display = "block";
+    });
+
+    dropdown.addEventListener("mouseleave", () => dropdown.style.display = "none");
+}
+
+
+
+async function setupFriendsButton(friendsButton) {
+
+    const friendsDropdown = document.getElementById("friends-dropdown");
+    const friendsDropdownContent = document.getElementById("friends-dropdown-content");
+    const sendFriendRequestBtn = document.getElementById("send-friend-request-btn");
+    let isFetching = false;  
+    const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+    let userSelectorHtml = "";
+
+    if (loggedInUsers.length > 1) {
+      userSelectorHtml = `
+        <div id="friends-user-selector-container" style="margin-bottom: 10px;">
+          <select id="friends-user-selector" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
+            ${loggedInUsers.map(user => `<option value="${user.id}">${user.username}</option>`).join("")}
+          </select>
+        </div>
+      `;
+    } else if (loggedInUsers.length === 1) {
+      userSelectorHtml = `
+        <div id="friends-user-selector-container" style="margin-bottom: 10px;">
+          <span id="friends-user-selector" data-user-id="${loggedInUsers[0].id}" style="display: inline-block; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
+            ${loggedInUsers[0].username}
+          </span>
+        </div>
+      `;
+    }
+    
+    async function updateFriendsForUser(userId) {
+      const friendsSection = document.getElementById("friends-section");
+      const friendRequestsSection = document.getElementById("friend-requests-section");
+      try {
+        const friends = await fetchFriends(userId);
+        console.log(`Fetched friends for user ${userId}:`, friends);
+        populateFriendsDropdown(friendsSection, friends, userId);
+        const friendRequests = await fetchFriendRequests(userId);
+        console.log(`Fetched friend requests for user ${userId}:`, friendRequests);
+        populateFriendRequests(friendRequestsSection, friendRequests, userId);
+      } catch (error) {
+        console.error(`Error fetching friends for user ${userId}:`, error);
+      }
+    }
+  
+    friendsDropdown.addEventListener("mouseenter", async () => {
+      if (isFetching) return;
+      isFetching = true;
+  
+      if (!document.getElementById("friends-user-selector") && userSelectorHtml) {
+        friendsDropdownContent.insertAdjacentHTML("afterbegin", userSelectorHtml);
+        const selector = document.getElementById("friends-user-selector");
+        if (selector.tagName.toLowerCase() === "select") {
+          selector.addEventListener("change", () => updateFriendsForUser(selector.value));
+        }
+      }
+  
+      let currentUserId;
+      const selector = document.getElementById("friends-user-selector");
+      if (selector) {
+        if (selector.tagName.toLowerCase() === "select") {
+          currentUserId = selector.value;
+        } else {
+          currentUserId = selector.getAttribute("data-user-id");
+        }
+      }
+      if (currentUserId) {
+        await updateFriendsForUser(currentUserId);
+      }
+      friendsDropdownContent.style.display = "block";
+      isFetching = false;
+    });
+  
+    friendsDropdown.addEventListener("mouseleave", () => {
+      friendsDropdownContent.style.display = "none";
+    });
+  
+    if (sendFriendRequestBtn) {
+      const newSendBtn = sendFriendRequestBtn.cloneNode(true);
+      sendFriendRequestBtn.parentNode.replaceChild(newSendBtn, sendFriendRequestBtn);
+      newSendBtn.addEventListener("click", async () => {
+        const friendUsername = document.getElementById("friend-username-input").value.trim();
+        if (!friendUsername) {
+          alert("Please enter a valid username.");
+          return;
+        }
+        let currentUserId;
+        const selector = document.getElementById("friends-user-selector");
+        if (selector) {
+          if (selector.tagName.toLowerCase() === "select") {
+            currentUserId = selector.value;
+          } else {
+            currentUserId = selector.getAttribute("data-user-id");
+          }
+        }
+        if (!currentUserId) {
+          alert("No user selected for sending friend request.");
+          return;
+        }
+        try {
+          const response = await fetch(
+            `api/users/${currentUserId}/friends/requests/?recipient_username=${encodeURIComponent(friendUsername)}`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: { "X-CSRFToken": await getCSRFCookie() },
+            }
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Error:", errorData);
+            alert(`Error: ${errorData.errors || response.statusText}`);
+            return;
+          }
+          console.log("Friend request sent successfully!");
+          alert("Friend request sent!");
+        } catch (error) {
+          console.error("Friend request error:", error);
+          alert("Something went wrong. Please try again.");
+        }
+      });
+    }
+  }
+  
 
 // Function to fetch friends
 async function fetchFriends(userId) {
@@ -160,12 +296,11 @@ async function fetchFriendRequests(userId) {
     }
 }
 
-function populateFriendRequests(container, requests) {
+function populateFriendRequests(container, requests, userId) {
     if (!container) return;
     
     async function handleFriendRequestAction(requestId, action) {
         try {
-            const userId = localStorage.getItem("user_id");
             const accepted = action === 'accept';
     
             const response = await fetch(`/api/users/${userId}/friends/requests/${requestId}/`, {
@@ -227,12 +362,11 @@ function populateFriendRequests(container, requests) {
     }
 }
 
-function populateFriendsDropdown(container, friends) {
+function populateFriendsDropdown(container, friends, userId) {
     if (!container) return;
 
     async function handleUnfriend(friendId) {
         try {
-            const userId = localStorage.getItem("user_id");
     
             const response = await fetch(`/api/users/${userId}/friends/${friendId}/`, {
                 method: 'DELETE',
@@ -293,7 +427,6 @@ function populateFriendsDropdown(container, friends) {
             button.addEventListener('click', async () => {
                 const friendId = button.dataset.id;
                 await handleUnfriend(friendId);
-                const userId = localStorage.getItem("user_id");
                 const friends = await fetchFriends(userId);
                 populateFriendsDropdown(container, friends);
             });

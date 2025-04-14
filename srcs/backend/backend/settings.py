@@ -22,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@auby^w*3yw6(7hx*0eiu*b)0-pnhgm@ntm8un^^m65+jg%w%8"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = [
     "0.0.0.0",
@@ -62,12 +62,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Django Monitoring
     "django_prometheus",
-    # Allauth apps
-    "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
 ]
 
 
@@ -83,9 +77,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
-    # Allauth middleware
-    "allauth.account.middleware.AccountMiddleware",
-    "users.middleware.UpdateLastActiveMiddleware",
 ]
 
 
@@ -130,18 +121,18 @@ AUTH_USER_MODEL = "users.CustomUser"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    # {
+    #     "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    # },
+    # {
+    #     "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    # },
+    # {
+    #     "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    # },
+    # {
+    #     "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    # },
 ]
 
 # Internationalization
@@ -196,7 +187,6 @@ AXES_LOCKOUT_CALLABLE = "backend.views.lockout"
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",  # Django Axes backend
     "django.contrib.auth.backends.ModelBackend",  # Default Django backend
-    "allauth.account.auth_backends.AuthenticationBackend",  # allauth backend
 ]
 
 CSRF_TRUSTED_ORIGINS = [

@@ -5,7 +5,6 @@ const setupLobbyJs = () => {
 
 const bindLobbyEventListeners = () => {
     document.getElementById("start-local-btn")?.addEventListener("click", showGameModal);
-    document.getElementById("start-online-btn")?.addEventListener("click", () => alert("🌍 Online mode coming soon!"));
 };
 
 const showGameModal = () => {

@@ -9,6 +9,7 @@ function setupLoginPageJs()
     else{
         console.error("Login button not found!");
     }
+    displayLoggedInUsers();
 }
 
 function checkAndShowSplash() {
@@ -27,37 +28,9 @@ function checkAndShowSplash() {
     }
 }
 
-async function getCSRFCookie() {
-    try {
-        const response = await fetch("/api/get-csrf-token/", {
-            method: "GET",
-            credentials: "include",
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch CSRF token: ${response.status}`);
-        }
-
-        const csrfToken = document.cookie.split('; ')
-            .find(row => row.startsWith('csrftoken='))
-            ?.split('=')[1];
-
-        if (!csrfToken) {
-            console.log("❌ CSRF Token not found.");
-            return "";
-        }
-
-        console.log("🔑 CSRF Token fetched:", csrfToken);
-        return csrfToken;
-    } catch (error) {
-        console.error("❌ CSRF Token fetch error:", error);
-        return "";
-    }
-}
-
 function handleLogin(loginButton) {
     loginButton.addEventListener("click", async () => {
-        const username = document.getElementById("login-username-email").value.trim();
+        const username = document.getElementById("login-username").value.trim();
         const password = document.getElementById("login-password").value.trim();
 
         if (!username || !password) {
@@ -86,24 +59,16 @@ function handleLogin(loginButton) {
 
             if (response.ok) {
                 alert("✅ Login successful!");
-                
-                // ✅ Store user ID in localStorage
-                if (data.id) {
-                    localStorage.setItem("user_id", data.id);
-                } else {
-                    console.error("❌ No user ID in response!");
-                }
 
-                localStorage.setItem("isLoggedIn", "true");
+                data.loggedIn = true;
+                addOrUpdateLoggedInUser(data);
+
                 updateNavbar();
                 window.location.hash = "#menu";
-            
-            }
-            else if (response.status == 400) {
+            } else if (response.status === 400) {
                 alert(`❌ Error: ${data.errors || "Redirecting to menu..."}`);
                 window.location.hash = "#menu";
-            }
-            else {
+            } else {
                 alert(`❌ Error: ${data.errors || "Login failed"}`);
             }
         } catch (error) {
@@ -112,3 +77,42 @@ function handleLogin(loginButton) {
         }
     });
 }
+
+
+function displayLoggedInUsers() {
+    const loggedInUsers = getLoggedInUsers();
+    const loggedInSessionsDiv = document.getElementById("loggedInSessions");
+    loggedInSessionsDiv.innerHTML = ""; // Clear previous content
+
+    if (loggedInUsers.length > 0) {
+        const sessionsTitle = document.createElement("p");
+        sessionsTitle.textContent = "Existing Sessions:";
+        loggedInSessionsDiv.appendChild(sessionsTitle);
+
+        loggedInUsers.forEach(user => {
+            const sessionParagraph = document.createElement("p");
+            sessionParagraph.textContent = `You're logged in as: ${user.username} `;
+
+            const continueLink = document.createElement("a");
+            continueLink.href = "#menu";
+            continueLink.textContent = "(Continue)";
+            continueLink.style.cursor = "pointer";
+
+            sessionParagraph.appendChild(continueLink);
+            loggedInSessionsDiv.appendChild(sessionParagraph);
+        });
+    } else {
+        const guestParagraph = document.createElement("p");
+        guestParagraph.textContent = "Continue as Guest ";
+
+        const continueLink = document.createElement("a");
+        continueLink.href = "#menu";
+        continueLink.textContent = "(Continue)";
+        continueLink.style.cursor = "pointer";
+
+        guestParagraph.appendChild(continueLink);
+        loggedInSessionsDiv.appendChild(guestParagraph);
+    }
+}
+
+

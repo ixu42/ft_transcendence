@@ -6,7 +6,8 @@ const routes = {
   "#leaderboard": "/views/leaderboard.html",
   "#lobby": "/views/lobby.html",
   "#dashy": "/views/dashy.html",
-  "#terms": "/views/terms-privacy.html",
+  "#terms-of-service": "/views/terms-of-service.html",
+  "#privacy-policy": "/views/privacy-policy.html",
   "#login": "/views/login.html",
   "#register": "/views/register.html",
   "#game": "/views/game.html",
@@ -19,7 +20,7 @@ const routes = {
 };
 
 const protectedRoutes = ["#profile"];
-const isUserLoggedIn = () => localStorage.getItem("isLoggedIn") === "true";
+let isAnyUserLoggedIn =  getLoggedInUsers().some(user => user.loggedIn);
 const routeToMenu = () => { history.replaceState(null, null, "#menu");};
 
 const routeHandlers = {
@@ -35,10 +36,21 @@ const routeHandlers = {
   "#dashy": () => setupDashyJs(),
   "#menu": () => console.log("Menu loaded"),
   "#leaderboard": () => setupLeaderboardJs(),
-  "#profile": () => setupProfilePageJs(),
-  "#terms": () => {},
+  "#profile": () => {
+    const hash = window.location.hash;
+    const queryString = hash.split("?")[1];
+    const userId = queryString ? new URLSearchParams(queryString).get("user_id") : null;
+    if (userId) {
+      console.log(`Profile loaded for user ID: ${userId}`);
+      setupProfilePageJs(userId);
+    } else {
+      console.warn("No user ID provided; profile not loaded.");
+    }
+  },
+  "#terms-of-service": () => {},
+  "#privacy-policy": () => {},
   "#about": () => {},
-  "#register": () => {},
+  "#register": () => setupRegisterPageJs(),
   "#login": () => setupLoginPageJs(),
   "#chat": () => {},
 
@@ -47,51 +59,51 @@ const routeHandlers = {
 let heartbeatInterval = null; // Store interval ID
 
 const startHeartbeat = async () => {
-  if (!isUserLoggedIn()) {
-    console.log("User is not logged in, skipping heartbeat.");
-    return;
+  const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+  if (loggedInUsers.length === 0) {
+      console.log("No logged in users, skipping heartbeat.");
+      return;
   }
-
   if (heartbeatInterval) {
-    console.log("Heartbeat already running.");
-    return; // Prevent multiple intervals
+      console.log("Heartbeat already running.");
+      return;
   }
 
-  const userId = localStorage.getItem("user_id");
   async function sendHeartbeat() {
-    try {
-      await apiRequest(`users/${userId}/heartbeat/`, "GET");
-      console.log("Heartbeat updated");
-    } catch (error) {
-      console.error("Heartbeat error:", error);
-      if (error.response?.status === 401) {
-        stopHeartbeat();
+      const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+      for (const user of loggedInUsers) {
+          try {
+              await apiRequest(`users/${user.id}/heartbeat/`, "GET");
+              console.log(`Heartbeat updated for user ${user.id}`);
+          } catch (error) {
+              console.error(`Heartbeat error for user ${user.id}:`, error);
+          }
       }
-    }
   }
 
   await sendHeartbeat();
-  heartbeatInterval = setInterval(sendHeartbeat, 10000);
-}
+  heartbeatInterval = setInterval(sendHeartbeat, 40000);
+};
 
 const stopHeartbeat = () => {
   if (heartbeatInterval) {
-    clearInterval(heartbeatInterval);
-    heartbeatInterval = null;
-    console.log("Heartbeat stopped.");
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
+      console.log("Heartbeat stopped.");
   }
-}
+};
 
 const handleLocation = async () => {
 
   if (!window.location.hash)
   {
-    const defaultRoute = isUserLoggedIn() ? "#menu" : "#login";
+    const defaultRoute = isAnyUserLoggedIn ? "#menu" : "#login";
     console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
     console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
     history.replaceState(null, null, defaultRoute);
   }
-  
+
+  isAnyUserLoggedIn =  getLoggedInUsers().some(user => user.loggedIn);
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
@@ -106,10 +118,9 @@ const handleLocation = async () => {
   if (footer) footer.classList.toggle("hidden", hideNavbarAndFooter);
 
   // Check for protected routes.
-  if (protectedRoutes.includes(path) && !isLoggedIn) {
+  if (protectedRoutes.includes(path) && !isAnyUserLoggedIn) {
     console.warn(`🚨 Access denied: ${path} requires authentication.`);
-    showRegisterPopup();
-    routeToMenu();
+    alert("You must be logged in to access this page.");
     return;
   }
 
@@ -125,7 +136,7 @@ const handleLocation = async () => {
     console.log(`Updating navbar...`);
     updateNavbar(); // Update the navbar after loading the route content
 
-    if (isLoggedIn) {
+    if (isAnyUserLoggedIn) {
       startHeartbeat();
     } else {
       stopHeartbeat();

@@ -7,24 +7,30 @@
     margin-bottom: 20px;
     border: 3px solid var(--accent-color);
     transition: opacity 0.3s ease;
+    display: block;
 }.avatar-container {
     position: relative;
     display: inline-block;
     margin-bottom: 25px;
-}.avatar-upload-label {
+}.avatar-upload-label, .avatar-reset-btn {
     position: absolute;
-    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.3s ease;
-}.avatar-container:hover .avatar-upload-label {
+    text-align: center;
+}.avatar-upload-label {
+    top: 40%;
+}.avatar-reset-btn {
+    top: 60%;
+}.avatar-container:hover .avatar-upload-label,
+.avatar-container:hover .avatar-reset-btn {
     opacity: 1;
 }.avatar-container:hover .profile-avatar {
     opacity: 0.8;
@@ -35,8 +41,22 @@
     width: 0;
     height: 0;
 }
+.avatar-loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+}
 
 /* Profile Container */
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+  }
 .profile-container {
     overflow-y: auto; /* Enable vertical scrolling */
     display: flex;
@@ -116,6 +136,8 @@
     gap: 10px;
     z-index: 1001;
     justify-content: space-between;
+    max-height: 80vh;      /* Limit modal height to 80% of viewport */
+    overflow-y: auto;
 }.profile-match-history-modal .modal-content h2 {
     margin-bottom: 15px;
     color: var(--primary-text-color);
@@ -219,7 +241,7 @@
 #profile-view-match-history-btn,
 #profile-logout-btn,
 .delete-account-btn,
-.deactivate-account-btn,
+.anonymize-data-btn,
 #edit-profile-btn,
 #save-profile-btn,
 #save-password-btn,
@@ -245,7 +267,7 @@
 #profile-menu-btn:hover,
 #profile-logout-btn:hover,
 .delete-account-btn:hover,
-.deactivate-account-btn:hover,
+.anonymize-data-btn:hover,
 #edit-profile-btn:hover,
 #save-profile-btn:hover,
 #save-password-btn:hover,
@@ -273,13 +295,13 @@
     background-color: var(--link-hover-color);
 }
 
-.deactivate-account-btn,
+.anonymize-data-btn,
 .delete-account-btn {
     background-color: #f44336;
     color: white;
 }
 
-.deactivate-account-btn:hover,
+.anonymize-data-btn:hover,
 .delete-account-btn:hover {
     background-color: #d32f2f;
 }

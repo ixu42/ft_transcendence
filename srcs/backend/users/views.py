@@ -36,19 +36,23 @@ def custom_login_required(view_func):
                 {"errors": "user_id is required in the route."}, status=400
             )
 
-        try:
-            User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return JsonResponse(
-                {"errors": f"User not found with user_id {user_id}."}, status=404
-            )
-
         cookie_name = f"session_{user_id}"
         session_cookie = request.COOKIES.get(cookie_name)
 
         # Check if the custom session cookie exists
         if not session_cookie:
-            return JsonResponse({"errors": "User is not authenticated."}, status=401)
+            response = JsonResponse({"errors": "User is not authenticated."}, status=401)
+            response.delete_cookie(cookie_name, path="/", domain="localhost")
+            return response
+
+        try:
+            User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            response =  JsonResponse(
+                {"errors": f"User not found with user_id {user_id}."}, status=404
+            )
+            response.delete_cookie(cookie_name, path="/", domain="localhost")
+            return response
 
         return view_func(request, *args, **kwargs)
 
@@ -64,16 +68,13 @@ def register_user(request):
 
     form = CustomUserCreationForm(data)
     if form.is_valid():
-        try:
-            form.save()
-            user_id = form.instance.id
-            username = form.cleaned_data.get("username")
-            return JsonResponse(
-                {"id": user_id, "username": username, "message": "User created."},
-                status=201,
-            )
-        except Exception as e:
-            return JsonResponse({"errors": str(e)}, status=500)
+        form.save()
+        user_id = form.instance.id
+        username = form.cleaned_data.get("username")
+        return JsonResponse(
+            {"id": user_id, "username": username, "message": "User created."},
+            status=201,
+        )
     else:
         return JsonResponse({"errors": form.errors}, status=400)
 
@@ -196,17 +197,6 @@ def update_profile(request, user_id):
         return JsonResponse({"errors": form.errors}, status=400)
 
 
-@require_http_methods(["PATCH"])
-def deactivate_user_account(request, user_id):
-    User.objects.filter(pk=user_id).update(is_active=False)  # Soft delete
-
-    username = User.objects.get(id=user_id).username
-    response = JsonResponse(
-        {"id": user_id, "username": username, "message": "Account deactivated."}
-    )
-    return custom_logout(request, user_id, response)
-
-
 @require_http_methods(["DELETE"])
 def delete_user_account(request, user_id):
     user = User.objects.get(id=user_id)
@@ -231,18 +221,8 @@ def delete_user_account(request, user_id):
 def user_profile(request, user_id):
     if request.method == "GET":
         return get_profile(request, user_id)
-
     elif request.method == "PATCH":
-        try:
-            body = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"errors", "Invalid JSON input."}, status=400)
-
-        if body.get("deactivate") is True:
-            return deactivate_user_account(request, user_id)
-
         return update_profile(request, user_id)
-
     elif request.method == "DELETE":
         return delete_user_account(request, user_id)
 
@@ -272,27 +252,53 @@ def update_password(request, user_id):
 
 
 @custom_login_required
-@require_POST
-def update_avatar(request, user_id):
-    if "avatar" not in request.FILES:
-        return JsonResponse({"errors": "No file uploaded."}, status=400)
-
+@require_http_methods(["POST", "DELETE"])
+def handle_avatar(request, user_id):
     user = User.objects.get(id=user_id)
-    old_file_path = user.avatar.name  # Store old file path for cleanup
-    form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
 
-    if form.is_valid():
-        user.update_avatar(form.cleaned_data.get("avatar"), old_file_path)
+    if request.method == "POST":
+        if "avatar" not in request.FILES:
+            return JsonResponse({"errors": "No file uploaded."}, status=400)
+
+        old_file_path = user.avatar.name  # Store old file path for cleanup
+        form = AvatarUpdateForm(request.POST, request.FILES, instance=user)
+
+        if form.is_valid():
+            user.update_avatar(form.cleaned_data.get("avatar"), old_file_path)
+            return JsonResponse(
+                {
+                    "id": user.id,
+                    "username": user.username,
+                    "message": "Avatar updated.",
+                    "avatar_url": user.get_avatar(),
+                }
+            )
+        return JsonResponse({"errors": form.errors}, status=400)
+    elif request.method == "DELETE":
+        user.reset_avatar()
         return JsonResponse(
             {
                 "id": user.id,
                 "username": user.username,
-                "message": "Avatar updated.",
+                "message": "Avatar reset.",
                 "avatar_url": user.get_avatar(),
             }
         )
 
-    return JsonResponse({"errors": form.errors}, status=400)
+
+@custom_login_required
+@require_http_methods(["PATCH"])
+def anonymize_user(request, user_id):
+    user = User.objects.get(id=user_id)
+
+    if user.is_anonymized:
+        return JsonResponse({"errors": "User is already anonymized."}, status=400)
+
+    user.anonymize()
+    response = JsonResponse(
+        {"message": "Your data has been anonymized. Logging out..."}
+    )
+    return custom_logout(request, user_id, response)
 
 
 @custom_login_required
@@ -347,7 +353,7 @@ def leaderboard(request):
 
     data = []
     for user in users:
-        if user.username == "admin" or user.username == "guest_player":
+        if user.username == "admin" or not user.is_active:
             continue
 
         data.append(

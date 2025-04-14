@@ -44,6 +44,20 @@ Register a new user in the system.
         ```json
         {"errors": {"username": ["A user with that username already exists."]}}
         ```
+        ```json
+        {"errors":{"password2":["The two password fields didn’t match."]}}
+        ```
+        ```json
+        {
+            "errors": {
+                "password2": [
+                    "This password is too short. It must contain at least 8 characters.",
+                    "This password is too common.",
+                    "This password is entirely numeric."
+                ]
+            }
+        }
+        ```
 
 </details>
 
@@ -175,6 +189,32 @@ Allow users to upload a new avatar image.
 
 ---
 
+### User avatar reset
+
+Allow users to reset their avatar to default one.
+
+<details>
+    <summary><code>DELETE</code><code><b>users/{user_id}/avatar/</b></code></summary>
+
+- **Response**
+    - **200**
+      ```json
+        {
+            "id": 1,
+            "username": "user1",
+            "message": "Avatar reset.",
+            "avatar_url": "/static/avatars/default.png"
+        }
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+
+</details>
+
+---
+
 ### User profile info
 
 Get details of the authenticated user's profile.
@@ -189,8 +229,11 @@ Get details of the authenticated user's profile.
             "id": 1,
             "username": "user1",
             "avatar": "/media/avatars/1/<filename>",
-            "email": "<email>",
-            "extra_fields": "..."
+            "email": "...",
+            "first_name": "...",
+            "last_name": "...",
+            "total_wins": 10,
+            "total_losses": 5
         }
         ```
     - **401**
@@ -287,35 +330,6 @@ Update the password of the authenticated user.
 
 ---
 
-### User account deactivation
-
-For the authenticated user to deactivate their account. Recommended by Django instead of deleting user account, as the related data to the user won't be affected.
-
-<details>
-    <summary><code>PATCH</code><code><b>users/{user_id}/</b></code></summary>
-
-- **Expected Request Body**:
-    ```json
-    {"deactivate": true}
-    ```
-- **Response**
-    - **200**
-        ```json
-        {
-            "id": 1,
-            "username": "user1",
-            "message": "Account deactivated."
-        }
-        ```
-    - **401**
-        ```json
-        {"errors": "User is not authenticated."}
-        ```
-
-</details>
-
----
-
 ### User account deletion
 
 For the authenticated user to delete its account. In this case, user object and related data will be deleted from the database.
@@ -331,6 +345,35 @@ For the authenticated user to delete its account. In this case, user object and 
             "username": "user1",
             "message": "Account deleted."
         }
+        ```
+    - **401**
+        ```json
+        {"errors": "User is not authenticated."}
+        ```
+
+</details>
+
+---
+
+### Anonymization
+
+Enable users to request anonymization of their personal data, ensuring that their identity and sensitive information are protected. The following actions are taken upon a successful request:
+- username and email anonymized;
+- first and last names become empty strings;
+- avatar reset to default and existing avatar deleted if it exists;
+- friends removed;
+- user is logged out and may not log in again.
+
+<details>
+    <summary><code>PATCH</code><code><b>users/{user_id}/anonymize/</b></code></summary>
+
+- **Response** 
+    - **200**
+        ```json
+        {"message": "Your data has been anonymized. Logging out..."}
+    - **400**
+        ```json
+        {"errors": "User is already anonymized."}
         ```
     - **401**
         ```json
@@ -434,17 +477,17 @@ Get basic user info and game stats for all users.
                 "id": 1,
                 "username": "user1",
                 "avatar": "/media/avatars/1/<filename>",
-                "score": 100,
+                "total_wins": 10,
+                "win_rate": 75.0,
                 "rank": 1,
-                "extra_fields": "..."
             },
             {
                 "id": 2,
                 "username": "user2",
                 "avatar": "/media/avatars/2/<filename>",
-                "score": 80,
+                "total_wins": 10,
+                "win_rate": 50.0,
                 "rank": 2,
-                "extra_fields": "..."
             }
             "... more items ..."
         ]

@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("This has been called");
-    initializeTournament();
+    // initializeTournament();
     // initializeGame();
-    // initializeAIGame();
+    initializeAIGame();
 });

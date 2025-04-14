@@ -28,7 +28,7 @@ const hitPaddle = (ball, player, direction) => {
     ball.speed += ball.speedUp;
 }
 
-const moveBall = (ball, player, player2, canvas) => {
+const moveBall = (ball, player, player2, canvas, game) => {
     ball.x += ball.dx * ball.speed;
     ball.y += ball.dy * ball.speed;
 
@@ -49,7 +49,19 @@ const moveBall = (ball, player, player2, canvas) => {
     }
 
     if (ball.x < 0 || ball.x > canvas.width) {
+
+        if (game.options.walls)
+        {
+            ball.x < 0 ? game.walls.player-- : game.walls.player2--;
+            if (game.walls.player <= 0 || game.walls.player2 <= 0) {
+                game.state = "gameOver";
+            }
+            ball.dx *= -1;
+            return;
+        }
         ball.x < 0 ? player2.score++ : player.score++;
+        if (game.winningScore > 0 && (game.player.score >= game.winningScore || game.player2.score >= game.winningScore))
+            game.state = "gameOver";
         resetBall(ball, canvas);
     }
 }
