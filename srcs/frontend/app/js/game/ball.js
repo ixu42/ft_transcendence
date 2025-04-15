@@ -32,7 +32,7 @@ const moveBall = (ball, player, player2, canvas, game, deltatime) => {
     ball.x += ball.dx * ball.speed * deltatime;
     ball.y += ball.dy * ball.speed * deltatime;
 
-    if (ball.y < ball.radius || ball.y > canvas.height - ball.radius) {
+    if ((ball.y - ball.radius < 0 && ball.dy < 0) || (ball.y + ball.radius > canvas.height && ball.dy > 0)) {
         ball.dy *= -1;
     }
 
@@ -48,8 +48,7 @@ const moveBall = (ball, player, player2, canvas, game, deltatime) => {
         hitPaddle(ball, player2, -1);
     }
 
-    if (ball.x < 0 || ball.x > canvas.width) {
-
+    if ((ball.x < 0 && ball.dx < 0) || (ball.x > canvas.width) && ball.dx > 0) {
         ball.x < 0 ? player2.score++ : player.score++;
         if (game.options.walls)
         {

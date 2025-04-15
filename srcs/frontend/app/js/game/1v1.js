@@ -25,9 +25,8 @@ const drawWalls = (game) => {
     const context = game.context;
 
     const getWallColor = (hp) => {
-        if (hp <= 1) return 'rgba(255, 0, 0, 0)'; // Invisible when HP is 1
-        const brightness = Math.min(255, 255 - 255 * (hp/game.winningScore)); // Brighter as HP decreases
-        return `rgb(255, ${brightness}, ${brightness})`; // Red with increasing brightness
+        const red = Math.floor((hp / game.winningScore) * 255);
+        return `rgb(${red}, 0, 0)`; // Red with increasing brightness
     };
     
     context.fillStyle = getWallColor(game.walls.player); // Color for left wall
