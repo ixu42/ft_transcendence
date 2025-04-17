@@ -92,21 +92,19 @@ const setupTournament = async (response) => {
         return null;
     }
 
-<<<<<<< Updated upstream
-    console.log("Tournament initialized with players:", players);
-    isTournamentRunning = false;
-    return { players, winningScore, keyboardEnter: false, state: 'table', isTournamentRunning };
-=======
+    // Step 7: Log and return tournament data
     console.log("Tournament initialized with 3 players:", players);
+    const isTournamentRunning = false; // Initialize tournament state
+
     return {
-        players,
-        allPlayers: [...players],
-        winningScore,
-        keyboardEnter: false,
-        state: "table",
-        tournamentId
+        players,                   
+        allPlayers: [...players],   // Copy of players for reference (from Stashed changes)
+        winningScore,               // Winning score for the tournament
+        keyboardEnter: false,       // Keyboard input state
+        state: "table",            // Initial tournament state
+        tournamentId,              // Tournament ID (from Stashed changes)
+        isTournamentRunning        // Tournament running state (from Updated upstream)
     };
->>>>>>> Stashed changes
 };
 
 const startTournament = async (tournament) => {
@@ -160,15 +158,12 @@ const stopTournamentLoop = (tournament) => {
     tournament.isTournamentRunning = false;
 }
 
-const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
-    if (tournament.isTournamentRunning == false)
-        return;
-=======
-    tournamentLoop(tournament, game, currentMatchIndex);
-};
-
 const tournamentLoop = async (tournament, game, currentMatchIndex) => {
->>>>>>> Stashed changes
+    // Early return if tournament is not running
+    if (tournament.isTournamentRunning === false) {
+        return;
+    }
+
     if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
