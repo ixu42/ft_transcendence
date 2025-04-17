@@ -3,8 +3,8 @@ const createBall = (x, y) => {
         x: x,
         y: y,
         radius: 10,
-        speed: 2,
-        speedUp: 0.2,
+        speed: 0.3,
+        speedUp: 0.03,
         dx: Math.cos(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1,
         dy: Math.sin(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1
     };
@@ -28,11 +28,11 @@ const hitPaddle = (ball, player, direction) => {
     ball.speed += ball.speedUp;
 }
 
-const moveBall = (ball, player, player2, canvas, game) => {
-    ball.x += ball.dx * ball.speed;
-    ball.y += ball.dy * ball.speed;
+const moveBall = (ball, player, player2, canvas, game, deltatime) => {
+    ball.x += ball.dx * ball.speed * deltatime;
+    ball.y += ball.dy * ball.speed * deltatime;
 
-    if (ball.y < ball.radius || ball.y > canvas.height - ball.radius) {
+    if ((ball.y - ball.radius < 0 && ball.dy < 0) || (ball.y + ball.radius > canvas.height && ball.dy > 0)) {
         ball.dy *= -1;
     }
 
@@ -48,8 +48,7 @@ const moveBall = (ball, player, player2, canvas, game) => {
         hitPaddle(ball, player2, -1);
     }
 
-    if (ball.x < 0 || ball.x > canvas.width) {
-
+    if ((ball.x < 0 && ball.dx < 0) || (ball.x > canvas.width) && ball.dx > 0) {
         ball.x < 0 ? player2.score++ : player.score++;
         if (game.options.walls)
         {

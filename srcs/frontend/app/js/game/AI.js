@@ -13,7 +13,6 @@ const initializeAIGame = (gameId, userId) => {
 
 const moveAIPaddle = (paddle, ball, canvas, aiLevel) => {
     const speed = aiLevel === "easy" ? 2 : aiLevel === "medium" ? 5 : aiLevel == 'hard' ? 9 : 2; // AI paddle speed
-    console.log("AI speed: " + speed);
     if (ball.y < paddle.y + paddle.height / 2) {
         paddle.y -= speed;
     } else if (ball.y > paddle.y + paddle.height / 2) {

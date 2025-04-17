@@ -12,22 +12,21 @@ const createGame = (isAI = false) => {
     const walls = {player: 0, player2: 0};
     const isGameRunning = false;
 
-    return { player, player2, ball, canvas, context, state, lastState, isAI, aiLevel, winningScore, options, walls, isGameRunning };
+    return { player, player2, ball, canvas, context, state, lastState, isAI, aiLevel, winningScore, options, walls, isGameRunning, lastTime: 0 };
 };
 
-const updateGame = (game) => {
+const updateGame = (deltatime, game) => {
     movePaddle(game.player, game.canvas);
     game.isAI ? moveAIPaddle(game.player2, game.ball, game.canvas, game.aiLevel) : movePaddle(game.player2, game.canvas);
-    game.state === "game" && moveBall(game.ball, game.player, game.player2, game.canvas, game);
+    game.state === "game" && moveBall(game.ball, game.player, game.player2, game.canvas, game, deltatime);
 };
 
 const drawWalls = (game) => {
     const context = game.context;
 
     const getWallColor = (hp) => {
-        if (hp <= 1) return 'rgba(255, 0, 0, 0)'; // Invisible when HP is 1
-        const brightness = Math.min(255, 255 - 255 * (hp/game.winningScore)); // Brighter as HP decreases
-        return `rgb(255, ${brightness}, ${brightness})`; // Red with increasing brightness
+        const red = Math.floor((hp / game.winningScore) * 255);
+        return `rgb(${red}, 0, 0)`; // Red with increasing brightness
     };
     
     context.fillStyle = getWallColor(game.walls.player); // Color for left wall
@@ -128,9 +127,13 @@ const stopGameLoop = (game) => {
 const gameLoop = (game) => {
     if (game.isGameRunning == false)
         return;
-    console.log("game state: " + game.state);
+    
+    const currentTime = performance.now();
+    const deltaTime = (currentTime - game.lastTime); 
+    game.lastTime = currentTime;
+
     if (game.state === "game" || game.state === "pause" || game.state === "prepare") {
-        updateGame(game);
+        updateGame(deltaTime, game);
         drawGame(game);
     }
     if (game.state === "levelSelection") {
