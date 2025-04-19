@@ -41,14 +41,16 @@ def custom_login_required(view_func):
 
         # Check if the custom session cookie exists
         if not session_cookie:
-            response = JsonResponse({"errors": "User is not authenticated."}, status=401)
+            response = JsonResponse(
+                {"errors": "User is not authenticated."}, status=401
+            )
             response.delete_cookie(cookie_name, path="/", domain="localhost")
             return response
 
         try:
             User.objects.get(id=user_id)
         except User.DoesNotExist:
-            response =  JsonResponse(
+            response = JsonResponse(
                 {"errors": f"User not found with user_id {user_id}."}, status=404
             )
             response.delete_cookie(cookie_name, path="/", domain="localhost")

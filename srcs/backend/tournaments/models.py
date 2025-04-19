@@ -47,7 +47,10 @@ class Tournament(models.Model):
         self.check_status()
         if self.players.count() >= Tournament.MAX_PLAYERS:
             raise ValidationError("Tournament is full")
-        if TournamentPlayer.objects.filter(tournament=self, user=user).exists():
+        if (
+            user.username != "guest_player"
+            and TournamentPlayer.objects.filter(tournament=self, user=user).exists()
+        ):
             raise ValidationError("You are already in this tournament.")
         if TournamentPlayer.objects.filter(
             tournament=self, display_name=display_name
