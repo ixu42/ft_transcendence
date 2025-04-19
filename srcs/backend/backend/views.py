@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET
+from django.contrib.auth import get_user_model
 from users.views import custom_login_required
 
 
@@ -34,3 +35,13 @@ def custom_404(request, exception):
 
 def custom_500(request):
     return JsonResponse({"errors": "Internal server error."}, status=500)
+
+
+@require_GET
+def guest_user_id(request):
+    User = get_user_model()
+    try:
+        guest = User.objects.get(username="guest_player")
+        return JsonResponse({"id": guest.id})
+    except User.DoesNotExist:
+        return JsonResponse({"errors": "Guest player not found."}, status=404)

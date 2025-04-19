@@ -35,6 +35,7 @@ urlpatterns = [
     path("friends/", include("friends.urls")),
     path("get-csrf-token/", views.get_csrf_token),
     path("session-check/<int:user_id>/", views.session_check, name="session_check"),
+    path("get-guest-id/", views.guest_user_id, name="guest_user_id"),
     path("", views.homepage),
     path("", include(prometheus_urls)),
 ]
