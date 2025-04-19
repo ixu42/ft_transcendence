@@ -1046,3 +1046,25 @@ Save the stats of a completed tournament.
         ```
 
 </details>
+
+---
+
+### Get guest player id
+
+<details>
+    <summary>
+        <code>GET</code>
+        <code><b>get-guest-id/</b></code>
+    </summary>
+
+- **Response**
+    - **200**
+        ```json
+        {"id": 1}
+        ```
+    - **404**
+        ```json
+        {"errors": "Guest player not found."}
+        ```
+
+</details>
