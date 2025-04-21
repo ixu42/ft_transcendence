@@ -15,7 +15,7 @@ const resetBall = (ball, canvas) => {
     ball.y = canvas.height / 2;
     ball.dx = Math.cos(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1;
     ball.dy = Math.sin(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1;
-    ball.speed = 2;
+    ball.speed = 0.3;
 }
 
 const hitPaddle = (ball, player, direction) => {
