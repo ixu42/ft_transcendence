@@ -39,6 +39,8 @@ const initializeTournament = (gameId) => {
     game.winningScore = tournament.winningScore;
     setupTournamentControls(tournament);
     setupControls(game.player, game.player2, game, gameId);
+    setupWindowEvents(game);
+    setupWindowEventsTournament(tournament);
     
     let currentMatchIndex = 0;
     tournament.isTournamentRunning = true;
@@ -53,6 +55,11 @@ const stopTournamentLoop = (tournament) => {
 const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
     if (tournament.isTournamentRunning == false)
         return;
+
+    const currentTime = performance.now();
+    const deltaTime = (currentTime - game.lastTime); 
+    game.lastTime = currentTime;
+
     if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
@@ -73,9 +80,9 @@ const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
             drawWallSelection(game);
         }
         else {
-            updateGame(game);
+            updateGame(deltaTime, game);
             drawGame(game);
-            if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
+            if (game.player.score == tournament.winningScore || game.player2.score == tournament.winningScore) {
                 let winner, loser;
                 if (game.player.score > game.player2.score) {
                     winner = tournament.players[currentMatchIndex];
