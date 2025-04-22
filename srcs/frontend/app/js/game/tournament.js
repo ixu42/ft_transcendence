@@ -56,10 +56,6 @@ const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
     if (tournament.isTournamentRunning == false)
         return;
 
-    const currentTime = performance.now();
-    const deltaTime = (currentTime - game.lastTime); 
-    game.lastTime = currentTime;
-
     if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
@@ -76,37 +72,33 @@ const tournamentLoop = (tournament, game, currentMatchIndex, gameId) => {
         }
     }
     if (tournament.state === 'playing') {
-        if (game.state === "wallSelection") {
-            drawWallSelection(game);
-        }
-        else {
-            updateGame(deltaTime, game);
-            drawGame(game);
-            if (game.player.score == tournament.winningScore || game.player2.score == tournament.winningScore) {
-                let winner, loser;
-                if (game.player.score > game.player2.score) {
-                    winner = tournament.players[currentMatchIndex];
-                    loser = tournament.players[currentMatchIndex + 1];
-                } else {
-                    winner = tournament.players[currentMatchIndex + 1];
-                    loser = tournament.players[currentMatchIndex];
-                }
-                winner.score++;
-                tournament.players = tournament.players.filter(player => player !== loser);
-                currentMatchIndex++;
-                if (currentMatchIndex >= tournament.players.length - 1)
-                    currentMatchIndex = 0;
-                if (tournament.players.length === 1) {
-                    game.state = 'gameOver';
-                    drawWinner(tournament.players[0], game.canvas);
-                    return;
-                }
-                tournament.state = 'table';
-                resetGame(game);
+        startGameLoop(game, () => {
+            let winner, loser;
+            if (game.player.score > game.player2.score) {
+                winner = tournament.players[currentMatchIndex];
+                loser = tournament.players[currentMatchIndex + 1];
+            } else {
+                winner = tournament.players[currentMatchIndex + 1];
+                loser = tournament.players[currentMatchIndex];
             }
-        }
+            winner.score++;
+            tournament.players = tournament.players.filter(player => player !== loser);
+            currentMatchIndex++;
+            if (currentMatchIndex >= tournament.players.length - 1) {
+                currentMatchIndex = 0;
+            }
+            if (tournament.players.length === 1) {
+                tournament.state = 'gameOver';
+                drawWinner(tournament.players[0], game.canvas);
+                return;
+            }
+            tournament.state = 'table';
+            resetGame(game);
+            tournamentLoop(tournament, game, currentMatchIndex, gameId);
+        });
+        return;
     }
-    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex));
+    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex, gameId));
 };
 
 const drawTable = (players, canvas) => {
