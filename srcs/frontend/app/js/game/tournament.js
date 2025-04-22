@@ -175,7 +175,7 @@ const startTournament = async (tournament) => {
     }
 };
 
-const initializeTournament = async (response) => {
+const initializeTournament = async (response, currentUserId) => {
     const canvas = document.getElementById("pong");
     if (!canvas) {
         console.error("Canvas element '#pong' not found.");
@@ -187,13 +187,13 @@ const initializeTournament = async (response) => {
     const game = createGame();
     game.winningScore = tournament.winningScore;
     setupTournamentControls(tournament);
-    setupControls(game.player, game.player2, game, response.game_id);
+    setupControls(game.player, game.player2, game, response.game_id, currentUserId, true);
     setupWindowEvents(game);
     setupWindowEventsTournament(tournament);
-    
+
     let currentMatchIndex = 0;
     tournament.isTournamentRunning = true;
-    tournamentLoop(tournament, game, currentMatchIndex, response.game_id);
+    tournamentLoop(tournament, game, currentMatchIndex);
 };
 
 
@@ -202,37 +202,35 @@ const stopTournamentLoop = (tournament) => {
 }
 
 const tournamentLoop = async (tournament, game, currentMatchIndex) => {
-    // Early return if tournament is not running
     if (tournament.isTournamentRunning === false) {
         return;
     }
     const currentTime = performance.now();
-    const deltaTime = (currentTime - game.lastTime); 
+    const deltaTime = currentTime - game.lastTime;
     game.lastTime = currentTime;
 
-    if (tournament.state === 'table') {
+    if (tournament.state === "table") {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
-            tournament.state = 'prepare';
+            tournament.state = "prepare";
             tournament.keyboardEnter = false;
         }
     }
-    if (tournament.state === 'prepare') {
+    if (tournament.state === "prepare") {
         drawMatch(tournament.players, game.canvas, currentMatchIndex);
         if (tournament.keyboardEnter) {
-            tournament.state = 'playing';
-            game.state = 'wallSelection';
+            tournament.state = "playing";
+            game.state = "wallSelection";
             tournament.keyboardEnter = false;
         }
     }
-    if (tournament.state === 'playing') {
+    if (tournament.state === "playing") {
         if (game.state === "wallSelection") {
             drawWallSelection(game);
-        }
-        else {
+        } else {
             updateGame(deltaTime, game);
             drawGame(game);
-            if (game.player.score == tournament.winningScore || game.player2.score == tournament.winningScore) {
+            if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
                 let winner, loser;
                 if (game.player.score > game.player2.score) {
                     winner = tournament.players[currentMatchIndex];
@@ -248,48 +246,22 @@ const tournamentLoop = async (tournament, game, currentMatchIndex) => {
                     currentMatchIndex = 0;
                 }
                 if (tournament.players.length === 1) {
-                    game.state = 'gameOver';
+                    game.state = "gameOver";
                     drawWinner(tournament.players[0], game.canvas);
 
-                    const winner = tournament.players[0];
+                    const winnerId = tournament.players[0].userId;
                     const creator = tournament.allPlayers[0];
 
-                    if (!creator.userId) {
-                        console.warn("No valid userId for creator; skipping stats save");
-                        alert("❌ Cannot save stats: Creator not logged in.");
+                    if (creator.userId && winnerId) {
+                        await saveTournamentStats(tournament.tournamentId, winnerId, creator.userId);
                     } else {
-                        const winnerId = winner.userId;
-                        if (!winnerId) {
-                            console.warn("No valid winner_id; skipping stats save");
-                            alert("❌ Cannot save stats: Winner has no valid userId.");
-                        } else {
-                            console.log(
-                                `Saving stats for creator user_id=${creator.userId}, winner_id=${winnerId}`
-                            );
-                            const statsResponse = await apiRequest(
-                                `tournaments/${tournament.tournamentId}/stats/?user_id=${creator.userId}`,
-                                "PATCH",
-                                {
-                                    winner_id: winnerId
-                                }
-                            );
-                            if (statsResponse.errors) {
-                                console.error(
-                                    `Failed to save stats for ${creator.name} (user_id=${creator.userId}):`,
-                                    statsResponse.errors
-                                );
-                                alert(
-                                    `❌ Failed to save stats for ${creator.name}: ${JSON.stringify(statsResponse.errors)}`
-                                );
-                            } else {
-                                console.log(`✅ Stats saved for ${creator.name}`);
-                            }
-                        }
+                        console.warn("Cannot save stats: Invalid creator.userId or winnerId", { creator, winnerId });
+                        alert("❌ Cannot save tournament stats: Invalid user IDs.");
                     }
 
                     return;
                 }
-                tournament.state = 'table';
+                tournament.state = "table";
                 resetGame(game);
             }
         }

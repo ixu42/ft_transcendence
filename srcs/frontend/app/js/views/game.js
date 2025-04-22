@@ -74,7 +74,7 @@ const setupGameJs = async () => {
                         display_name: loggedInUsers.find(u => u.id == currentUserId).username
                     })
                     if (response.error) { throw new Error(response.error); }
-                    initializeTournament(response);
+                    initializeTournament(response, currentUserId);
                     break;
                 case "1v1":
                     response = await apiRequest(`users/${currentUserId}/games/local/`, 'POST');
@@ -115,3 +115,23 @@ async function saveGameStats(gameId, player1Score, player2Score, userId)
         console.log('Failed to save game stats:', response.error || response.errors);
     }
 }
+
+const saveTournamentStats = async (tournamentId, winnerId, userId) => {
+    try {
+        console.log(`Saving tournament stats: tournamentId=${tournamentId}, winnerId=${winnerId}, userId=${userId}`);
+        const response = await apiRequest(
+            `tournaments/${tournamentId}/stats/?user_id=${userId}`,
+            "PATCH",
+            { winner_id: winnerId }
+        );
+        if (response.errors) {
+            console.error("Failed to save tournament stats:", response.errors);
+            alert(`❌ Failed to save tournament stats: ${JSON.stringify(response.errors)}`);
+        } else {
+            console.log("Tournament stats saved successfully:", response);
+        }
+    } catch (error) {
+        console.error("Error saving tournament stats:", error);
+        alert("❌ Error saving tournament stats.");
+    }
+};
