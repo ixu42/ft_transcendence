@@ -14,7 +14,7 @@ const setupGameJs = async () => {
                 .map(user => `${user.id}: ${user.username}`)
                 .join("\n");
             const selected = window.prompt(
-                "Multiple users are logged in. Please enter your user ID for the game:\n" + userOptions
+                "Please enter your user ID to create the game:\n" + userOptions
             );
             if (!selected) {
                 window.location.hash = "#lobby";

@@ -3,16 +3,17 @@ const setupTournament = async (response) => {
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
 
-    // Step 1: Check if there are at least 3 logged-in users (including creator)
-    if (loggedInUsers.length < 3) {
-        alert("❌ Tournament requires exactly 3 logged-in users. Found: " + loggedInUsers.length);
-        return null;
-    }
-
-    // Step 2: Verify the creator is logged in
+    // Step 1: Verify the creator is logged in
     const creator = loggedInUsers.find(user => user.username === creatorUsername);
     if (!creator) {
         alert("❌ Tournament creator must be logged in.");
+        return null;
+    }
+
+    // Step 2: Check if there are at least 2 potential players (logged-in or guest)
+    // Creator is already included, so we need 2 more players
+    if (loggedInUsers.length < 1) {
+        alert("❌ At least one logged-in user (creator) is required.");
         return null;
     }
 
@@ -26,57 +27,97 @@ const setupTournament = async (response) => {
         }
     ];
 
-    // Step 4: Prompt to select exactly 2 additional logged-in players
-    const potentialPlayers = loggedInUsers.filter(
+    // Step 4: Prompt to select exactly 2 additional players (logged-in or guest)
+    const potentialLoggedInPlayers = loggedInUsers.filter(
         user => user.username !== creatorUsername
     );
-    let playerOptions = potentialPlayers
+    let playerOptions = potentialLoggedInPlayers
         .map(user => `${user.id}: ${user.username}`)
         .join("\n");
+    playerOptions += "\nOr enter a guest username (e.g., guest123)";
 
-    while (players.length < 3 && potentialPlayers.length > 0) {
+    while (players.length < 3) {
         const selectedPlayer = window.prompt(
-            `Select a logged-in user to join the tournament (need ${3 - players.length} more):\n${playerOptions}`
+            `Select a logged-in user by ID or enter a guest username (need ${3 - players.length} more):\n${playerOptions}`
         );
         if (!selectedPlayer) {
             alert("❌ Tournament requires exactly 3 players. Selection cancelled.");
             return null;
         }
 
-        const playerId = selectedPlayer.trim();
-        const player = potentialPlayers.find(p => p.id.toString() === playerId);
-        if (!player) {
-            alert("❌ Invalid player selection.");
-            continue;
-        }
+        const input = selectedPlayer.trim();
+        let player, playerId, displayName;
 
-        // Join player via API
-        const joinResponse = await apiRequest(
-            `tournaments/${tournamentId}/players/?user_id=${playerId}`,
-            "PATCH",
-            {
-                display_name: player.username
+        // Check if input is a logged-in user ID
+        if (potentialLoggedInPlayers.find(p => p.id.toString() === input)) {
+            player = potentialLoggedInPlayers.find(p => p.id.toString() === input);
+            playerId = player.id;
+            displayName = player.username;
+
+            // Join logged-in player via API
+            const joinResponse = await apiRequest(
+                `tournaments/${tournamentId}/players/?user_id=${playerId}`,
+                "PATCH",
+                { display_name: displayName }
+            );
+            if (joinResponse.errors) {
+                alert(`❌ Failed to add ${displayName}: ${JSON.stringify(joinResponse.errors)}`);
+                continue;
             }
-        );
-        if (joinResponse.errors) {
-            alert(`❌ Failed to add ${player.username}: ${JSON.stringify(joinResponse.errors)}`);
-            continue;
+
+            // Add logged-in player to tournament
+            players.push({
+                name: displayName,
+                userId: playerId,
+                score: 0,
+                matches: 0
+            });
+            console.log(`✅ ${displayName} (logged-in) joined tournament ${tournamentId}`);
+
+            // Remove selected player from potential logged-in players
+            potentialLoggedInPlayers.splice(potentialLoggedInPlayers.indexOf(player), 1);
+        } else {
+            // Assume input is a guest username
+            displayName = input;
+
+            // Fetch guest ID
+            const guestResponse = await apiRequest(
+                `get-guest-id/?username=${encodeURIComponent(displayName)}`,
+                "GET",
+                null
+            );
+            if (guestResponse.errors || !guestResponse.id) {
+                alert(`❌ Failed to fetch guest ID for ${displayName}: ${JSON.stringify(guestResponse.errors || "No guest ID returned")}`);
+                continue;
+            }
+            playerId = guestResponse.id;
+
+            // Join guest player via API
+            const joinResponse = await apiRequest(
+                `tournaments/${tournamentId}/players/?user_id=${playerId}`,
+                "PATCH",
+                { display_name: displayName }
+            );
+            if (joinResponse.errors) {
+                alert(`❌ Failed to add guest ${displayName}: ${JSON.stringify(joinResponse.errors)}`);
+                continue;
+            }
+
+            // Add guest player to tournament
+            players.push({
+                name: displayName,
+                userId: playerId,
+                score: 0,
+                matches: 0
+            });
+            console.log(`✅ ${displayName} (guest) joined tournament ${tournamentId}`);
         }
 
-        // Add player to tournament
-        players.push({
-            name: player.username,
-            userId: player.id,
-            score: 0,
-            matches: 0
-        });
-        console.log(`✅ ${player.username} joined tournament ${tournamentId}`);
-
-        // Remove selected player from potential players
-        potentialPlayers.splice(potentialPlayers.indexOf(player), 1);
-        playerOptions = potentialPlayers
+        // Update player options
+        playerOptions = potentialLoggedInPlayers
             .map(user => `${user.id}: ${user.username}`)
             .join("\n");
+        playerOptions += "\nOr enter a guest username (e.g., guest123)";
     }
 
     // Step 5: Verify exactly 3 players
@@ -94,16 +135,16 @@ const setupTournament = async (response) => {
 
     // Step 7: Log and return tournament data
     console.log("Tournament initialized with 3 players:", players);
-    const isTournamentRunning = false; // Initialize tournament state
+    const isTournamentRunning = false;
 
     return {
-        players,                   
-        allPlayers: [...players],   // Copy of players for reference (from Stashed changes)
-        winningScore,               // Winning score for the tournament
-        keyboardEnter: false,       // Keyboard input state
-        state: "table",            // Initial tournament state
-        tournamentId,              // Tournament ID (from Stashed changes)
-        isTournamentRunning        // Tournament running state (from Updated upstream)
+        players,
+        allPlayers: [...players],
+        winningScore,
+        keyboardEnter: false,
+        state: "table",
+        tournamentId,
+        isTournamentRunning
     };
 };
 
@@ -146,13 +187,13 @@ const initializeTournament = async (response) => {
     const game = createGame();
     game.winningScore = tournament.winningScore;
     setupTournamentControls(tournament);
-    setupControls(game.player, game.player2, game, gameId);
+    setupControls(game.player, game.player2, game, response.game_id);
     setupWindowEvents(game);
     setupWindowEventsTournament(tournament);
     
     let currentMatchIndex = 0;
     tournament.isTournamentRunning = true;
-    tournamentLoop(tournament, game, currentMatchIndex, gameId);
+    tournamentLoop(tournament, game, currentMatchIndex, response.game_id);
 };
 
 
