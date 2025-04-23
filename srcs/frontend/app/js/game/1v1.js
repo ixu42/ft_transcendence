@@ -115,16 +115,16 @@ const resetGame = (game) => {
     resetBall(game.ball, game.canvas);
 };
 
-const startGameLoop = (game) => {
+const startGameLoop = (game, onGameEnd) => {
     game.isGameRunning = true;
-    gameLoop(game);
+    gameLoop(game, onGameEnd);
 }
 
 const stopGameLoop = (game) => {
     game.isGameRunning = false;
 }
 
-const gameLoop = (game) => {
+const gameLoop = (game, onGameEnd) => {
     if (game.isGameRunning == false)
         return;
     
@@ -147,9 +147,13 @@ const gameLoop = (game) => {
     }
     if (game.state === "gameOver") {
         drawGameOver(game);
+        game.isGameRunning = false;
+        if (onGameEnd) {
+            onGameEnd();
+        }
         return;
     }
-    requestAnimationFrame(() => gameLoop(game));
+    requestAnimationFrame(() => gameLoop(game, onGameEnd));
 };
 
 const initializeGame = (gameId, userId) => {

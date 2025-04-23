@@ -205,11 +205,7 @@ const tournamentLoop = async (tournament, game, currentMatchIndex) => {
     if (tournament.isTournamentRunning === false) {
         return;
     }
-    const currentTime = performance.now();
-    const deltaTime = currentTime - game.lastTime;
-    game.lastTime = currentTime;
-
-    if (tournament.state === "table") {
+    if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
             tournament.state = "prepare";
@@ -224,49 +220,34 @@ const tournamentLoop = async (tournament, game, currentMatchIndex) => {
             tournament.keyboardEnter = false;
         }
     }
-    if (tournament.state === "playing") {
-        if (game.state === "wallSelection") {
-            drawWallSelection(game);
-        } else {
-            updateGame(deltaTime, game);
-            drawGame(game);
-            if (game.player.score === tournament.winningScore || game.player2.score === tournament.winningScore) {
-                let winner, loser;
-                if (game.player.score > game.player2.score) {
-                    winner = tournament.players[currentMatchIndex];
-                    loser = tournament.players[currentMatchIndex + 1];
-                } else {
-                    winner = tournament.players[currentMatchIndex + 1];
-                    loser = tournament.players[currentMatchIndex];
-                }
-                winner.score++;
-                tournament.players = tournament.players.filter(player => player !== loser);
-                currentMatchIndex++;
-                if (currentMatchIndex >= tournament.players.length - 1) {
-                    currentMatchIndex = 0;
-                }
-                if (tournament.players.length === 1) {
-                    game.state = "gameOver";
-                    drawWinner(tournament.players[0], game.canvas);
-
-                    const winnerId = tournament.players[0].userId;
-                    const creator = tournament.allPlayers[0];
-
-                    if (creator.userId && winnerId) {
-                        await saveTournamentStats(tournament.tournamentId, winnerId, creator.userId);
-                    } else {
-                        console.warn("Cannot save stats: Invalid creator.userId or winnerId", { creator, winnerId });
-                        alert("❌ Cannot save tournament stats: Invalid user IDs.");
-                    }
-
-                    return;
-                }
-                tournament.state = "table";
-                resetGame(game);
+    if (tournament.state === 'playing') {
+        startGameLoop(game, () => {
+            let winner, loser;
+            if (game.player.score > game.player2.score) {
+                winner = tournament.players[currentMatchIndex];
+                loser = tournament.players[currentMatchIndex + 1];
+            } else {
+                winner = tournament.players[currentMatchIndex + 1];
+                loser = tournament.players[currentMatchIndex];
             }
-        }
+            winner.score++;
+            tournament.players = tournament.players.filter(player => player !== loser);
+            currentMatchIndex++;
+            if (currentMatchIndex >= tournament.players.length - 1) {
+                currentMatchIndex = 0;
+            }
+            if (tournament.players.length === 1) {
+                tournament.state = 'gameOver';
+                drawWinner(tournament.players[0], game.canvas);
+                return;
+            }
+            tournament.state = 'table';
+            resetGame(game);
+            tournamentLoop(tournament, game, currentMatchIndex, gameId);
+        });
+        return;
     }
-    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex));
+    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex, gameId));
 };
 
 const drawTable = (players, canvas) => {
