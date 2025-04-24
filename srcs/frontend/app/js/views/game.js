@@ -116,22 +116,30 @@ async function saveGameStats(gameId, player1Score, player2Score, userId)
     }
 }
 
-const saveTournamentStats = async (tournamentId, winnerId, userId) => {
+async function saveTournamentStats(tournamentId, winnerId) {
     try {
-        console.log(`Saving tournament stats: tournamentId=${tournamentId}, winnerId=${winnerId}, userId=${userId}`);
-        const response = await apiRequest(
-            `tournaments/${tournamentId}/stats/?user_id=${userId}`,
-            "PATCH",
-            { winner_id: winnerId }
+        const response = await fetch(
+            `/api/tournaments/${tournamentId}/stats/?user_id=${encodeURIComponent(winnerId)}`,
+            {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': await getCSRFCookie(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ winner_id: winnerId })
+            }
         );
-        if (response.errors) {
-            console.error("Failed to save tournament stats:", response.errors);
-            alert(`❌ Failed to save tournament stats: ${JSON.stringify(response.errors)}`);
-        } else {
-            console.log("Tournament stats saved successfully:", response);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error saving tournament stats:', errorData);
+            alert(`Failed to save tournament stats: ${errorData.errors || response.statusText}`);
+            return;
         }
+        console.log('Tournament stats saved successfully!');
     } catch (error) {
-        console.error("Error saving tournament stats:", error);
-        alert("❌ Error saving tournament stats.");
+        console.error('Error saving tournament stats:', error);
+        alert('Something went wrong while saving tournament stats.');
     }
-};
+}
+

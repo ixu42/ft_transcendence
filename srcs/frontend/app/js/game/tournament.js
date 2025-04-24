@@ -193,7 +193,7 @@ const initializeTournament = async (response, currentUserId) => {
 
     let currentMatchIndex = 0;
     tournament.isTournamentRunning = true;
-    tournamentLoop(tournament, game, currentMatchIndex);
+    tournamentLoop(tournament, game, currentMatchIndex, response.game_id);
 };
 
 
@@ -201,22 +201,22 @@ const stopTournamentLoop = (tournament) => {
     tournament.isTournamentRunning = false;
 }
 
-const tournamentLoop = async (tournament, game, currentMatchIndex) => {
+const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
     if (tournament.isTournamentRunning === false) {
         return;
     }
     if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
         if (tournament.keyboardEnter) {
-            tournament.state = "prepare";
+            tournament.state = 'prepare';
             tournament.keyboardEnter = false;
         }
     }
-    if (tournament.state === "prepare") {
+    if (tournament.state === 'prepare') {
         drawMatch(tournament.players, game.canvas, currentMatchIndex);
         if (tournament.keyboardEnter) {
-            tournament.state = "playing";
-            game.state = "wallSelection";
+            tournament.state = 'playing';
+            game.state = 'wallSelection';
             tournament.keyboardEnter = false;
         }
     }
@@ -239,15 +239,20 @@ const tournamentLoop = async (tournament, game, currentMatchIndex) => {
             if (tournament.players.length === 1) {
                 tournament.state = 'gameOver';
                 drawWinner(tournament.players[0], game.canvas);
+                saveTournamentStats(tournament.tournamentId, tournament.players[0].userId);
                 return;
             }
             tournament.state = 'table';
             resetGame(game);
-            tournamentLoop(tournament, game, currentMatchIndex, gameId);
+            tournamentLoop(tournament, game, currentMatchIndex, game_id);
         });
         return;
     }
-    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex, gameId));
+    if (tournament.state === 'gameOver') {
+        drawWinner(tournament.players[0], game.canvas);
+        return;
+    }
+    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex, game_id));
 };
 
 const drawTable = (players, canvas) => {
