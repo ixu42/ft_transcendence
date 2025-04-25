@@ -8,7 +8,6 @@ from .forms import TournamentCreationForm, TournamentJoiningForm
 from .models import Tournament
 
 User = get_user_model()
-guest = User.objects.get(username="guest_player")
 
 
 def custom_login_required(view_func):
@@ -36,6 +35,7 @@ def custom_login_required(view_func):
                 {"errors": f"User not found with user_id {user_id}."}, status=404
             )
 
+        guest = User.objects.get(username="guest_player")
         if user_id != guest.id:
             cookie_name = f"session_{user_id}"
             session_cookie = request.COOKIES.get(cookie_name)

@@ -14,7 +14,7 @@ const setupGameJs = async () => {
                 .map(user => `${user.id}: ${user.username}`)
                 .join("\n");
             const selected = window.prompt(
-                "Multiple users are logged in. Please enter your user ID for the game:\n" + userOptions
+                "Please enter your user ID to create the game:\n" + userOptions
             );
             if (!selected) {
                 window.location.hash = "#lobby";
@@ -69,9 +69,12 @@ const setupGameJs = async () => {
         } else if (type === "local") {
             switch (mode) {
                 case "tournament":
-                    response = await apiRequest(`users/${currentUserId}/games/local/`, 'POST');
+                    response = await apiRequest(`tournaments/?user_id=${currentUserId}`, "POST", {
+                        tournament_name: `${loggedInUsers.find(u => u.id == currentUserId).username}'s tournament`,
+                        display_name: loggedInUsers.find(u => u.id == currentUserId).username
+                    })
                     if (response.error) { throw new Error(response.error); }
-                    initializeTournament(response.game_id);
+                    initializeTournament(response, currentUserId);
                     break;
                 case "1v1":
                     response = await apiRequest(`users/${currentUserId}/games/local/`, 'POST');
@@ -112,3 +115,31 @@ async function saveGameStats(gameId, player1Score, player2Score, userId)
         console.log('Failed to save game stats:', response.error || response.errors);
     }
 }
+
+async function saveTournamentStats(tournamentId, winnerId) {
+    try {
+        const response = await fetch(
+            `/api/tournaments/${tournamentId}/stats/?user_id=${encodeURIComponent(winnerId)}`,
+            {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': await getCSRFCookie(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ winner_id: winnerId })
+            }
+        );
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error saving tournament stats:', errorData);
+            alert(`Failed to save tournament stats: ${errorData.errors || response.statusText}`);
+            return;
+        }
+        console.log('Tournament stats saved successfully!');
+    } catch (error) {
+        console.error('Error saving tournament stats:', error);
+        alert('Something went wrong while saving tournament stats.');
+    }
+}
+

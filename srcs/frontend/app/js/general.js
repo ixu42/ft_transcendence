@@ -4,6 +4,15 @@ function getLoggedInUsers() {
     return JSON.parse(localStorage.getItem('loggedInUsers') || '[]');
 }
 
+function debounce(func, wait) {
+    let timeout;
+    console.log("Debounce function initialized with wait time:", wait);
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 function addOrUpdateLoggedInUser(user) {
     const sanitizedUser = {
         id: user.id,

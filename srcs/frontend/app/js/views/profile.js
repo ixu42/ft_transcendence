@@ -70,7 +70,7 @@ const fetchProfileData = async (userId) => {
             
             if (response.status === 403 || response.status === 401) {
                 alert("❌ You are not authorized. Redirecting to login.");
-                removeLoggedInUser(userId);
+                //removeLoggedInUser(userId);
                 window.location.hash = "#login";
             }
             return;
