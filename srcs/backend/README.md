@@ -1103,3 +1103,34 @@ Save the stats of a completed tournament.
 
 </details>
 ````
+
+---
+
+### Get data of all logged-in users
+
+<details>
+    <summary>
+        <code>GET</code>
+        <code><b>users/</b></code>
+    </summary>
+
+- **Response**
+  - **200**
+    ```json
+    {
+        "users": [
+            {
+                "id": 3,
+                "username": "test1"
+            },
+            {
+                "id": 4,
+                "username": "test2"
+            },
+            "... more items ..."
+        ]
+    }
+    ```
+
+</details>
+````

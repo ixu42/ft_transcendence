@@ -393,6 +393,7 @@ def heartbeat(request, user_id):
     return JsonResponse({"message": "Heartbeat updated."})
 
 
+@require_GET
 def get_logged_in_users(request):
     user_ids = []
 
