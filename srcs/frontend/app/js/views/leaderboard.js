@@ -25,22 +25,31 @@ const renderLeaderboard = (playersData, currentPage) => {
     const prevButton = document.getElementById('leaderboard-prev-btn');
     const nextButton = document.getElementById('leaderboard-next-btn');
 
-    const sortedPlayers = playersData.sort((a, b) => b.score - a.score || a.rank - b.rank);
+    const sortedPlayers = playersData.sort((a, b) => b.total_wins - a.total_wins || a.rank - b.rank);
     const start = (currentPage - 1) * playersPerPage;
     const playersToShow = sortedPlayers.slice(start, start + playersPerPage);
 
     leaderboardList.innerHTML = `
         <li class="leaderboard-header">
             <span class="rank-header">Rank</span>
+            <span class="player-id-header">ID</span>
+            <span class="avatar-header"></span>
+            <span class="username-header">Username</span>
             <span class="score-header">Wins</span>
+            <span class="win-rate-header">Win Rate</span>
         </li>
         ${playersToShow.map(player => `
             <li class="leaderboard-item">
-                <span class="rank">${player.total_wins > 0 ? `#${player.rank}` : '?'}</span>
-                <span class="player-id">ID: ${player.id}</span>
+                <span class="rank">${
+                    player.total_wins > 0 
+                        ? `#${player.rank}` 
+                        : '<span class="rank-tooltip">?<span class="tooltip-text">Play a game to get ranked!</span></span>'
+                }</span>
+                <span class="player-id">${player.id}</span>
                 <img src="${fixAvatarURL(player.avatar)}" alt="${player.username}'s avatar" class="avatar">
                 <span class="username">${player.username}</span>
                 <span class="score">${player.total_wins}</span>
+                <span class="win-rate">${player.win_rate.toFixed(1)}%</span>
             </li>
         `).join('')}
     `;

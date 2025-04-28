@@ -4,152 +4,185 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 40, 0.8));
     color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 10;
-    padding: 20px;
+    padding: 30px;
+    font-family: 'Arial', sans-serif;
 }
 
 #leaderboard-container h2 {
-    font-size: 2.2rem;
-    margin-bottom: 20px;
+    font-size: 2.5rem;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #f39c12;
+    text-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
 }
 
 #leaderboard ul {
     list-style: none;
     padding: 0;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Leaderboard Header */
 .leaderboard-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 80px 80px 60px 1fr 100px 100px;
     align-items: center;
-    padding: 15px 0;
-    border-bottom: 3px solid #fff;
-    margin-bottom: 10px;
-    font-size: 1.3rem;
+    padding: 15px 20px;
+    border-bottom: 3px solid #f39c12;
+    font-size: 1.2rem;
     font-weight: bold;
+    text-transform: uppercase;
+    color: #f39c12;
 }
 
 .leaderboard-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 80px 80px 60px 1fr 100px 100px;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px 0;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-    margin: 12px 0;
-    font-size: 1.2rem;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 1.1rem;
+    transition: background 0.2s ease;
+}
+
+.leaderboard-item:hover {
+    background: rgba(243, 156, 18, 0.1);
 }
 
 .leaderboard-item .rank {
-    width: 70px; /* Adjusted */
     text-align: center;
     font-weight: bold;
     color: #f39c12;
 }
 
+.rank-tooltip {
+    position: relative;
+    cursor: pointer;
+}
+
+.rank-tooltip .tooltip-text {
+    visibility: hidden;
+    width: 140px;
+    background-color: #f39c12;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.rank-tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
 .leaderboard-item img.avatar {
-    width: 50px; /* Increased */
-    height: 50px; /* Increased */
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    margin-right: 15px;
+    border: 2px solid #f39c12;
+    object-fit: cover;
 }
 
 .leaderboard-item .player-id {
-    width: 80px;
+    text-align: center;
     font-size: 1rem;
     color: #aaa;
-    font-weight: bold;
-    text-align: center;
+    font-weight: 500;
 }
 
 .leaderboard-item .username {
     font-size: 1.2rem;
     font-weight: bold;
-    margin-right: 15px;
     color: #fff;
-    max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .leaderboard-item .score {
-    width: 110px; /* Adjusted */
-    text-align: right;
+    text-align: center;
     font-size: 1.1rem;
     color: #f39c12;
     font-weight: bold;
 }
 
-/* Pagination Buttons */
-.leaderboard-pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
-}
-/* Pagination Buttons */
-.leaderboard-pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
+.leaderboard-item .win-rate {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #f39c12;
+    font-weight: bold;
 }
 
-/* Leaderboard Pagination Buttons */
 .leaderboard-pagination {
     display: flex;
     justify-content: center;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .leaderboard-pagination-btn {
-    background-color: #f39c12;
+    background: linear-gradient(45deg, #f39c12, #e67e22);
     border: none;
     color: white;
     font-size: 1rem;
-    padding: 12px 20px;
-    margin: 0 5px;
+    padding: 12px 25px;
+    margin: 0 10px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 25px;
     font-weight: bold;
-    transition: background 0.3s ease-in-out;
+    text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .leaderboard-pagination-btn:hover {
-    background-color: #e67e22;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.5);
 }
 
 .leaderboard-pagination-btn:disabled {
-    background-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-/* Initially hide the Prev button */
 #leaderboard-prev-btn {
     display: none;
 }
 
-/* Leaderboard Menu Button */
 .leaderboard-menu-btn {
     display: inline-block;
-    margin-top: 20px; /* Added margin */
-    padding: 10px 15px;
-    background-color: #555;
+    margin-top: 25px;
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #555, #777);
     color: white;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 25px;
     font-weight: bold;
-    transition: background 0.3s ease-in-out;
+    text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .leaderboard-menu-btn:hover {
-    background-color: #777;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(119, 119, 119, 0.5);
 }
