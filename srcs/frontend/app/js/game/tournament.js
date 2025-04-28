@@ -455,18 +455,19 @@ const drawMatch = (players, canvas, matchIndex) => {
     );
     context.fillText('Press Enter to start', canvas.width / 2 - 50, 150);
     context.fillText('Current Standings:', canvas.width / 2 - 50, 220);
-    context.font = '20px Arial'; // Smaller font for standings to fit W/L
+    context.font = '20px Arial';
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-    let y = 250; // Adjusted y-coordinate for standings
+    let y = 250;
     for (let i = 0; i < sortedPlayers.length; i++) {
         context.fillText(
-            `${i + 1}. ${sortedPlayers[i].name}: ${sortedPlayers[i].score} W ${sortedPlayers[i].losses} L`,
+            `${i + 1}. ${sortedPlayers[i].name}: ${sortedPlayers[i].score} W`,
             canvas.width / 2 - 50,
             y
         );
-        y += 30; // Reduced spacing to fit more players
+        y += 30;
     }
 };
+
 
 const drawWinner = (player, canvas) => {
     const context = canvas.getContext('2d');
