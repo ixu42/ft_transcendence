@@ -402,7 +402,8 @@ For the authenticated user to view their participated tournaments related info, 
                     "user1",
                     "user2",
                     "user3"
-                ]
+                ],
+                "winner": "user1",
             }
             "... more items ..."
         ]

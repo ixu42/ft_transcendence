@@ -317,6 +317,7 @@ def participated_tournaments(request, user_id):
             "status": tournament.status,
             "started_at": tournament.started_at,
             "players": tournament.get_players,
+            "winner": tournament.winner.username,
         }
         for tournament in participated_tournaments
     ]
