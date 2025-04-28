@@ -2,6 +2,7 @@ const setupTournament = async (response) => {
     const tournamentId = response.tournament_id;
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+    const MAX_PLAYERS = 6; // Add this constant at the top
 
     // Helper function to redirect to #lobby
     function redirectToLobby() {
@@ -56,10 +57,10 @@ const setupTournament = async (response) => {
         }
     ];
 
-    // Step 4: Prompt for the desired number of players (minimum 3)
+    // Step 4: Prompt for the desired number of players (minimum 3, maximum 6)
     let targetPlayerCount;
     while (!targetPlayerCount) {
-        const input = prompt("Enter the number of players for the tournament (minimum 3):");
+        const input = prompt(`Enter the number of players for the tournament (minimum 3, maximum ${MAX_PLAYERS}):`);
         if (input === null) {
             return redirectToLobby();
         }
@@ -68,8 +69,8 @@ const setupTournament = async (response) => {
             continue;
         }
         targetPlayerCount = parseInt(input, 10);
-        if (isNaN(targetPlayerCount) || targetPlayerCount < 3) {
-            alert("❌ Number of players must be a positive integer ≥ 3.");
+        if (isNaN(targetPlayerCount) || targetPlayerCount < 3 || targetPlayerCount > MAX_PLAYERS) {
+            alert(`❌ Number of players must be between 3 and ${MAX_PLAYERS}.`);
             targetPlayerCount = null;
             continue;
         }
@@ -80,15 +81,21 @@ const setupTournament = async (response) => {
         user => user.username !== creatorUsername
     );
 
-    while (players.length < targetPlayerCount) {
+    while (players.length < targetPlayerCount && players.length < MAX_PLAYERS) {
+        // Check if we've reached the maximum players
+        if (players.length >= MAX_PLAYERS) {
+            alert(`✅ Maximum number of players (${MAX_PLAYERS}) reached. Starting tournament.`);
+            break;
+        }
+
         let playerOptions = potentialLoggedInPlayers
             .map(user => `${user.id}: ${user.username}`)
             .join("\n");
         playerOptions += "\nOr enter a guest username (e.g., guest123)";
-        playerOptions += `\nEnter 'done' to start the tournament (current players: ${players.length})`;
+        playerOptions += `\nEnter 'done' to start the tournament (current players: ${players.length}/${targetPlayerCount})`;
 
         const selectedPlayer = window.prompt(
-            `Select a logged-in user by ID, enter a guest username, or type 'done' to start (need at least 2 players):\n${playerOptions}`
+            `Select a logged-in user by ID, enter a guest username, or type 'done' to start (need at least 2 players, max ${MAX_PLAYERS}):\n${playerOptions}`
         );
 
         if (selectedPlayer === null) {
@@ -130,7 +137,7 @@ const setupTournament = async (response) => {
                 if (joinResponse.errors) {
                     alert(`❌ Failed to add ${displayName}: ${JSON.stringify(joinResponse.errors)}. Please try again.`);
                     const retry = window.prompt(
-                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start:\n${playerOptions}`
+                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start (max ${MAX_PLAYERS} players):\n${playerOptions}`
                     );
                     if (retry === null) {
                         return redirectToLobby();
@@ -157,7 +164,7 @@ const setupTournament = async (response) => {
                     }
                     input = retry.trim();
                     player = potentialLoggedInPlayers.find(p => p.id.toString() === input);
-                    if (!player) break; // Proceed to guest logic if retry input isn’t a logged-in user ID
+                    if (!player) break; // Proceed to guest logic if retry input isn't a logged-in user ID
                     playerId = player.id;
                     displayName = player.username;
                 }
@@ -191,7 +198,7 @@ const setupTournament = async (response) => {
                 if (guestResponse.errors || !guestResponse.id) {
                     alert(`❌ Failed to fetch guest ID for ${displayName}: ${JSON.stringify(guestResponse.errors || "No guest ID returned")}. Please enter a different username.`);
                     const retry = window.prompt(
-                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start:\n${playerOptions}`
+                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start (max ${MAX_PLAYERS} players):\n${playerOptions}`
                     );
                     if (retry === null) {
                         return redirectToLobby();
@@ -236,7 +243,7 @@ const setupTournament = async (response) => {
                 if (joinResponse.errors) {
                     alert(`❌ Failed to add guest ${displayName}: ${JSON.stringify(joinResponse.errors)}. Please enter a different username.`);
                     const retry = window.prompt(
-                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start:\n${playerOptions}`
+                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start (max ${MAX_PLAYERS} players):\n${playerOptions}`
                     );
                     if (retry === null) {
                         return redirectToLobby();
@@ -249,7 +256,7 @@ const setupTournament = async (response) => {
                         console.log(`✅ User chose to start tournament with ${players.length} players.`);
                         const winningScore = await promptWinningScore();
                         if (winningScore === null) {
-                            return null; // Redirect already handled in promptWinningScore
+                            return null;
                         }
                         return {
                             players,
@@ -441,9 +448,24 @@ const drawMatch = (players, canvas, matchIndex) => {
     context.font = '30px Arial';
     context.fillStyle = '#fff';
     context.fillText('Match', canvas.width / 2 - 50, 30);
-
-    context.fillText(`${players[matchIndex].name} vs ${players[matchIndex + 1].name}`, canvas.width / 2 - 50, 100);
+    context.fillText(
+        `${players[matchIndex].name} vs ${players[matchIndex + 1].name}`,
+        canvas.width / 2 - 50,
+        100
+    );
     context.fillText('Press Enter to start', canvas.width / 2 - 50, 150);
+    context.fillText('Current Standings:', canvas.width / 2 - 50, 220);
+    context.font = '20px Arial'; // Smaller font for standings to fit W/L
+    const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+    let y = 250; // Adjusted y-coordinate for standings
+    for (let i = 0; i < sortedPlayers.length; i++) {
+        context.fillText(
+            `${i + 1}. ${sortedPlayers[i].name}: ${sortedPlayers[i].score} W ${sortedPlayers[i].losses} L`,
+            canvas.width / 2 - 50,
+            y
+        );
+        y += 30; // Reduced spacing to fit more players
+    }
 };
 
 const drawWinner = (player, canvas) => {
