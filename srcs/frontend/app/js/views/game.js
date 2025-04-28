@@ -38,7 +38,7 @@ const setupGameJs = async () => {
             currentUserId = selectedUser;
         }
 
-        if ((mode === "1v1" || mode === "ai") && opponentId !== "guest") {
+        if ((mode === "1v1") && opponentId !== "guest") {
             const potentialOpponents = loggedInUsers.filter(
                 user => user.id.toString() !== currentUserId.toString()
             );
