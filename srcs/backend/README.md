@@ -736,9 +736,17 @@ Create a local 1v1 game for user1 (id as path parameter) and user2 (id as query 
       "game_id": 1
     }
     ```
+  - **400**
+    ```json
+    { "errors": "player1 and player2 cannot be the same user." }
+    ```
   - **401**
     ```json
     { "errors": "User is not authenticated." }
+    ```
+  - **404**
+    ```json
+    { "errors": "User not found with user_id 42." }
     ```
 
 </details>
@@ -789,6 +797,9 @@ Save the stats for a completed game for a logged-in user.
     "player2_score": 10
   }
   ```
+
+````
+
 - **Response**
   - **200**
     ```json
@@ -1090,3 +1101,4 @@ Save the stats of a completed tournament.
     ```
 
 </details>
+````
