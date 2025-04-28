@@ -28,7 +28,7 @@ const setupControls = async (player, player2, game, gameId, userId, isTournament
                 game.winningScore = 7;
                 game.state = 'wallSelection';
             } else if (key === '3') {
-                game.winningScore = -1;
+                game.winningScore = 20;
                 game.state = 'wallSelection';
             }
             return;
@@ -107,6 +107,14 @@ const setupWindowEvents = (game) => {
                 game.state = 'pause'; // Pause the game
                 console.log("Game paused because the tab is hidden");
             }
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        if (game.state === 'game') {
+            game.lastState = game.state; // Save the current state
+            game.state = 'pause'; // Pause the game
+            console.log("Game paused because the window lost focus");
         }
     });
 }

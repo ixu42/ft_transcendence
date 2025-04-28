@@ -243,7 +243,7 @@ const setupMatchHistoryModal = (userId) => {
             tournamentsContainer.innerHTML = "<p>No tournament data found.</p>";
             return;
         }
-
+    
         tournamentsContainer.innerHTML = tournaments.map(tournament => `
             <div class="tournament-item">
                 <p><strong>Tournament ID:</strong> ${tournament.id}</p>
@@ -251,6 +251,7 @@ const setupMatchHistoryModal = (userId) => {
                 <p><strong>Status:</strong> ${tournament.status}</p>
                 <p><strong>Started At:</strong> ${tournament.started_at ? new Date(tournament.started_at).toLocaleString() : 'Not started'}</p>
                 <p><strong>Players:</strong> ${tournament.players.join(", ")}</p>
+                <p><strong>Winner:</strong> ${tournament.winner || 'No winner yet'}</p>
             </div>
         `).join("");
     };
