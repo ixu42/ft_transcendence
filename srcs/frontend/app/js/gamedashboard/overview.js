@@ -25,9 +25,14 @@ async function initializeGameStatsOverview(userId) {
       <p><strong>Total Games:</strong> ${totalGames}</p>
       <p><strong>Average Score Per Match:</strong> ${avgScore}</p>
       <p><strong>Average Score Margin:</strong> ${avgMargin}</p>
+      <button class="basicbutton menu-btn" onclick="window.location.hash='dashy'" style="margin-top: 10px;">Back</button>
     `;
   } catch (err) {
     console.error("Error loading game stats overview:", err);
+    const container = document.getElementById("game-stats-overview");
+    container.innerHTML = `
+      <p>Error loading game stats. Please try again later.</p>
+      <button class="basicbutton menu-btn" onclick="window.location.hash='dashy'" style="margin-top: 10px;">Back</button>
+    `;
   }
 }
-
