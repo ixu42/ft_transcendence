@@ -5,11 +5,11 @@ async function initializeUserOverview(userId) {
       apiRequest(`users/${userId}/match-history/`, "GET"),
     ]);
 
-    -    // Check for errors in the API responses
--    if (user.error || matchData.error) {
--      throw new Error(user.error || matchData.error);
--    }
--
+//     -    // Check for errors in the API responses
+// -    if (user.error || matchData.error) {
+// -      throw new Error(user.error || matchData.error);
+// -    }
+// -
     const matches = Array.isArray(matchData.match_history) ? matchData.match_history : [];
     const totalMatches = matches.length;
     console.log("📦 match history raw response:", matches);

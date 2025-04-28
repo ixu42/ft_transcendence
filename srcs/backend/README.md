@@ -461,6 +461,30 @@ For the authenticated user to view their match history including date, winner, p
 
 ---
 
+### User scores
+
+Get sum of the scores of all games played by the user, as well as the number of games played.
+
+<details>
+    <summary><code>GET</code><code><b>users/{user_id}/scores/</b></code></summary>
+
+- **Response**
+  - **200**
+    ```json
+    {
+        "sum_of_scores": 100,
+        "total_games": 10
+    }
+    ```
+  - **401**
+    ```json
+    { "errors": "User is not authenticated." }
+    ```
+
+</details>
+
+---
+
 ### Leaderboard
 
 Get basic user info and game stats for all users.
