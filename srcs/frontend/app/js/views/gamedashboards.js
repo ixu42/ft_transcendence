@@ -11,7 +11,6 @@ const setupGameDashboardJs = async () => {
         const params = new URLSearchParams(window.location.hash.split("?")[1]);
         const section = params.get("section") || "overview";
 
-        console.log(`📈 Loading Game Stats | Section: ${section.toUpperCase()} | User ID: ${userId}`);
 
         switch (section) {
             case "overview":

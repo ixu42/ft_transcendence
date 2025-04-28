@@ -1,7 +1,6 @@
 
 
 function setupRegisterPageJs() {
-    console.log("Register page loaded");
     const registerForm = document.getElementById("register-form");
     if (registerForm) {
         attachRegisterEvent(registerForm);
@@ -13,7 +12,6 @@ function setupRegisterPageJs() {
 
 async function register({ username, password1, password2 }) {
     const csrfToken = await getCSRFCookie();
-    console.log("CSRF Token:", csrfToken);
 
     const response = await fetch("api/users/register/", {
         method: "POST",
@@ -25,7 +23,6 @@ async function register({ username, password1, password2 }) {
         body: JSON.stringify({ username, password1, password2 }),
     });
 
-    console.log("Sending request with body:", JSON.stringify({ username, password1, password2 }));
 
     const data = await safeParseJSON(response);
 
@@ -46,7 +43,6 @@ function attachRegisterEvent(form) {
             password2: document.getElementById("register-password2")?.value.trim(),
         };
 
-        console.log("Collected user data:", userData);
 
         if (!userData.username || !userData.password1 || !userData.password2) {
             console.warn("⚠️ Missing required fields. User data:", userData);

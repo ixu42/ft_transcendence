@@ -1,5 +1,4 @@
 const setupDashyJs = () => {
-    console.log("🏠 Dashy Loaded");
     bindDashyEventListeners();
 };
 

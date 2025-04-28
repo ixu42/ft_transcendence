@@ -36,7 +36,7 @@ class BaseTestCase(TestCase):
 
 class TestCreateLocalGame(BaseTestCase):
     def setUp(self):
-        self.url = reverse("users:games:create_local_game", args=[self.user1.id])
+        self.url = reverse("users:games:create_local_game_guest", args=[self.user1.id])
 
     def make_request(self, url=None):
         if not url:

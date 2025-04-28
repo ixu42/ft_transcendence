@@ -172,7 +172,6 @@ const setupAndStart = (gameId, userId, game) =>
 {
     setupControls(game.player, game.player2, game, gameId, userId);
     setupWindowEvents(game);
-    console.log("Starting game loop");
     startGameLoop(game, () => {
         if (getLoggedInUsers().length > 0) {
             saveGameStats(gameId, game.player.score, game.player2.score, userId);

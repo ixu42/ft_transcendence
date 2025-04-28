@@ -1,5 +1,4 @@
 const setupLobbyJs = () => {
-    console.log("🏠 Lobby Loaded");
     bindLobbyEventListeners();
 };
 

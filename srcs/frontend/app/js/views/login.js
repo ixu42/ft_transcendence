@@ -16,14 +16,11 @@ function checkAndShowSplash() {
     const splashScreen = document.querySelector(".splash-screen");
     const loginContainer = document.getElementById("login-container");
 
-    console.log("Checking localStorage splashShown:", localStorage.getItem("splashShown"));
 
     if (localStorage.getItem("splashShown") === "true") {
-        console.log("Splash already shown. Skipping...");
         splashScreen?.classList.add("hidden");
         loginContainer?.classList.remove("hidden");
     } else {
-        console.log("Splash not shown yet. Displaying splash screen...");
         splashScreen?.classList.remove("hidden");
     }
 }

@@ -86,7 +86,6 @@ const setupGameJs = async () => {
         }
 
         let response;
-        console.log(`🎮 Starting ${type.toUpperCase()} | Mode: ${mode.toUpperCase()} for user ${currentUserId}`);
 
         if (type === "online") {
             initializeOnlineGame(mode);
@@ -136,9 +135,7 @@ async function saveGameStats(gameId, player1Score, player2Score, userId)
 
     const response = await apiRequest(`users/${userId}/games/${gameId}/stats/`, 'PATCH', body);
     if (response.message === 'Game stats saved.') {
-        console.log('Game stats saved successfully');
     } else {
-        console.log('Failed to save game stats:', response.error || response.errors);
     }
 }
 
@@ -162,7 +159,6 @@ async function saveTournamentStats(tournamentId, winnerId) {
             alert(`Failed to save tournament stats: ${errorData.errors || response.statusText}`);
             return;
         }
-        console.log('Tournament stats saved successfully!');
     } catch (error) {
         console.error('Error saving tournament stats:', error);
         alert('Something went wrong while saving tournament stats.');

@@ -4,14 +4,12 @@ async function listAndSelectLoggedInUser() {
         const loggedInUsers = getLoggedInUsers();
         const activeUsers = loggedInUsers.filter(user => user.loggedIn);
 
-        console.log("CALLED listAndSelectLoggedInUser");
 
         if (activeUsers.length === 0) {
             console.error("❌ No logged-in users found.");
             return null;
         }
         if (activeUsers.length === 1) {
-            console.log(`✅ Auto-selecting user: ${activeUsers[0].username}`);
             return activeUsers[0].id;
         }
         const userList = activeUsers
@@ -22,7 +20,6 @@ async function listAndSelectLoggedInUser() {
         return new Promise((resolve) => {
             const userInput = prompt(promptMessage);
             if (userInput === null || userInput.trim() === '') {
-                console.log("❌ User selection cancelled or empty.");
                 resolve(null);
                 return;
             }
@@ -33,7 +30,6 @@ async function listAndSelectLoggedInUser() {
                 return;
             }
             const selectedUserId = activeUsers[selectedIndex].id;
-            console.log(`✅ Selected user ID: ${selectedUserId}`);
             resolve(selectedUserId);
         });
     } catch (error) {
@@ -54,7 +50,6 @@ async function syncLoggedInUsersWithBackend() {
             return getLoggedInUsers();
         }
         const backendUsers = response.users || [];
-        console.log('Fetched backend users:', backendUsers);
         for (const user of backendUsers) {
             await addOrUpdateLoggedInUser({
                 id: user.id,
@@ -63,7 +58,6 @@ async function syncLoggedInUsersWithBackend() {
             });
         }
 
-        console.log('Synced and updated all backend users');
         return getLoggedInUsers();
     } catch (error) {
         console.error('Sync error:', error);
@@ -73,7 +67,6 @@ async function syncLoggedInUsersWithBackend() {
 
 function debounce(func, wait) {
     let timeout;
-    console.log("Debounce function initialized with wait time:", wait);
     return function (...args) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(this, args), wait);
@@ -95,16 +88,13 @@ async function addOrUpdateLoggedInUser(user) {
         users.push(sanitizedUser);
     }
     localStorage.setItem('loggedInUsers', JSON.stringify(users));
-    console.log('User added/updated:', sanitizedUser);
 }
 
 async function removeLoggedInUser(userId) {
     await syncLoggedInUsersWithBackend();
 
     const users = getLoggedInUsers();
-    console.log("Before removal:", users);
     const updatedUsers = users.filter(u => u.id.toString() !== userId.toString());
-    console.log("After removal:", updatedUsers);
     localStorage.setItem('loggedInUsers', JSON.stringify(updatedUsers));
 }
 
@@ -124,11 +114,9 @@ async function getCSRFCookie() {
             ?.split('=')[1];
 
         if (!csrfToken) {
-            console.log("❌ CSRF Token not found.");
             return "";
         }
 
-        console.log("🔑 CSRF Token fetched:", csrfToken);
         return csrfToken;
     } catch (error) {
         console.error("❌ CSRF Token fetch error:", error);
@@ -210,7 +198,7 @@ const safeParseJSON = async response => {
         data = await clonedResponse.json();
     } catch (err) {
         console.warn("⚠️ Failed to parse JSON, returning text:", err);
-        data = await response.text(); // Fallback to plain text
+        data = await response.text();
     }
     return data;
 };
@@ -231,7 +219,6 @@ const session_check = async () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("✅ Session valid for user:", data.user_id);
                 validUsers.push(user);
             } else {
                 console.warn(`⚠️ Session expired for user ${userId}`);
@@ -240,8 +227,6 @@ const session_check = async () => {
             console.error(`❌ Error checking session for user ${userId}:`, err);
         }
     }
-    console.log("users:", users);
-    console.log("validUsers:", validUsers);
     if (users.length !== validUsers.length) {
         localStorage.setItem('loggedInUsers', JSON.stringify(validUsers));
     }

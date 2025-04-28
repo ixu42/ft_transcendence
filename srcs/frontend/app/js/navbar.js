@@ -1,5 +1,4 @@
 async function updateNavbar() {
-    console.log("Updating navbar...");
 
     const authButton = document.getElementById("tr-auth-btn");
     const profileDropdown = document.getElementById("profile-dropdown");
@@ -23,11 +22,9 @@ async function updateNavbar() {
 
     if (friendsButton) {
         if (isAnyUserLoggedIn) {
-            console.log("At least one user is logged in. Enabling friends dropdown...");
             friendsDropdown.style.display = "inline-block";
             setupFriendsButton(friendsButton);
         } else {
-            console.log("No users logged in. Hiding friends dropdown...");
             friendsDropdown.style.display = "none";
         }
     }
@@ -43,12 +40,10 @@ function handleLogout(userId) {
 }
 
 function populateProfileDropdown(container, userDataArray) {
-    console.log("Populating profile dropdown with user data:", userDataArray);
 
     const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
     const activeUsers = loggedInUsers.filter(user => user.loggedIn);
 
-    console.log("Active users:", activeUsers);
 
     const userEntries = activeUsers.length > 0
         ? activeUsers.map(user => {
@@ -155,10 +150,8 @@ async function setupFriendsButton(friendsButton) {
       const friendRequestsSection = document.getElementById("friend-requests-section");
       try {
         const friends = await fetchFriends(userId);
-        console.log(`Fetched friends for user ${userId}:`, friends);
         populateFriendsDropdown(friendsSection, friends, userId);
         const friendRequests = await fetchFriendRequests(userId);
-        console.log(`Fetched friend requests for user ${userId}:`, friendRequests);
         populateFriendRequests(friendRequestsSection, friendRequests, userId);
       } catch (error) {
         console.error(`Error fetching friends for user ${userId}:`, error);
@@ -234,7 +227,6 @@ async function setupFriendsButton(friendsButton) {
             alert(`Error: ${errorData.errors || response.statusText}`);
             return;
           }
-          console.log("Friend request sent successfully!");
           alert("Friend request sent!");
         } catch (error) {
           console.error("Friend request error:", error);
@@ -248,7 +240,6 @@ async function setupFriendsButton(friendsButton) {
 // Function to fetch friends
 async function fetchFriends(userId) {
     try {
-        console.log("Fetching friends for user ID:", userId);
 
         const response = await fetch(`/api/users/${userId}/friends/`, {
             method: "GET",
@@ -264,7 +255,6 @@ async function fetchFriends(userId) {
         }
 
         const data = await response.json();
-        console.log("Friends data:", data);
         return data.friends;
     } catch (error) {
         console.error("Error fetching friends:", error);
