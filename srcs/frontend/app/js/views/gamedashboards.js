@@ -4,6 +4,7 @@ const setupGameDashboardJs = async () => {
         const userId = await listAndSelectLoggedInUser();
         if (!userId) {
             console.error("❌ No user selected. Aborting dashboard setup.");
+            window.location.hash = "#dashy";
             return;
         }
 
