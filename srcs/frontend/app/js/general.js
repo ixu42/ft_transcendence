@@ -1,9 +1,7 @@
-
 async function listAndSelectLoggedInUser() {
     try {
         const loggedInUsers = getLoggedInUsers();
         const activeUsers = loggedInUsers.filter(user => user.loggedIn);
-
 
         if (activeUsers.length === 0) {
             console.error("❌ No logged-in users found.");
@@ -12,26 +10,31 @@ async function listAndSelectLoggedInUser() {
         if (activeUsers.length === 1) {
             return activeUsers[0].id;
         }
-        const userList = activeUsers
-            .map((user, index) => `${index + 1}. ${user.username}`)
-            .join('\n');
-        const promptMessage = `Select a logged-in user by entering the number:\n${userList}\n\nEnter number (1-${activeUsers.length}):`;
 
-        return new Promise((resolve) => {
-            const userInput = prompt(promptMessage);
-            if (userInput === null || userInput.trim() === '') {
-                resolve(null);
-                return;
-            }
-            const selectedIndex = parseInt(userInput, 10) - 1;
-            if (isNaN(selectedIndex) || selectedIndex < 0 || selectedIndex >= activeUsers.length) {
-                console.error(`❌ Invalid selection: ${userInput}`);
-                resolve(null);
-                return;
-            }
-            const selectedUserId = activeUsers[selectedIndex].id;
-            resolve(selectedUserId);
-        });
+        const promptUser = async () => {
+            const userList = activeUsers
+                .map((user, index) => `${index + 1}. ${user.username}`)
+                .join('\n');
+            const promptMessage = `Select a logged-in user by entering the number:\n${userList}\n\nEnter number (1-${activeUsers.length}) or Cancel to exit:`;
+
+            return new Promise((resolve) => {
+                const userInput = prompt(promptMessage);
+                if (userInput === null || userInput.trim().toLowerCase() === 'cancel') {
+                    resolve(null);
+                    return;
+                }
+                const selectedIndex = parseInt(userInput, 10) - 1;
+                if (isNaN(selectedIndex) || selectedIndex < 0 || selectedIndex >= activeUsers.length) {
+                    console.error(`❌ Invalid selection: ${userInput}. Please try again.`);
+                    resolve(promptUser()); // Recursively prompt again
+                    return;
+                }
+                const selectedUserId = activeUsers[selectedIndex].id;
+                resolve(selectedUserId);
+            });
+        };
+
+        return await promptUser();
     } catch (error) {
         console.error("Error listing logged-in users:", error);
         return null;
@@ -231,5 +234,6 @@ const session_check = async () => {
         localStorage.setItem('loggedInUsers', JSON.stringify(validUsers));
     }
 }
+
 
 document.addEventListener("DOMContentLoaded", session_check);
