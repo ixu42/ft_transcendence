@@ -7,18 +7,19 @@ const createGame = () => {
     const state = "scoreSelection";
     const lastState = "prepare";
     const isAI = false;
+    const AI = null;
     const aiLevel = 'none';
     const winningScore = -1;
     const options = {walls: 0};
     const walls = {player: 0, player2: 0};
     const isGameRunning = false;
 
-    return { player, player2, ball, canvas, context, state, lastState, isAI, aiLevel, winningScore, options, walls, isGameRunning, lastTime: 0 };
+    return { player, player2, ball, canvas, context, state, lastState, isAI, AI, aiLevel, winningScore, options, walls, isGameRunning, lastTime: 0 };
 };
 
 const updateGame = (deltatime, game) => {
     movePaddle(game.player, game.canvas);
-    game.isAI ? moveAIPaddle(game.player2, game.ball, game.canvas, game.aiLevel) : movePaddle(game.player2, game.canvas);
+    game.isAI ? moveAIPaddle(game.player2, game.ball, game.canvas, game.aiLevel, game.AI) : movePaddle(game.player2, game.canvas);
     game.state === "game" && moveBall(game.ball, game.player, game.player2, game.canvas, game, deltatime);
 };
 
