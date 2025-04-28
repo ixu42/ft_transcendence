@@ -364,21 +364,18 @@ def user_scores(request, user_id):
     games1 = Game.objects.filter(Q(player1=user))
     games2 = Game.objects.filter(Q(player2=user))
 
-    game_data = [
-        {
-            "score": game.player1_score,
-        }
-        for game in games1
-    ]
+    scores = 0
 
-    game_data.extend([
-        {
-            "score": game.player2_score,
-        }
-        for game in games2
-    ])
+    for game in games1:
+        scores += game.player1_score
 
-    return JsonResponse({"user_scores": game_data})
+    for game in games2:
+        scores += game.player2_score
+
+    return JsonResponse({
+        "sum_of_scores": scores,
+        "total_games": user.total_games      
+    })
 
 
 @require_GET
