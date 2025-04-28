@@ -99,6 +99,16 @@ const setupWindowEvents = (game) => {
     window.addEventListener('popstate', () => {
         game.isGameRunning = false;
     });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            if (game.state === 'game') {
+                game.lastState = game.state; // Save the current state
+                game.state = 'pause'; // Pause the game
+                console.log("Game paused because the tab is hidden");
+            }
+        }
+    });
 }
 
 const setupWindowEventsTournament = (tournament) => {
