@@ -22,6 +22,8 @@ urlpatterns = [
     ),
     # Match history
     path("<int:user_id>/match-history/", views.match_history, name="match_history"),
+    # User scores
+    path("<int:user_id>/scores/", views.user_scores, name="user_scores"),
     # Leaderboard route (all users info: basic user info + game stats)
     path("leaderboard/", views.leaderboard, name="leaderboard"),
     # Friends

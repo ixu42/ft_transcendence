@@ -356,6 +356,31 @@ def match_history(request, user_id):
     return JsonResponse({"match_history": game_data})
 
 
+@custom_login_required
+@require_GET
+def user_scores(request, user_id):
+    user = User.objects.get(id=user_id)
+
+    games1 = Game.objects.filter(Q(player1=user))
+    games2 = Game.objects.filter(Q(player2=user))
+
+    game_data = [
+        {
+            "score": game.player1_score,
+        }
+        for game in games1
+    ]
+
+    game_data.extend([
+        {
+            "score": game.player2_score,
+        }
+        for game in games2
+    ])
+
+    return JsonResponse({"user_scores": game_data})
+
+
 @require_GET
 def leaderboard(request):
     users = User.objects.all()
