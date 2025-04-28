@@ -4,12 +4,11 @@ const initializeAIGame = (gameId, userId) => {
         console.error("Canvas element '#pong' not found.");
         return;
     }
-    const game = createGame(true);
-    setupControls(game.player, game.player2, game, gameId, userId, false);
+    const game = createGame();
+    game.state = "levelSelection";
+    game.isAI = true;
     setupAILevelControls(game);
-    setupWindowEvents(game);
-    console.log("Starting game loop");
-    startGameLoop(game);
+    setupAndStart(gameId, userId, game);
 };
 
 const moveAIPaddle = (paddle, ball, canvas, aiLevel) => {
