@@ -128,6 +128,11 @@ def login_user(request):
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         return JsonResponse({"errors": "Username does not exist."}, status=401)
+    
+    if user.is_superuser:
+        return JsonResponse(
+              {"errors": "Invalid username/password."}, status=400
+          )
 
     user = authenticate(request, username=username, password=password)
 
