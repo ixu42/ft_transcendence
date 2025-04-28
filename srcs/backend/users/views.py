@@ -361,8 +361,8 @@ def match_history(request, user_id):
 def user_scores(request, user_id):
     user = User.objects.get(id=user_id)
 
-    games1 = Game.objects.filter(Q(player1=user))
-    games2 = Game.objects.filter(Q(player2=user))
+    games1 = Game.objects.filter(Q(player1=user) & Q(completed=True))
+    games2 = Game.objects.filter(Q(player2=user) & Q(completed=True))
 
     scores = 0
 
