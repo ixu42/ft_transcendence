@@ -5,11 +5,11 @@ async function initializeUserOverview(userId) {
       apiRequest(`users/${userId}/match-history/`, "GET"),
     ]);
 
-    // Check for errors in the API responses
-    if (user.error || matchData.error) {
-      throw new Error(user.error || matchData.error);
-    }
-
+    -    // Check for errors in the API responses
+-    if (user.error || matchData.error) {
+-      throw new Error(user.error || matchData.error);
+-    }
+-
     const matches = Array.isArray(matchData.match_history) ? matchData.match_history : [];
     const totalMatches = matches.length;
     console.log("📦 match history raw response:", matches);
@@ -48,27 +48,15 @@ async function initializeUserOverview(userId) {
 
   } catch (err) {
     console.error("Error loading user overview:", err);
-    const overviewContainer = document.getElementById("user-overview");
-    overviewContainer.innerHTML = `<p>Error loading user stats: ${err.message}. Please try again later.</p>`;
   }
 }
 
 async function initializeTournamentOverview(userId, username) {
   try {
     const tournamentData = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
-
-    // Check for errors returned by apiRequest
-    if (tournamentData.error) {
-      throw new Error(tournamentData.error || "Failed to fetch tournament data");
-    }
-
-    // Extract participated_tournaments from response
-    const tournaments = Array.isArray(tournamentData.participated_tournaments)
-      ? tournamentData.participated_tournaments
-      : [];
+    const tournaments = Array.isArray(tournamentData) ? tournamentData : [];
     const totalTournaments = tournaments.length;
     console.log("🏆 tournament history raw response:", tournaments);
-
     const completedTournaments = tournaments.filter(t => t.status === "COMPLETED").length;
     const opponents = {};
     tournaments.forEach(t => {
@@ -104,7 +92,7 @@ async function initializeTournamentOverview(userId, username) {
   } catch (err) {
     console.error("Error loading tournament overview:", err);
     const overviewContainer = document.getElementById("user-overview");
-    overviewContainer.innerHTML = `<p>Error loading tournament stats: ${err.message}. Please try again later.</p>`;
+    overviewContainer.innerHTML = `<p>Error loading tournament stats. Please try again later.</p>`;
   }
 }
 
