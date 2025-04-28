@@ -1,6 +1,5 @@
-async function initializeUserOverview() {
+async function initializeUserOverview(userId) {
   try {
-    const userId = localStorage.getItem("user_id");
     const [user, matchData] = await Promise.all([
       apiRequest(`users/${userId}/`, "GET"),
       apiRequest(`users/${userId}/match-history/`, "GET"),

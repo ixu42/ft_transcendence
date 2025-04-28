@@ -1,6 +1,5 @@
-async function initializeGameStatsOverview() {
+async function initializeGameStatsOverview(userId) {
   try {
-    const userId = localStorage.getItem("user_id");
     const { match_history } = await apiRequest(`users/${userId}/match-history/`, "GET");
     const matches = Array.isArray(match_history) ? match_history : [];
 

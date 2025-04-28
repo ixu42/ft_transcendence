@@ -1,4 +1,46 @@
 
+async function listAndSelectLoggedInUser() {
+    try {
+        const loggedInUsers = getLoggedInUsers();
+        const activeUsers = loggedInUsers.filter(user => user.loggedIn);
+
+        console.log("CALLED listAndSelectLoggedInUser");
+
+        if (activeUsers.length === 0) {
+            console.error("❌ No logged-in users found.");
+            return null;
+        }
+        if (activeUsers.length === 1) {
+            console.log(`✅ Auto-selecting user: ${activeUsers[0].username}`);
+            return activeUsers[0].id;
+        }
+        const userList = activeUsers
+            .map((user, index) => `${index + 1}. ${user.username}`)
+            .join('\n');
+        const promptMessage = `Select a logged-in user by entering the number:\n${userList}\n\nEnter number (1-${activeUsers.length}):`;
+
+        return new Promise((resolve) => {
+            const userInput = prompt(promptMessage);
+            if (userInput === null || userInput.trim() === '') {
+                console.log("❌ User selection cancelled or empty.");
+                resolve(null);
+                return;
+            }
+            const selectedIndex = parseInt(userInput, 10) - 1;
+            if (isNaN(selectedIndex) || selectedIndex < 0 || selectedIndex >= activeUsers.length) {
+                console.error(`❌ Invalid selection: ${userInput}`);
+                resolve(null);
+                return;
+            }
+            const selectedUserId = activeUsers[selectedIndex].id;
+            console.log(`✅ Selected user ID: ${selectedUserId}`);
+            resolve(selectedUserId);
+        });
+    } catch (error) {
+        console.error("Error listing logged-in users:", error);
+        return null;
+    }
+}
 
 function getLoggedInUsers() {
     return JSON.parse(localStorage.getItem('loggedInUsers') || '[]');

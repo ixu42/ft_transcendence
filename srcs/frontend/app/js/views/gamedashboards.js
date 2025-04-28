@@ -1,21 +1,23 @@
 
 const setupGameDashboardJs = async () => {
     try {
-        const params = new URLSearchParams(window.location.hash.split("?")[1]);
-        const section = params.get("section") || "overview"; 
-        const userId = localStorage.getItem("user_id");
+        const userId = await listAndSelectLoggedInUser();
+        if (!userId) {
+            console.error("❌ No user selected. Aborting dashboard setup.");
+            return;
+        }
 
-        console.log(`📈 Loading Game Stats | Section:: ${section.toUpperCase()}`);
+        const params = new URLSearchParams(window.location.hash.split("?")[1]);
+        const section = params.get("section") || "overview";
+
+        console.log(`📈 Loading Game Stats | Section: ${section.toUpperCase()} | User ID: ${userId}`);
 
         switch (section) {
             case "overview":
-                initializeGameStatsOverview();
+                initializeGameStatsOverview(userId);
                 break;
-            // case "matches":
-            //     initializeGameHistory();
-            //     break;
             case "trends":
-                initializeTrends();
+                initializeTrends(userId);
                 break;
             default:
                 console.error(`❌ Unknown gamestats section: ${section}`);
@@ -24,7 +26,3 @@ const setupGameDashboardJs = async () => {
         console.error("Error setting up the gamestats dashboards:", error);
     }
 };
-
-// export function setupGameDashboardJs() {
-//   console.log("✅ setupGameDashboardJs available");
-// }
