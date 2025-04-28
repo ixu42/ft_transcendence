@@ -3,20 +3,47 @@ const setupTournament = async (response) => {
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
 
-    // Step 1: Verify the creator is logged in
-    let creator;
-    while (!creator) {
-        creator = loggedInUsers.find(user => user.username === creatorUsername);
-        if (!creator) {
-            alert("❌ Tournament creator must be logged in. Please log in as the creator.");
-            return null; // Hard requirement; no reprompting as user must log in
-        }
+    // Helper function to redirect to #lobby
+    function redirectToLobby() {
+        console.log("❌ Tournament setup cancelled, redirecting to #lobby");
+        window.location.hash = 'lobby';
+        return null;
     }
 
-    // Step 2: Check for at least 1 logged-in user (creator is included)
+    // Helper function to prompt for winning score
+    async function promptWinningScore() {
+        let winningScore;
+        while (!winningScore) {
+            const input = prompt("Enter the winning match score (e.g., 10):");
+            if (input === null) {
+                return redirectToLobby();
+            }
+            if (input.trim() === "") {
+                alert("❌ Please enter a valid positive integer for the winning score.");
+                continue;
+            }
+            winningScore = parseInt(input, 10);
+            if (isNaN(winningScore) || winningScore <= 0) {
+                alert("❌ Winning score must be a positive integer.");
+                winningScore = null;
+                continue;
+            }
+        }
+        return winningScore;
+    }
+
+    // Step 1: Verify the creator is logged in
+    let creator;
+    creator = loggedInUsers.find(user => user.username === creatorUsername);
+    if (!creator) {
+        alert("❌ Tournament creator must be logged in. Please log in as the creator.");
+        return redirectToLobby();
+    }
+
+    // Step 2: Check for at least 1 logged-in user (creator)
     if (loggedInUsers.length < 1) {
         alert("❌ At least one logged-in user (creator) is required.");
-        return null; // Hard requirement; no reprompting as login is needed
+        return redirectToLobby();
     }
 
     // Step 3: Initialize players with the creator
@@ -29,27 +56,61 @@ const setupTournament = async (response) => {
         }
     ];
 
-    // Step 4: Prompt to select exactly 2 additional players (logged-in or guest)
+    // Step 4: Prompt for the desired number of players (minimum 3)
+    let targetPlayerCount;
+    while (!targetPlayerCount) {
+        const input = prompt("Enter the number of players for the tournament (minimum 3):");
+        if (input === null) {
+            return redirectToLobby();
+        }
+        if (input.trim() === "") {
+            alert("❌ Please enter a valid number of players.");
+            continue;
+        }
+        targetPlayerCount = parseInt(input, 10);
+        if (isNaN(targetPlayerCount) || targetPlayerCount < 3) {
+            alert("❌ Number of players must be a positive integer ≥ 3.");
+            targetPlayerCount = null;
+            continue;
+        }
+    }
+
+    // Step 5: Prompt to add players until the target is reached or user chooses to continue
     const potentialLoggedInPlayers = loggedInUsers.filter(
         user => user.username !== creatorUsername
     );
 
-    while (players.length < 3) {
+    while (players.length < targetPlayerCount) {
         let playerOptions = potentialLoggedInPlayers
             .map(user => `${user.id}: ${user.username}`)
             .join("\n");
         playerOptions += "\nOr enter a guest username (e.g., guest123)";
+        playerOptions += `\nEnter 'done' to start the tournament (current players: ${players.length})`;
 
         const selectedPlayer = window.prompt(
-            `Select a logged-in user by ID or enter a guest username (need ${3 - players.length} more):\n${playerOptions}`
+            `Select a logged-in user by ID, enter a guest username, or type 'done' to start (need at least 2 players):\n${playerOptions}`
         );
 
-        if (selectedPlayer === null || selectedPlayer.trim() === "") {
-            alert("❌ Please select a valid player or enter a guest username.");
+        if (selectedPlayer === null) {
+            return redirectToLobby();
+        }
+        if (selectedPlayer.trim() === "") {
+            alert("❌ Please select a valid player, enter a guest username, or type 'done'.");
             continue;
         }
 
-        const input = selectedPlayer.trim();
+        const input = selectedPlayer.trim().toLowerCase();
+
+        // Check if user wants to start the tournament
+        if (input === 'done') {
+            if (players.length < 2) {
+                alert("❌ At least 2 players are required to start the tournament.");
+                continue;
+            }
+            console.log(`✅ User chose to start tournament with ${players.length} players.`);
+            break; // Exit the loop to start the tournament
+        }
+
         let player, playerId, displayName;
 
         // Check if input is a logged-in user ID
@@ -69,15 +130,34 @@ const setupTournament = async (response) => {
                 if (joinResponse.errors) {
                     alert(`❌ Failed to add ${displayName}: ${JSON.stringify(joinResponse.errors)}. Please try again.`);
                     const retry = window.prompt(
-                        `Select a logged-in user by ID or enter a guest username (need ${3 - players.length} more):\n${playerOptions}`
+                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start:\n${playerOptions}`
                     );
-                    if (retry === null || retry.trim() === "") {
-                        alert("❌ Please select a valid player or enter a guest username.");
-                        continue;
+                    if (retry === null) {
+                        return redirectToLobby();
+                    }
+                    if (retry.trim() === "" || retry.trim().toLowerCase() === 'done') {
+                        if (players.length < 2) {
+                            alert("❌ At least 2 players are required to start the tournament.");
+                            continue;
+                        }
+                        console.log(`✅ User chose to start tournament with ${players.length} players.`);
+                        const winningScore = await promptWinningScore();
+                        if (winningScore === null) {
+                            return null; // Redirect already handled in promptWinningScore
+                        }
+                        return {
+                            players,
+                            allPlayers: [...players],
+                            winningScore,
+                            keyboardEnter: false,
+                            state: "table",
+                            tournamentId,
+                            isTournamentRunning: false
+                        };
                     }
                     input = retry.trim();
                     player = potentialLoggedInPlayers.find(p => p.id.toString() === input);
-                    if (!player) break; // If retry input isn’t a logged-in user ID, proceed to guest logic
+                    if (!player) break; // Proceed to guest logic if retry input isn’t a logged-in user ID
                     playerId = player.id;
                     displayName = player.username;
                 }
@@ -96,7 +176,7 @@ const setupTournament = async (response) => {
         } else {
             displayName = input;
             if (players.some(p => p.name.toLowerCase() === displayName.toLowerCase())) {
-                alert(`❌ Guest username "${displayName}" is already used in this tournament. Please enter a unique guest username.`);
+                alert(`❌ Username "${displayName}" is already used in this tournament. Please enter a unique username.`);
                 continue;
             }
 
@@ -109,17 +189,36 @@ const setupTournament = async (response) => {
                     null
                 );
                 if (guestResponse.errors || !guestResponse.id) {
-                    alert(`❌ Failed to fetch guest ID for ${displayName}: ${JSON.stringify(guestResponse.errors || "No guest ID returned")}. Please enter a different guest username.`);
+                    alert(`❌ Failed to fetch guest ID for ${displayName}: ${JSON.stringify(guestResponse.errors || "No guest ID returned")}. Please enter a different username.`);
                     const retry = window.prompt(
-                        `Select a logged-in user by ID or enter a guest username (need ${3 - players.length} more):\n${playerOptions}`
+                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start:\n${playerOptions}`
                     );
-                    if (retry === null || retry.trim() === "") {
-                        alert("❌ Please enter a valid guest username.");
-                        continue;
+                    if (retry === null) {
+                        return redirectToLobby();
+                    }
+                    if (retry.trim() === "" || retry.trim().toLowerCase() === 'done') {
+                        if (players.length < 2) {
+                            alert("❌ At least 2 players are required to start the tournament.");
+                            continue;
+                        }
+                        console.log(`✅ User chose to start tournament with ${players.length} players.`);
+                        const winningScore = await promptWinningScore();
+                        if (winningScore === null) {
+                            return null; // Redirect already handled in promptWinningScore
+                        }
+                        return {
+                            players,
+                            allPlayers: [...players],
+                            winningScore,
+                            keyboardEnter: false,
+                            state: "table",
+                            tournamentId,
+                            isTournamentRunning: false
+                        };
                     }
                     displayName = retry.trim();
                     if (players.some(p => p.name.toLowerCase() === displayName.toLowerCase())) {
-                        alert(`❌ Guest username "${displayName}" is already used in this tournament. Please enter a unique guest username.`);
+                        alert(`❌ Username "${displayName}" is already used in this tournament. Please enter a unique username.`);
                         continue;
                     }
                 }
@@ -135,20 +234,38 @@ const setupTournament = async (response) => {
                     { display_name: displayName }
                 );
                 if (joinResponse.errors) {
-                    alert(`❌ Failed to add guest ${displayName}: ${JSON.stringify(joinResponse.errors)}. Please enter a different guest username.`);
+                    alert(`❌ Failed to add guest ${displayName}: ${JSON.stringify(joinResponse.errors)}. Please enter a different username.`);
                     const retry = window.prompt(
-                        `Select a logged-in user by ID or enter a guest username (need ${3 - players.length} more):\n${playerOptions}`
+                        `Select a logged-in user by ID, enter a guest username, or type 'done' to start:\n${playerOptions}`
                     );
-                    if (retry === null || retry.trim() === "") {
-                        alert("❌ Please enter a valid guest username.");
-                        continue;
+                    if (retry === null) {
+                        return redirectToLobby();
+                    }
+                    if (retry.trim() === "" || retry.trim().toLowerCase() === 'done') {
+                        if (players.length < 2) {
+                            alert("❌ At least 2 players are required to start the tournament.");
+                            continue;
+                        }
+                        console.log(`✅ User chose to start tournament with ${players.length} players.`);
+                        const winningScore = await promptWinningScore();
+                        if (winningScore === null) {
+                            return null; // Redirect already handled in promptWinningScore
+                        }
+                        return {
+                            players,
+                            allPlayers: [...players],
+                            winningScore,
+                            keyboardEnter: false,
+                            state: "table",
+                            tournamentId,
+                            isTournamentRunning: false
+                        };
                     }
                     displayName = retry.trim();
                     if (players.some(p => p.name.toLowerCase() === displayName.toLowerCase())) {
-                        alert(`❌ Guest username "${displayName}" is already used in this tournament. Please enter a unique guest username.`);
+                        alert(`❌ Username "${displayName}" is already used in this tournament. Please enter a unique username.`);
                         continue;
                     }
-                    // Re-fetch guest ID for new username
                     guestResponse = await apiRequest(
                         `get-guest-id/?username=${encodeURIComponent(displayName)}`,
                         "GET",
@@ -171,32 +288,16 @@ const setupTournament = async (response) => {
             });
             console.log(`✅ ${displayName} (guest) joined tournament ${tournamentId}`);
         }
-
-        // Update player options
-        playerOptions = potentialLoggedInPlayers
-            .map(user => `${user.id}: ${user.username}`)
-            .join("\n");
-        playerOptions += "\nOr enter a guest username (e.g., guest123)";
     }
 
-    // Step 5: Set winning score
-    let winningScore;
-    while (!winningScore) {
-        const input = prompt("Enter the winning match score (e.g., 10):");
-        if (input === null || input.trim() === "") {
-            alert("❌ Please enter a valid positive integer for the winning score.");
-            continue;
-        }
-        winningScore = parseInt(input);
-        if (isNaN(winningScore) || winningScore <= 0) {
-            alert("❌ Winning score must be a positive integer.");
-            winningScore = null;
-            continue;
-        }
+    // Step 6: Set winning score
+    const winningScore = await promptWinningScore();
+    if (winningScore === null) {
+        return null; // Redirect already handled in promptWinningScore
     }
 
-    // Step 6: Log and return tournament data
-    console.log("Tournament initialized with 3 players:", players);
+    // Step 7: Log and return tournament data
+    console.log(`Tournament initialized with ${players.length} players:`, players);
     const isTournamentRunning = false;
 
     return {
