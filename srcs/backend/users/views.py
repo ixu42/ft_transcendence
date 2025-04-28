@@ -129,11 +129,9 @@ def login_user(request):
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         return JsonResponse({"errors": "Username does not exist."}, status=401)
-    
+
     if user.is_superuser:
-        return JsonResponse(
-              {"errors": "Invalid username/password."}, status=400
-          )
+        return JsonResponse({"errors": "Invalid username/password."}, status=400)
 
     user = authenticate(request, username=username, password=password)
 
@@ -372,10 +370,11 @@ def user_scores(request, user_id):
     for game in games2:
         scores += game.player2_score
 
-    return JsonResponse({
-        "sum_of_scores": scores,
-        "total_games": user.total_games      
-    })
+    total_games = Game.objects.filter(
+        (Q(player1=user) | Q(player2=user)) & Q(completed=True)
+    )
+
+    return JsonResponse({"sum_of_scores": scores, "total_games": total_games})
 
 
 @require_GET
@@ -421,7 +420,7 @@ def get_logged_in_users(request):
 
     for cookie_name in request.COOKIES.keys():
         # match cookies with pattern like "session_1", "session_10" etc
-        match = re.match(r'^session_(\d+)$', cookie_name)
+        match = re.match(r"^session_(\d+)$", cookie_name)
         if match:
             user_id = match.group(1)
             user_ids.append(user_id)
@@ -431,9 +430,11 @@ def get_logged_in_users(request):
 
     users_data = []
     for user in users:
-        users_data.append({
-            'id': user.id,
-            'username': user.username,
-        })
+        users_data.append(
+            {
+                "id": user.id,
+                "username": user.username,
+            }
+        )
 
-    return JsonResponse({'users': users_data})
+    return JsonResponse({"users": users_data})

@@ -33,7 +33,9 @@ def create_local_game(request, user_id):
     user2 = User.objects.get(id=int(user2_id))
 
     if user1.id == user2.id:
-        return JsonResponse({"errors": "player1 and player2 cannot be the same user."}, status=400)
+        return JsonResponse(
+            {"errors": "player1 and player2 cannot be the same user."}, status=400
+        )
 
     game = LocalGameForm().save(user=user1, opponent=user2)
 
