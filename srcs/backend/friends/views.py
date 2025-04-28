@@ -4,13 +4,13 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.contrib.auth import get_user_model
-from users.views import custom_login_required
+from backend.decorators import validate_user_id_path_param
 from friends.models import FriendRequest
 
 User = get_user_model()
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_GET
 def list_friends(request, user_id):
     user = User.objects.get(id=user_id)
@@ -60,7 +60,7 @@ def send_friend_request(request, user_id):
     return JsonResponse({"message": "Friend request sent."}, status=201)
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_http_methods(["POST", "GET"])
 def send_or_list_friend_request(request, user_id):
     user = User.objects.get(id=user_id)
@@ -77,7 +77,7 @@ def send_or_list_friend_request(request, user_id):
         return JsonResponse({"friend_requests": request_list}, safe=False)
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_POST
 def handle_friend_request(request, user_id, request_id):
     req = FriendRequest.objects.filter(id=request_id, status="pending")
@@ -100,7 +100,7 @@ def handle_friend_request(request, user_id, request_id):
 
 
 # Remove a Friend
-@custom_login_required
+@validate_user_id_path_param
 @require_http_methods(["DELETE"])
 def remove_friend(request, user_id, friend_id):
     user = User.objects.get(id=user_id)

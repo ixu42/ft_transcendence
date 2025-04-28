@@ -3,56 +3,15 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from functools import wraps
+from backend.decorators import validate_user_id_query_param
 from .forms import TournamentCreationForm, TournamentJoiningForm
 from .models import Tournament
 
 User = get_user_model()
 
 
-def custom_login_required(view_func):
-    """
-    Custom decorator that ensures the user is authenticated.
-    Returns a 401 JSON response instead of redirecting.
-    """
-
-    @wraps(view_func)
-    def wrapper(request, *args, **kwargs):
-        user_id = request.GET.get("user_id")
-        if not user_id:
-            return JsonResponse(
-                {"errors": "Missing user_id query parameter."}, status=400
-            )
-        try:
-            user_id = int(user_id)
-            User.objects.get(id=user_id)
-        except ValueError:
-            return JsonResponse(
-                {"errors": "Invalid user_id value passed in query param."}, status=400
-            )
-        except User.DoesNotExist:
-            return JsonResponse(
-                {"errors": f"User not found with user_id {user_id}."}, status=404
-            )
-
-        guest = User.objects.get(username="guest_player")
-        if user_id != guest.id:
-            cookie_name = f"session_{user_id}"
-            session_cookie = request.COOKIES.get(cookie_name)
-
-            # Check if the custom session cookie exists
-            if not session_cookie:
-                return JsonResponse(
-                    {"errors": "User is not authenticated."}, status=401
-                )
-
-        return view_func(request, *args, **kwargs)
-
-    return wrapper
-
-
 @require_POST
-@custom_login_required
+@validate_user_id_query_param
 def create_tournament(request):
     user_id = request.GET.get("user_id")
     user = User.objects.get(id=int(user_id))
@@ -77,7 +36,7 @@ def create_tournament(request):
 
 
 @require_http_methods(["PATCH"])
-@custom_login_required
+@validate_user_id_query_param
 def join_tournament(request, tournament_id):
     user_id = request.GET.get("user_id")
     user = User.objects.get(id=int(user_id))
@@ -110,7 +69,7 @@ def join_tournament(request, tournament_id):
 
 
 @require_http_methods(["PATCH"])
-@custom_login_required
+@validate_user_id_query_param
 def start_tournament(request, tournament_id):
     user_id = request.GET.get("user_id")
     user = User.objects.get(id=int(user_id))
@@ -136,7 +95,7 @@ def start_tournament(request, tournament_id):
 
 
 @require_http_methods(["PATCH"])
-@custom_login_required
+@validate_user_id_query_param
 def save_tournament_stats(request, tournament_id):
     user_id = request.GET.get("user_id")
     user = User.objects.get(id=int(user_id))

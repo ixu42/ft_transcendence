@@ -472,8 +472,8 @@ Get sum of the scores of all games played by the user, as well as the number of 
   - **200**
     ```json
     {
-        "sum_of_scores": 100,
-        "total_games": 10
+      "sum_of_scores": 100,
+      "total_games": 10
     }
     ```
   - **401**
@@ -769,10 +769,6 @@ Create a local 1v1 game for user1 (id as path parameter) and user2 (id as query 
     ```json
     { "errors": "User is not authenticated." }
     ```
-  - **404**
-    ```json
-    { "errors": "User not found with user_id 42." }
-    ```
 
 </details>
 
@@ -912,11 +908,6 @@ Create a tournament.
     ```json
     { "errors": "User is not authenticated." }
     ```
-  - **404**
-    - When user is not found with given user_id
-      ```json
-      { "errors": "User not found with user_id {user_id}." }
-      ```
 
 </details>
 
@@ -982,9 +973,6 @@ Join a tournament.
     ```
   - **404**
     ```json
-    { "errors": "User not found with user_id {user_id}." }
-    ```
-    ```json
     { "errors": "Tournament not found with tournament_id {tournament_id}." }
     ```
 
@@ -1032,9 +1020,6 @@ Start a tournament.
     { "errors": "User is not authenticated." }
     ```
   - **404**
-    ```json
-    { "errors": "User not found with user_id {user_id}." }
-    ```
     ```json
     { "errors": "Tournament not found with tournament_id {tournament_id}." }
     ```
@@ -1094,9 +1079,6 @@ Save the stats of a completed tournament.
     ```
   - **404**
     ```json
-    { "errors": "User not found with user_id {user_id}." }
-    ```
-    ```json
     { "errors": "Tournament not found with tournament_id {tournament_id}." }
     ```
     ```json
@@ -1142,17 +1124,17 @@ Save the stats of a completed tournament.
   - **200**
     ```json
     {
-        "users": [
-            {
-                "id": 3,
-                "username": "test1"
-            },
-            {
-                "id": 4,
-                "username": "test2"
-            },
-            "... more items ..."
-        ]
+      "users": [
+        {
+          "id": 3,
+          "username": "test1"
+        },
+        {
+          "id": 4,
+          "username": "test2"
+        },
+        "... more items ..."
+      ]
     }
     ```
 

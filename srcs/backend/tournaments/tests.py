@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from .views import custom_login_required
+from backend.decorators import validate_user_id_query_param
 from .models import Tournament, TournamentPlayer
 
 User = get_user_model()
@@ -56,7 +56,7 @@ class BaseTestCase(TestCase):
         )
 
 
-@custom_login_required
+@validate_user_id_query_param
 def dummy_view(request):
     return JsonResponse({"message": "User is authenticated."}, status=200)
 
@@ -80,14 +80,6 @@ class TestCustomLoginRequired(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
             response.content, {"errors": "Invalid user_id value passed in query param."}
-        )
-
-    def test_user_does_not_exist(self):
-        request = self.factory.get("/dummy/", {"user_id": "4242"})
-        response = dummy_view(request)
-        self.assertEqual(response.status_code, 404)
-        self.assertJSONEqual(
-            response.content, {"errors": "User not found with user_id 4242."}
         )
 
     def test_missing_session_cookie(self):

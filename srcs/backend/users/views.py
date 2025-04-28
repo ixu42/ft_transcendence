@@ -8,10 +8,10 @@ from django.contrib.auth import authenticate
 from django.contrib.sessions.backends.db import SessionStore
 from django.conf import settings
 from django.db.models import Q
-from functools import wraps
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.middleware.csrf import rotate_token, get_token
+from backend.decorators import validate_user_id_path_param
 from users.forms import (
     CustomUserCreationForm,
     AvatarUpdateForm,
@@ -21,45 +21,6 @@ from users.forms import (
 from games.models import Game
 
 User = get_user_model()
-
-
-def custom_login_required(view_func):
-    """
-    Custom decorator that ensures the user is authenticated.
-    Returns a 401 JSON response instead of redirecting.
-    """
-
-    @wraps(view_func)
-    def wrapper(request, *args, **kwargs):
-        user_id = kwargs.get("user_id")  # Get user_id from route
-        if not user_id:
-            return JsonResponse(
-                {"errors": "user_id is required in the route."}, status=400
-            )
-
-        cookie_name = f"session_{user_id}"
-        session_cookie = request.COOKIES.get(cookie_name)
-
-        # Check if the custom session cookie exists
-        if not session_cookie:
-            response = JsonResponse(
-                {"errors": "User is not authenticated."}, status=401
-            )
-            response.delete_cookie(cookie_name, path="/", domain="localhost")
-            return response
-
-        try:
-            User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            response = JsonResponse(
-                {"errors": f"User not found with user_id {user_id}."}, status=404
-            )
-            response.delete_cookie(cookie_name, path="/", domain="localhost")
-            return response
-
-        return view_func(request, *args, **kwargs)
-
-    return wrapper
 
 
 @require_POST
@@ -151,7 +112,7 @@ def custom_logout(request, user_id, response):
     return response
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_POST
 def logout_user(request, user_id):
     username = User.objects.get(id=user_id).username
@@ -222,7 +183,7 @@ def delete_user_account(request, user_id):
     return custom_logout(request, user_id, response)
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_http_methods(["GET", "PATCH", "DELETE"])
 def user_profile(request, user_id):
     if request.method == "GET":
@@ -233,7 +194,7 @@ def user_profile(request, user_id):
         return delete_user_account(request, user_id)
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_POST
 def update_password(request, user_id):
     try:
@@ -257,7 +218,7 @@ def update_password(request, user_id):
         return JsonResponse({"errors": form.errors}, status=400)
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_http_methods(["POST", "DELETE"])
 def handle_avatar(request, user_id):
     user = User.objects.get(id=user_id)
@@ -292,7 +253,7 @@ def handle_avatar(request, user_id):
         )
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_http_methods(["PATCH"])
 def anonymize_user(request, user_id):
     user = User.objects.get(id=user_id)
@@ -307,7 +268,7 @@ def anonymize_user(request, user_id):
     return custom_logout(request, user_id, response)
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_GET
 def participated_tournaments(request, user_id):
     user = User.objects.get(id=user_id)
@@ -329,7 +290,7 @@ def participated_tournaments(request, user_id):
     return JsonResponse({"participated_tournaments": tournament_data})
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_GET
 def match_history(request, user_id):
     user = User.objects.get(id=user_id)
@@ -354,7 +315,7 @@ def match_history(request, user_id):
     return JsonResponse({"match_history": game_data})
 
 
-@custom_login_required
+@validate_user_id_path_param
 @require_GET
 def user_scores(request, user_id):
     user = User.objects.get(id=user_id)
@@ -405,7 +366,7 @@ def leaderboard(request):
 
 
 # Heartbeat for online status
-@custom_login_required
+@validate_user_id_path_param
 @require_GET
 def heartbeat(request, user_id):
     user = User.objects.get(id=user_id)
