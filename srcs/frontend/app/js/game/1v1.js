@@ -1,11 +1,12 @@
-const createGame = (isAI = false) => {
+const createGame = () => {
     const canvas = document.getElementById('pong');
     const player = createPaddle(0, canvas.height / 2 - 50);
     const player2 = createPaddle(canvas.width - 10, canvas.height / 2 - 50);
     const ball = createBall(canvas.width / 2, canvas.height / 2);
     const context = canvas.getContext('2d');
-    const state = isAI ? "levelSelection" : "scoreSelection";
+    const state = "scoreSelection";
     const lastState = "prepare";
+    const isAI = false;
     const aiLevel = 'none';
     const winningScore = -1;
     const options = {walls: 0};
@@ -157,14 +158,23 @@ const gameLoop = (game, onGameEnd) => {
 };
 
 const initializeGame = (gameId, userId) => {
-        const canvas = document.getElementById('pong');
-        if (!canvas) {
-            console.error("Canvas element '#pong' not found.");
-            return;
-        }
-        const game = createGame(false);
-        setupControls(game.player, game.player2, game, gameId, userId);
-        setupWindowEvents(game);
-        console.log("Starting game loop");
-        startGameLoop(game);
+    const canvas = document.getElementById('pong');
+    if (!canvas) {
+        console.error("Canvas element '#pong' not found.");
+        return;
+    }
+    const game = createGame();
+    setupAndStart(gameId, userId, game);
 };
+
+const setupAndStart = (gameId, userId, game) => 
+{
+    setupControls(game.player, game.player2, game, gameId, userId);
+    setupWindowEvents(game);
+    console.log("Starting game loop");
+    startGameLoop(game, () => {
+        if (getLoggedInUsers().length > 0) {
+            saveGameStats(gameId, game.player.score, game.player2.score, userId);
+         }
+    }); 
+}

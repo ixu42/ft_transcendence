@@ -49,9 +49,6 @@ const setupControls = async (player, player2, game, gameId, userId, isTournament
         // Game Over state handling
         if (game.state === 'gameOver') {
             if (key === 'x') {
-                if (getLoggedInUsers().length > 0 && !isTournament) {
-                   await saveGameStats(gameId, player.score, player2.score, userId);
-                }
                 window.location.href = "/#lobby"; // Adjust the URL to your lobby page
             }
             return;
