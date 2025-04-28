@@ -17,10 +17,7 @@ class LocalGameForm(forms.ModelForm):
 
         if user:
             game.player1 = user
-        if opponent == "AI":
-            game.player2 = None
-        else:
-            game.player2 = User.objects.get(username="guest_player")
+        game.player2 = opponent
 
         if commit:
             game.save()

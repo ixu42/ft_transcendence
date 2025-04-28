@@ -5,26 +5,39 @@ from users.views import custom_login_required
 from django.contrib.auth import get_user_model
 from .models import Game
 from .forms import GameStatsForm, LocalGameForm
+from tournaments.views import custom_login_required as custom_login_required_multi_users
 
 User = get_user_model()
 
 
 @custom_login_required
 @require_POST
-def create_local_game(request, user_id):
+def create_local_game_guest(request, user_id):
     user = User.objects.get(id=user_id)
-    game = LocalGameForm().save(user=user, opponent="guest_player")
+    guest = User.objects.get(username="guest_player")
+    game = LocalGameForm().save(user=user, opponent=guest)
 
     return JsonResponse(
         {"message": "Local game created.", "game_id": game.id}, status=201
     )
 
+@custom_login_required_multi_users
+@require_POST
+def create_local_game(request, user_id):
+    user1 = User.objects.get(id=user_id)
+    user2_id = request.GET.get("user_id")
+    user2 = User.objects.get(id=int(user2_id))
+    game = LocalGameForm().save(user=user1, opponent=user2)
+
+    return JsonResponse(
+        {"message": "Local game created.", "game_id": game.id}, status=201
+    )
 
 @custom_login_required
 @require_POST
 def create_ai_game(request, user_id):
     user = User.objects.get(id=user_id)
-    game = LocalGameForm().save(user=user, opponent="AI")
+    game = LocalGameForm().save(user=user, opponent=None)
 
     return JsonResponse({"message": "AI game created.", "game_id": game.id}, status=201)
 
