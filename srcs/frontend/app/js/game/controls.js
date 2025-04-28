@@ -109,6 +109,14 @@ const setupWindowEvents = (game) => {
             }
         }
     });
+
+    window.addEventListener('blur', () => {
+        if (game.state === 'game') {
+            game.lastState = game.state; // Save the current state
+            game.state = 'pause'; // Pause the game
+            console.log("Game paused because the window lost focus");
+        }
+    });
 }
 
 const setupWindowEventsTournament = (tournament) => {
