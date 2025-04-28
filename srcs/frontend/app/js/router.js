@@ -95,15 +95,15 @@ const stopHeartbeat = () => {
 
 const handleLocation = async () => {
 
-  if (!window.location.hash)
-  {
-    const defaultRoute = isAnyUserLoggedIn ? "#menu" : "#login";
-    console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
-    console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
-    history.replaceState(null, null, defaultRoute);
+  await syncLoggedInUsersWithBackend();
+  isAnyUserLoggedIn = getLoggedInUsers().some(user => user.loggedIn);
+
+  if (!window.location.hash) {
+      const defaultRoute = isAnyUserLoggedIn ? "#menu" : "#login";
+      console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
+      history.replaceState(null, null, defaultRoute);
   }
 
-  isAnyUserLoggedIn =  getLoggedInUsers().some(user => user.loggedIn);
   const hashParts = window.location.hash.split("?");
   const path = hashParts[0] || "#";
   const route = routes[path] || routes[404];
@@ -116,36 +116,35 @@ const handleLocation = async () => {
   if (navbar) navbar.classList.toggle("hidden", hideNavbarAndFooter);
   if (footer) footer.classList.toggle("hidden", hideNavbarAndFooter);
 
-  // Check for protected routes.
+  // Check for protected routes
   if (protectedRoutes.includes(path) && !isAnyUserLoggedIn) {
-    console.warn(`🚨 Access denied: ${path} requires authentication.`);
-    alert("You must be logged in to access this page.");
-    return;
+      console.warn(`🚨 Access denied: ${path} requires authentication.`);
+      alert("You must be logged in to access this page.");
+      return;
   }
-
   try {
-    const html = await fetch(route).then((data) => data.text());
-    app.innerHTML = html;
+      const html = await fetch(route).then((data) => data.text());
+      app.innerHTML = html;
 
-    if (routeHandlers[path]) {
-      routeHandlers[path]();
-    }
+      if (routeHandlers[path]) {
+          routeHandlers[path]();
+      }
 
-    console.log(`✅ Loaded route content: ${path}`);
-    console.log(`Updating navbar...`);
-    updateNavbar(); // Update the navbar after loading the route content
+      console.log(`✅ Loaded route content: ${path}`);
+      console.log(`Updating navbar...`);
+      updateNavbar();
 
-    if (isAnyUserLoggedIn) {
-      startHeartbeat();
-    } else {
-      stopHeartbeat();
-    }
-  
+      if (isAnyUserLoggedIn) {
+          startHeartbeat();
+      } else {
+          stopHeartbeat();
+      }
   } catch (error) {
-    app.innerHTML = "<h1>Error loading page</h1>";
-    console.error(`❌ Failed to load route ${path}:`, error);
+      app.innerHTML = "<h1>Error loading page</h1>";
+      console.error(`❌ Failed to load route ${path}:`, error);
   }
 };
+
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
 
