@@ -372,7 +372,7 @@ def user_scores(request, user_id):
 
     total_games = Game.objects.filter(
         (Q(player1=user) | Q(player2=user)) & Q(completed=True)
-    )
+    ).count()
 
     return JsonResponse({"sum_of_scores": scores, "total_games": total_games})
 
