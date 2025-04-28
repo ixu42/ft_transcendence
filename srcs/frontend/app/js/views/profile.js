@@ -1,6 +1,5 @@
 
 const logoutUser = async (userId) => {
-    console.log("Logout button clicked for user:", userId);
     const csrfToken = await getCSRFCookie();
     if (!csrfToken) {
         return console.error("❌ CSRF Token is missing.");
@@ -15,7 +14,6 @@ const logoutUser = async (userId) => {
     });
 
     if (response.ok) {
-        console.log("✅ Logout successful");
         document.cookie = "csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         localStorage.setItem("isLoggedIn", "false");
         removeLoggedInUser(userId);
@@ -28,11 +26,6 @@ const logoutUser = async (userId) => {
 
 
 const setupProfilePageJs = async (userId) => {
-    console.log("⚡ setupProfilePage() called!");
-    console.log("🔑 User ID:", userId);
-    console.log("🔑 User ID:", userId);
-    console.log("🔑 User ID:", userId);
-    console.log("🔑 User ID:", userId);
     try {
         await fetchProfileData(userId);
         setupAvatarUpload(userId);
@@ -76,7 +69,6 @@ const fetchProfileData = async (userId) => {
             return;
         }
 
-        console.log("✅ Profile data fetched:", data);
         updateProfileUI(data);
     } catch (error) {
         console.error("❌ Error fetching profile data:", error);
@@ -88,7 +80,6 @@ const fetchProfileData = async (userId) => {
 // Update profile UI elements
 const updateProfileUI = (data) => {
     const fixieAvatarURL = (avatarPath) => {
-        console.log("🔑 Raw Avatar Path:", avatarPath);
         if (!avatarPath) {
             return "api/static/avatars/default.png";
         }
@@ -102,10 +93,6 @@ const updateProfileUI = (data) => {
     const usernameEl = document.querySelector(".profile-username");
     const oldEmailEl = document.querySelector(".profile-email");
 
-    // console.log("🔑 Avatar URL:", avatarUrl);
-    // console.log("🔑 Avatar URL:", avatarUrl);
-    // console.log("🔑 Avatar URL:", avatarUrl);
-    // console.log("🔑 Avatar URL:", avatarUrl);
 
     if (avatarEl) {avatarEl.src = avatarUrl;}
     if (usernameEl) {usernameEl.textContent = data.username || "Username";}
@@ -336,7 +323,6 @@ const setupButtons = (userId) => {
         { 
             selector: "#profile-menu-btn", 
             callback: () => {
-                console.log("📌 Menu button clicked");
                 window.location.hash = "#menu";
             }, 
             message: "✅ Found menu button" 
@@ -349,7 +335,6 @@ const setupButtons = (userId) => {
         { 
             selector: "#edit-profile-btn", 
             callback: () => {
-                console.log("📌 Edit Profile button clicked");
                 document.getElementById("profile-edit-modal").classList.add("profile-edit-modal-visible");
             }, 
             message: "✅ Found edit profile button" 
@@ -362,7 +347,6 @@ const setupButtons = (userId) => {
     ].forEach(({ selector, callback, message }) => {
         const element = document.querySelector(selector);
         if (element) {
-            console.log(message);
             element.addEventListener("click", callback);
         } else {
             console.warn(`⚠️ ${selector} not found.`);
@@ -531,7 +515,6 @@ const setupEditProfile = (userId) => {
                 return;
             }
 
-            console.log("✅ Profile updated successfully:", data);
             alert("✅ Profile updated successfully!");
             fetchProfileData(userId);
         } catch (error) {
@@ -581,7 +564,6 @@ const setupAvatarUpload = (userId) => {
                 return;
             }
 
-            console.log("✅ Avatar updated:", data.message);
             const newAvatarUrl = `api/${data.avatar_url}`;
     
             document.querySelector(".profile-avatar").src = newAvatarUrl;
@@ -606,7 +588,6 @@ const setupAvatarUpload = (userId) => {
                 return;
             }
 
-            console.log("✅ Avatar reset:", data.message);
             const newAvatarUrl = `api/${data.avatar_url}`;
             document.querySelector(".profile-avatar").src = newAvatarUrl;
             localStorage.setItem("user_avatar", newAvatarUrl);

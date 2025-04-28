@@ -12,7 +12,6 @@ const setupUserDashboardJs = async () => {
         const params = new URLSearchParams(window.location.hash.split("?")[1]);
         const section = params.get("section") || "overview";
 
-        console.log(`📊 Loading User Stats | Section: ${section.toUpperCase()} | User ID: ${userId}`);
 
         switch (section) {
             case "overview":

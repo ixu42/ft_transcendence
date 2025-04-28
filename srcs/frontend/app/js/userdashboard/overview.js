@@ -12,7 +12,6 @@ async function initializeUserOverview(userId) {
 // -
     const matches = Array.isArray(matchData.match_history) ? matchData.match_history : [];
     const totalMatches = matches.length;
-    console.log("📦 match history raw response:", matches);
     const wins = matches.filter(m => m.winner === user.username).length;
     const winRate = totalMatches ? ((wins / totalMatches) * 100).toFixed(1) + '%' : 'N/A';
 
@@ -26,7 +25,6 @@ async function initializeUserOverview(userId) {
 
     const [mostFrequentOpponent, frequency] = Object.entries(opponents).sort((a, b) => b[1] - a[1])[0] || ["N/A", 0];
 
-    console.log("🕓 Raw join date:", user.date_joined);
     const overviewContainer = document.getElementById("user-overview");
     overviewContainer.innerHTML = `
       <p><strong>Username:</strong> ${user.username}</p>
@@ -56,7 +54,6 @@ async function initializeTournamentOverview(userId, username) {
     const tournamentData = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
     const tournaments = Array.isArray(tournamentData) ? tournamentData : [];
     const totalTournaments = tournaments.length;
-    console.log("🏆 tournament history raw response:", tournaments);
     const completedTournaments = tournaments.filter(t => t.status === "COMPLETED").length;
     const opponents = {};
     tournaments.forEach(t => {

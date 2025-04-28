@@ -6,7 +6,6 @@ const setupTournament = async (response) => {
 
     // Helper function to redirect to #lobby
     function redirectToLobby() {
-        console.log("❌ Tournament setup cancelled, redirecting to #lobby");
         window.location.hash = 'lobby';
         return null;
     }
@@ -114,7 +113,6 @@ const setupTournament = async (response) => {
                 alert("❌ At least 2 players are required to start the tournament.");
                 continue;
             }
-            console.log(`✅ User chose to start tournament with ${players.length} players.`);
             break; // Exit the loop to start the tournament
         }
 
@@ -147,7 +145,6 @@ const setupTournament = async (response) => {
                             alert("❌ At least 2 players are required to start the tournament.");
                             continue;
                         }
-                        console.log(`✅ User chose to start tournament with ${players.length} players.`);
                         const winningScore = await promptWinningScore();
                         if (winningScore === null) {
                             return null; // Redirect already handled in promptWinningScore
@@ -177,7 +174,6 @@ const setupTournament = async (response) => {
                     score: 0,
                     matches: 0
                 });
-                console.log(`✅ ${displayName} (logged-in) joined tournament ${tournamentId}`);
                 potentialLoggedInPlayers.splice(potentialLoggedInPlayers.indexOf(player), 1);
             }
         } else {
@@ -208,7 +204,6 @@ const setupTournament = async (response) => {
                             alert("❌ At least 2 players are required to start the tournament.");
                             continue;
                         }
-                        console.log(`✅ User chose to start tournament with ${players.length} players.`);
                         const winningScore = await promptWinningScore();
                         if (winningScore === null) {
                             return null; // Redirect already handled in promptWinningScore
@@ -253,7 +248,6 @@ const setupTournament = async (response) => {
                             alert("❌ At least 2 players are required to start the tournament.");
                             continue;
                         }
-                        console.log(`✅ User chose to start tournament with ${players.length} players.`);
                         const winningScore = await promptWinningScore();
                         if (winningScore === null) {
                             return null;
@@ -293,7 +287,6 @@ const setupTournament = async (response) => {
                 score: 0,
                 matches: 0
             });
-            console.log(`✅ ${displayName} (guest) joined tournament ${tournamentId}`);
         }
     }
 
@@ -304,7 +297,6 @@ const setupTournament = async (response) => {
     }
 
     // Step 7: Log and return tournament data
-    console.log(`Tournament initialized with ${players.length} players:`, players);
     const isTournamentRunning = false;
 
     return {
@@ -326,7 +318,6 @@ const startTournament = async (tournament) => {
         return;
     }
 
-    console.log(`Attempting to start tournament ${tournament.tournamentId} for creator user_id=${creator.userId}`);
     const startResponse = await apiRequest(
         `tournaments/${tournament.tournamentId}/start/?user_id=${creator.userId}`,
         "PATCH",
@@ -341,7 +332,6 @@ const startTournament = async (tournament) => {
             `❌ Failed to start tournament: ${JSON.stringify(startResponse.errors)}`
         );
     } else {
-        console.log(`✅ Tournament started for ${creator.name} (user_id=${creator.userId})`);
     }
 };
 

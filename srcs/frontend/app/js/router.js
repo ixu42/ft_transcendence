@@ -27,21 +27,14 @@ const routeHandlers = {
   "#game": () => setupGameJs(),
   "#userstats": () => setupUserDashboardJs(),
   "#gamestats": () => setupGameDashboardJs(),
-//   "#gamestats": async () => {
-//   const mod = await import("./views/gamedashboards.js");
-//   mod.setupGameDashboardJs();
-// },
-
   "#lobby": () => setupLobbyJs(),
   "#dashy": () => setupDashyJs(),
-  "#menu": () => console.log("Menu loaded"),
   "#leaderboard": () => setupLeaderboardJs(),
   "#profile": () => {
     const hash = window.location.hash;
     const queryString = hash.split("?")[1];
     const userId = queryString ? new URLSearchParams(queryString).get("user_id") : null;
     if (userId) {
-      console.log(`Profile loaded for user ID: ${userId}`);
       setupProfilePageJs(userId);
     } else {
       console.warn("No user ID provided; profile not loaded.");
@@ -56,16 +49,14 @@ const routeHandlers = {
 
 };
 
-let heartbeatInterval = null; // Store interval ID
+let heartbeatInterval = null;
 
 const startHeartbeat = async () => {
   const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
   if (loggedInUsers.length === 0) {
-      console.log("No logged in users, skipping heartbeat.");
       return;
   }
   if (heartbeatInterval) {
-      console.log("Heartbeat already running.");
       return;
   }
 
@@ -74,7 +65,6 @@ const startHeartbeat = async () => {
       for (const user of loggedInUsers) {
           try {
               await apiRequest(`users/${user.id}/heartbeat/`, "GET");
-              console.log(`Heartbeat updated for user ${user.id}`);
           } catch (error) {
               console.error(`Heartbeat error for user ${user.id}:`, error);
           }
@@ -89,7 +79,6 @@ const stopHeartbeat = () => {
   if (heartbeatInterval) {
       clearInterval(heartbeatInterval);
       heartbeatInterval = null;
-      console.log("Heartbeat stopped.");
   }
 };
 
@@ -100,7 +89,6 @@ const handleLocation = async () => {
 
   if (!window.location.hash) {
       const defaultRoute = isAnyUserLoggedIn ? "#menu" : "#login";
-      console.log(`🔀 Redirecting to default route: ${defaultRoute}`);
       history.replaceState(null, null, defaultRoute);
   }
 
@@ -130,8 +118,6 @@ const handleLocation = async () => {
           routeHandlers[path]();
       }
 
-      console.log(`✅ Loaded route content: ${path}`);
-      console.log(`Updating navbar...`);
       updateNavbar();
 
       if (isAnyUserLoggedIn) {
@@ -147,59 +133,3 @@ const handleLocation = async () => {
 
 window.addEventListener("hashchange", handleLocation);
 window.addEventListener("DOMContentLoaded", handleLocation);
-
-   /* Just the basics first 
-
-   async function fetchCSRFToken() {
-     const csrfCookieName = "csrftoken";
-     let csrfToken = getCookie(csrfCookieName);
-     if (!csrfToken) {
-       try {
-         const response = await fetch("/api/get-csrf-token/", {
-           method: "GET",
-           credentials: "same-origin",
-         });
-         if (!response.ok) throw new Error(`Failed to fetch CSRF token`);
-         const data = await response.json();
-         csrfToken = data.csrfToken;
-         document.cookie = `${csrfCookieName}=${csrfToken}; path=/`;
-       } catch (error) {
-         console.error("Error fetching CSRF token:", error);
-         return null;
-       }
-     }
-     return csrfToken;
-   }
-   function getCookie(name) {
-     const cookies = document.cookie.split(";");
-     for (let cookie of cookies) {
-       const [cookieName, cookieValue] = cookie.trim().split("=");
-       if (cookieName === name) return decodeURIComponent(cookieValue);
-     }
-     return null;
-   }
-   async function fetchDataWithCSRF() {
-     const csrfToken = await fetchCSRFToken();
-     if (!csrfToken) return console.error("CSRF token not available.");
-     try {
-       const response = await fetch("/api/secure-endpoint/", {
-         method: "POST",
-         headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
-         body: JSON.stringify({ key: "value" }),
-         credentials: "same-origin",
-       });
-       if (!response.ok) throw new Error("Request failed");
-       const data = await response.json();
-       console.log("Data fetched successfully:", data);
-     } catch (error) {
-       console.error("Error during fetch:", error);
-     }
-   }
-   (async function initializeCSRFToken() {
-     const csrfToken = await fetchCSRFToken();
-     if (csrfToken) console.log("CSRF token initialized:", csrfToken);
-   })();
-
-   */
-
-

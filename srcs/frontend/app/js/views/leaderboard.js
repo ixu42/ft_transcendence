@@ -12,7 +12,6 @@ const setupLeaderboardJs = async () => {
             return;
         }
 
-        console.log("✅ Leaderboard data fetched:", data);
         renderLeaderboard(data, 1);
     } catch (error) {
         console.error("❌ Error fetching leaderboard data:", error);

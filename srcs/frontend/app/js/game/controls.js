@@ -99,7 +99,6 @@ const setupWindowEvents = (game) => {
             if (game.state === 'game') {
                 game.lastState = game.state; // Save the current state
                 game.state = 'pause'; // Pause the game
-                console.log("Game paused because the tab is hidden");
             }
         }
     });
@@ -108,7 +107,6 @@ const setupWindowEvents = (game) => {
         if (game.state === 'game') {
             game.lastState = game.state; // Save the current state
             game.state = 'pause'; // Pause the game
-            console.log("Game paused because the window lost focus");
         }
     });
 }
