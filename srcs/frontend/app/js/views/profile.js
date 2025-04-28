@@ -258,16 +258,18 @@ const setupMatchHistoryModal = (userId) => {
 
 // Function to handle account deletion
 const handleAccountDeletion = async (userId) => {
+
     if (!userId) {
         alert("User not logged in.");
         return;
     }
 
+    // Show confirmation dialog
     const isConfirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
 
     if (isConfirmed) {
         try {
-            const csrfToken = await getCSRFCookie();
+            const csrfToken = await getCSRFCookie(); // If using CSRF protection
             const response = await fetch(`api/users/${userId}/`, {
                 method: "DELETE",
                 headers: { "X-CSRFToken": csrfToken },
@@ -282,8 +284,7 @@ const handleAccountDeletion = async (userId) => {
 
             alert("✅ Account deleted successfully.");
             removeLoggedInUser(userId);
-            const loggedInUsers = getLoggedInUsers();
-            window.location.hash = loggedInUsers.length > 0 ? "#menu" : "#login";
+            window.location.hash = "#login";
         } catch (error) {
             console.error("❌ Error deleting account:", error);
             alert("❌ Error deleting account.");
@@ -291,40 +292,39 @@ const handleAccountDeletion = async (userId) => {
     }
 };
 
-const handleAnonymization = async (userId) => {
-    if (!userId) {
-        console.error("⚠️ User ID not found.");
-        alert("Error: Unable to anonymize personal data.");
-        return;
-    }
+const handleAnonymization  = async (userId) => {
+  if (!userId) {
+      console.error("⚠️ User ID not found.");
+      alert("Error: Unable to anonymize personal data.");
+      return;
+  }
 
-    const confirmation = confirm("Are you sure you want to anonymize your personal data? This cannot be undone, and your account will be unusable.");
-    if (!confirmation) return;
+  const confirmation = confirm("Are you sure you want to anonymize your personal data? This cannot be undone, and your account will be unusable.");
+  if (!confirmation) return;
 
-    try {
-        const response = await fetch(`api/users/${userId}/anonymize/`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: { "X-CSRFToken": await getCSRFCookie() },
-        });
+  try {
+      const response = await fetch(`api/users/${userId}/anonymize/`, {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "X-CSRFToken": await getCSRFCookie(), }
+      });
 
-        if (response.ok) {
-            const data = await response.json();
-            alert(`✅ ${data.message}`);
-            removeLoggedInUser(userId);
-            localStorage.clear();
-            const loggedInUsers = getLoggedInUsers();
-            window.location.hash = loggedInUsers.length > 0 ? "#menu" : "#login";
-        } else {
-            const errorData = await response.json();
-            alert(`❌ Error: ${errorData.errors || "Failed to anonymize personal data."}`);
-        }
-    } catch (error) {
-        console.error("⚠️ Network or server error:", error);
-        alert("An error occurred while anonymizing personal data.");
-    }
+      if (response.ok) {
+          const data = await response.json();
+          alert(`✅ ${data.message}`);
+          localStorage.clear();
+          window.location.hash = "#login";
+      } else {
+          const errorData = await response.json();
+          alert(`❌ Error: ${errorData.errors || "Failed to anonymize personal data."}`);
+      }
+  } catch (error) {
+      console.error("⚠️ Network or server error:", error);
+      alert("An error occurred while anonymizing personal data.");
+  }
 };
 
+// Button callbacks for profile page
 const setupButtons = (userId) => {
     [
         { 
@@ -383,17 +383,48 @@ const setupEditProfile = (userId) => {
     const saveProfileBtn = document.getElementById("save-profile-btn");
     const savePasswordBtn = document.getElementById("save-password-btn");
 
-
-    // Button to open edit profile modal --
-    editProfileBtn.addEventListener("click", () => {
+    // Button to open edit profile modal
+    editProfileBtn.addEventListener("click", async () => {
         const matchHistoryModal = document.getElementById("profile-match-history-modal");
         matchHistoryModal.classList.remove("profile-match-history-modal-visible");
         matchHistoryModal.classList.add("profile-match-history-modal-hidden");
 
-        document.getElementById("edit-username").value = document.querySelector(".profile-username").textContent;
-        document.getElementById("edit-email").value = document.querySelector(".profile-email").textContent;
-        document.getElementById("edit-first-name").value = document.querySelector(".profile-first-name").textContent;
-        document.getElementById("edit-last-name").value = document.querySelector(".profile-last-name").textContent;
+        // Fetch profile data from API
+        try {
+            const csrfToken = await getCSRFCookie();
+            const response = await fetch(`api/users/${userId}/`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                console.error("Failed to fetch profile data:", await response.json());
+                alert("Failed to load profile data. Some fields may be empty.");
+                // Fallback to empty strings
+                document.getElementById("edit-username").value = document.querySelector(".profile-username")?.textContent || "";
+                document.getElementById("edit-email").value = "";
+                document.getElementById("edit-first-name").value = "";
+                document.getElementById("edit-last-name").value = "";
+            } else {
+                const data = await response.json();
+                document.getElementById("edit-username").value = data.username || "";
+                document.getElementById("edit-email").value = data.email || "";
+                document.getElementById("edit-first-name").value = data.first_name || "";
+                document.getElementById("edit-last-name").value = data.last_name || "";
+            }
+        } catch (error) {
+            console.error("Error fetching profile data:", error);
+            alert("Error loading profile data. Some fields may be empty.");
+            // Fallback to empty strings
+            document.getElementById("edit-username").value = document.querySelector(".profile-username")?.textContent || "";
+            document.getElementById("edit-email").value = "";
+            document.getElementById("edit-first-name").value = "";
+            document.getElementById("edit-last-name").value = "";
+        }
 
         profileEditModal.classList.add("profile-edit-modal-visible");
     });
@@ -408,7 +439,7 @@ const setupEditProfile = (userId) => {
         }
     });
 
-    // Save password button --
+    // Save password button
     savePasswordBtn.addEventListener("click", async () => {
         if (!userId) {
             alert("User ID not found. Please log in again.");
@@ -465,9 +496,7 @@ const setupEditProfile = (userId) => {
         }
     });
     
-    
-
-    // Save profile button --
+    // Save profile button
     saveProfileBtn.addEventListener("click", async () => {
         if (!userId) {
             alert("User ID not found. Please log in again.");
