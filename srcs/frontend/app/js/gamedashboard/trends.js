@@ -26,6 +26,7 @@ async function initializeTrends(userId) {
       <div style="max-width: 600px; margin: 0 auto;">
         <canvas id="trends-chart"></canvas>
       </div>
+      <button class="basicbutton menu-btn" onclick="window.location.hash='dashy'" style="margin-top: 10px;">Back</button>
     `;
 
     const canvas = document.getElementById("trends-chart");
@@ -54,6 +55,12 @@ async function initializeTrends(userId) {
 
   } catch (err) {
     console.error("Error loading user trends:", err);
+    const container = document.getElementById("user-trends");
+    if (container) {
+      container.innerHTML = `
+        <p>Error loading trends data. Please try again later.</p>
+        <button class="basicbutton menu-btn" onclick="window.location.hash='dashy'" style="margin-top: 10px;">Back</button>
+      `;
+    }
   }
 }
-

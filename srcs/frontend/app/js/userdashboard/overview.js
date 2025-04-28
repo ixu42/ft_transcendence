@@ -11,7 +11,6 @@ async function initializeUserOverview(userId) {
     const wins = matches.filter(m => m.winner === user.username).length;
     const winRate = totalMatches ? ((wins / totalMatches) * 100).toFixed(1) + '%' : 'N/A';
 
-    // Most frequent opponent
     const opponents = {};
     matches.forEach(m => {
       const opponent = m.player1 === user.username ? m.player2 : m.player1;
@@ -31,15 +30,13 @@ async function initializeUserOverview(userId) {
       <p><strong>Win Rate:</strong> ${winRate}</p>
       <p><strong>Most Frequent Opponent:</strong> ${mostFrequentOpponent}</p>
       <button id="view-tournament-stats-btn" style="margin-top: 10px; padding: 8px 16px; background-color: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer;">View Tournament Stats</button>
-    `;
-    overviewContainer.innerHTML += `
       <div style="max-width: 300px; margin: 20px auto;">
         <canvas id="winloss-chart"></canvas>
       </div>
+      <button class="basicbutton menu-btn" onclick="window.location.hash='dashy'" style="margin-top: 10px;">Back</button>
     `;
+    
     renderWinLossChart(matches, user.username, "winloss-chart");
-
-    // Add event listener for tournament stats button
     document.getElementById("view-tournament-stats-btn").addEventListener("click", () => {
       initializeTournamentOverview(userId, user.username);
     });
@@ -55,11 +52,7 @@ async function initializeTournamentOverview(userId, username) {
     const tournaments = Array.isArray(tournamentData) ? tournamentData : [];
     const totalTournaments = tournaments.length;
     console.log("🏆 tournament history raw response:", tournaments);
-
-    // Count completed tournaments
     const completedTournaments = tournaments.filter(t => t.status === "COMPLETED").length;
-
-    // Most frequent opponent in tournaments
     const opponents = {};
     tournaments.forEach(t => {
       if (Array.isArray(t.players)) {
@@ -87,8 +80,6 @@ async function initializeTournamentOverview(userId, username) {
       </div>
     `;
     renderTournamentStatusChart(tournaments, "tournament-status-chart");
-
-    // Add event listener to switch back to match stats
     document.getElementById("view-match-stats-btn").addEventListener("click", () => {
       initializeUserOverview(userId);
     });
