@@ -30,4 +30,6 @@ urlpatterns = [
     path("<int:user_id>/heartbeat/", views.heartbeat, name="heartbeat"),
     # Game routes
     path("<int:user_id>/games/", include("games.urls")),
+    # Get data of all logged-in users
+    path("", views.get_logged_in_users, name="get_logged_in_users"),
 ]

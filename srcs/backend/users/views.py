@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import re
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
 from django.contrib.auth import authenticate
@@ -390,3 +391,26 @@ def heartbeat(request, user_id):
     user.last_active = timezone.now()
     user.save(update_fields=["last_active"])
     return JsonResponse({"message": "Heartbeat updated."})
+
+
+def get_logged_in_users(request):
+    user_ids = []
+
+    for cookie_name in request.COOKIES.keys():
+        # match cookies with pattern like "session_1", "session_10" etc
+        match = re.match(r'^session_(\d+)$', cookie_name)
+        if match:
+            user_id = match.group(1)
+            user_ids.append(user_id)
+
+    # query all users based on extracted user_ids
+    users = User.objects.filter(id__in=user_ids)
+
+    users_data = []
+    for user in users:
+        users_data.append({
+            'id': user.id,
+            'username': user.username,
+        })
+
+    return JsonResponse({'users': users_data})
