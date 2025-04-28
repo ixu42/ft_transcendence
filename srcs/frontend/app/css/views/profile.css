@@ -119,6 +119,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
+    display: none;
 }
 .profile-match-history-modal-visible {
     opacity: 1;
@@ -129,29 +130,22 @@
     background: var(--primary-bg-color);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
     width: 80%;
     max-width: 600px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
     z-index: 1001;
     justify-content: space-between;
-    max-height: 80vh;
+    max-height: 80vh;      /* Limit modal height to 80% of viewport */
     overflow-y: auto;
-    font-family: 'Arial', sans-serif; /* Improved typography */
-    color: var(--primary-text-color);
 }
 .profile-match-history-modal .modal-content h2 {
     margin-bottom: 15px;
-    color: white;
-    background-color: var(--accent-color); /* Distinct background for headers */
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1.6em;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white; /* White text for contrast */
+    background-color: #007bff; /* Blue background for headers */
 }
 .profile-match-history-modal .modal-content button {
     background-color: var(--secondary-bg-color);
@@ -161,41 +155,26 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size: 1em;
-    font-weight: 500;
 }
 .profile-match-history-modal .modal-content button:hover {
     background-color: var(--accent-color);
     color: white;
 }
-.profile-match-history-modal .modal-content .profile-match-history,
-.profile-match-history-modal .modal-content .profile-tournaments {
-    text-align: left;
-    font-size: 0.95em;
-    line-height: 1.5;
-}
 .profile-match-history-modal .modal-content .match-history-item,
 .profile-match-history-modal .modal-content .tournament-item {
-    background-color: var(--secondary-bg-color);
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: left; /* Align text to the left */
+    border-bottom: 1px solid #e0e0e0; /* Subtle divider line */
+    padding-bottom: 10px; /* Space below content before divider */
+    margin-bottom: 10px; /* Space after divider */
 }
-.profile-match-history-modal .modal-content .match-history-item p,
-.profile-match-history-modal .modal-content .tournament-item p {
-    margin: 5px 0;
+.profile-match-history-modal .modal-content .match-history-item:last-child,
+.profile-match-history-modal .modal-content .tournament-item:last-child {
+    border-bottom: none; /* Remove divider for the last item */
 }
 .profile-match-history-modal .modal-content .match-history-item p strong,
 .profile-match-history-modal .modal-content .tournament-item p strong {
-    color: var(--accent-color);
+    color: #007bff; /* Blue for highlighted labels */
 }
-.profile-match-history-modal .modal-content .error-message {
-    color: #d32f2f;
-    font-weight: 500;
-}
-
-
 
 
 /* Profile Edit Modal Styles */
