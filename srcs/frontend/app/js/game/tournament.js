@@ -2,15 +2,13 @@ const setupTournament = async (response) => {
     const tournamentId = response.tournament_id;
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
-    const MAX_PLAYERS = 6; // Add this constant at the top
+    const MAX_PLAYERS = 6;
 
-    // Helper function to redirect to #lobby
     function redirectToLobby() {
         window.location.hash = 'lobby';
         return null;
     }
 
-    // Helper function to prompt for winning score
     async function promptWinningScore() {
         let winningScore;
         while (!winningScore) {
@@ -437,25 +435,44 @@ const drawMatch = (players, canvas, matchIndex) => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.font = '30px Arial';
     context.fillStyle = '#fff';
-    context.fillText('Match', canvas.width / 2 - 50, 30);
+    context.textAlign = 'center';
+
+    context.fillText('Match', canvas.width / 2, 30);
     context.fillText(
         `${players[matchIndex].name} vs ${players[matchIndex + 1].name}`,
-        canvas.width / 2 - 50,
+        canvas.width / 2,
         100
     );
-    context.fillText('Press Enter to start', canvas.width / 2 - 50, 150);
-    context.fillText('Current Standings:', canvas.width / 2 - 50, 220);
+    context.fillText('Press Enter to start', canvas.width / 2, 150);
+
+    context.fillText('Current Standings:', canvas.width / 2, 220);
     context.font = '20px Arial';
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
     let y = 250;
     for (let i = 0; i < sortedPlayers.length; i++) {
         context.fillText(
             `${i + 1}. ${sortedPlayers[i].name}: ${sortedPlayers[i].score} W`,
-            canvas.width / 2 - 50,
+            canvas.width / 2,
             y
         );
         y += 30;
     }
+
+    context.textAlign = 'left';
+    context.font = '20px Arial';
+    context.fillText('Upcoming Matches:', 20, 50);
+    y = 80;
+    for (let i = 0; i < players.length - 1; i += 2) {
+        if (i !== matchIndex) {
+            context.fillText(
+                `${players[i].name} vs ${players[i + 1].name}`,
+                20,
+                y
+            );
+            y += 30;
+        }
+    }
+    context.textAlign = 'start';
 };
 
 
