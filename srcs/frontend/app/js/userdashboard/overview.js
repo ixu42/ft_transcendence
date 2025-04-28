@@ -48,10 +48,19 @@ async function initializeUserOverview(userId) {
 
 async function initializeTournamentOverview(userId, username) {
   try {
-    const tournamentData = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
-    const tournaments = Array.isArray(tournamentData) ? tournamentData : [];
+    const response = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.errors || "Failed to fetch tournament data");
+    }
+
+    const tournamentData = await response.json();
+    const tournaments = Array.isArray(tournamentData.participated_tournaments)
+      ? tournamentData.participated_tournaments
+      : [];
     const totalTournaments = tournaments.length;
     console.log("🏆 tournament history raw response:", tournaments);
+
     const completedTournaments = tournaments.filter(t => t.status === "COMPLETED").length;
     const opponents = {};
     tournaments.forEach(t => {
@@ -87,8 +96,20 @@ async function initializeTournamentOverview(userId, username) {
   } catch (err) {
     console.error("Error loading tournament overview:", err);
     const overviewContainer = document.getElementById("user-overview");
-    overviewContainer.innerHTML = `<p>Error loading tournament stats. Please try again later.</p>`;
+    overviewContainer.innerHTML = `<p>Error loading tournament stats: ${err.message}. Please try again later.</p>`;
   }
+}
+
+async function apiRequest(url, method) {
+  const csrfToken = await getCSRFCookie();
+  return fetch(`api/${url}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    credentials: "include",
+  });
 }
 
 function renderWinLossChart(matches, username, containerId) {
