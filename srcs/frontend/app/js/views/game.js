@@ -1,4 +1,3 @@
-
 const setupGameJs = async () => {
     try {
         const params = new URLSearchParams(window.location.hash.split("?")[1]);
@@ -8,7 +7,6 @@ const setupGameJs = async () => {
         let currentUserId = localStorage.getItem("user_id");
         const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
 
-        
         const selectUserForGame = () => {
             const userOptions = loggedInUsers
                 .map(user => `${user.id}: ${user.username}`)
@@ -22,8 +20,6 @@ const setupGameJs = async () => {
             }
             return selected.trim();
         };
-
-
 
         if (loggedInUsers.length === 0) {
             alert("Please log in to play a game 🏓");
@@ -72,17 +68,21 @@ const setupGameJs = async () => {
                     response = await apiRequest(`tournaments/?user_id=${currentUserId}`, "POST", {
                         tournament_name: `${loggedInUsers.find(u => u.id == currentUserId).username}'s tournament`,
                         display_name: loggedInUsers.find(u => u.id == currentUserId).username
-                    })
+                    });
                     if (response.error) { throw new Error(response.error); }
                     initializeTournament(response, currentUserId);
                     break;
                 case "1v1":
-                    response = await apiRequest(`users/${currentUserId}/games/local/`, 'POST');
+                    if (opponentId === "guest") {
+                        response = await apiRequest(`users/${currentUserId}/games/local/guest/`, "POST");
+                    } else {
+                        response = await apiRequest(`users/${currentUserId}/games/local/?user_id=${opponentId}`, "POST");
+                    }
                     if (response.error) { throw new Error(response.error); }
                     initializeGame(response.game_id, currentUserId, opponentId);
                     break;
                 case "ai":
-                    response = await apiRequest(`users/${currentUserId}/games/ai/`, 'POST');
+                    response = await apiRequest(`users/${currentUserId}/games/ai/`, "POST");
                     if (response.error) { throw new Error(response.error); }
                     initializeAIGame(response.game_id, currentUserId, opponentId);
                     break;

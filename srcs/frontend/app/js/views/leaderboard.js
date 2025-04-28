@@ -43,7 +43,7 @@ const renderLeaderboard = (playersData, currentPage) => {
                 <span class="rank">${
                     player.total_wins > 0 
                         ? `#${player.rank}` 
-                        : '<span class="rank-tooltip">?<span class="tooltip-text">Play a game to get ranked!</span></span>'
+                        : '<span class="rank-tooltip">?<span class="tooltip-text">Win a game to get ranked!</span></span>'
                 }</span>
                 <span class="player-id">${player.id}</span>
                 <img src="${fixAvatarURL(player.avatar)}" alt="${player.username}'s avatar" class="avatar">
