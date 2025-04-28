@@ -80,7 +80,7 @@ const drawScoreSelection = (game) => {
     context.fillText('Select Winning Score', game.canvas.width / 2 - 100, game.canvas.height / 2 - 60);
     context.fillText('1. 3 Points', game.canvas.width / 2 - 50, game.canvas.height / 2 - 20);
     context.fillText('2. 7 Points', game.canvas.width / 2 - 50, game.canvas.height / 2 + 20);
-    context.fillText('3. Endless', game.canvas.width / 2 - 50, game.canvas.height / 2 + 60);
+    context.fillText('3. 20 Points', game.canvas.width / 2 - 50, game.canvas.height / 2 + 60);
     context.fillText('Press 1, 2, or 3 to select', game.canvas.width / 2 - 100, game.canvas.height / 2 + 100);
 };
 
