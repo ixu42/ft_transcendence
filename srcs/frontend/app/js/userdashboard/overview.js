@@ -5,6 +5,11 @@ async function initializeUserOverview(userId) {
       apiRequest(`users/${userId}/match-history/`, "GET"),
     ]);
 
+    // Check for errors in the API responses
+    if (user.error || matchData.error) {
+      throw new Error(user.error || matchData.error);
+    }
+
     const matches = Array.isArray(matchData.match_history) ? matchData.match_history : [];
     const totalMatches = matches.length;
     console.log("📦 match history raw response:", matches);
@@ -43,18 +48,21 @@ async function initializeUserOverview(userId) {
 
   } catch (err) {
     console.error("Error loading user overview:", err);
+    const overviewContainer = document.getElementById("user-overview");
+    overviewContainer.innerHTML = `<p>Error loading user stats: ${err.message}. Please try again later.</p>`;
   }
 }
 
 async function initializeTournamentOverview(userId, username) {
   try {
-    const response = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.errors || "Failed to fetch tournament data");
+    const tournamentData = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
+
+    // Check for errors returned by apiRequest
+    if (tournamentData.error) {
+      throw new Error(tournamentData.error || "Failed to fetch tournament data");
     }
 
-    const tournamentData = await response.json();
+    // Extract participated_tournaments from response
     const tournaments = Array.isArray(tournamentData.participated_tournaments)
       ? tournamentData.participated_tournaments
       : [];
@@ -98,18 +106,6 @@ async function initializeTournamentOverview(userId, username) {
     const overviewContainer = document.getElementById("user-overview");
     overviewContainer.innerHTML = `<p>Error loading tournament stats: ${err.message}. Please try again later.</p>`;
   }
-}
-
-async function apiRequest(url, method) {
-  const csrfToken = await getCSRFCookie();
-  return fetch(`api/${url}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": csrfToken,
-    },
-    credentials: "include",
-  });
 }
 
 function renderWinLossChart(matches, username, containerId) {
