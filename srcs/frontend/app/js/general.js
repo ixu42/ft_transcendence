@@ -46,6 +46,31 @@ function getLoggedInUsers() {
     return JSON.parse(localStorage.getItem('loggedInUsers') || '[]');
 }
 
+async function syncLoggedInUsersWithBackend() {
+    try {
+        const response = await apiRequest('users/', 'GET');
+        if (response.error) {
+            console.error('Failed to sync with backend:', response.error);
+            return getLoggedInUsers();
+        }
+        const backendUsers = response.users || [];
+        console.log('Fetched backend users:', backendUsers);
+        for (const user of backendUsers) {
+            await addOrUpdateLoggedInUser({
+                id: user.id,
+                username: user.username,
+                loggedIn: true
+            });
+        }
+
+        console.log('Synced and updated all backend users');
+        return getLoggedInUsers();
+    } catch (error) {
+        console.error('Sync error:', error);
+        return getLoggedInUsers();
+    }
+}
+
 function debounce(func, wait) {
     let timeout;
     console.log("Debounce function initialized with wait time:", wait);
@@ -55,7 +80,7 @@ function debounce(func, wait) {
     };
 }
 
-function addOrUpdateLoggedInUser(user) {
+async function addOrUpdateLoggedInUser(user) {
     const sanitizedUser = {
         id: user.id,
         username: user.username,
@@ -70,16 +95,18 @@ function addOrUpdateLoggedInUser(user) {
         users.push(sanitizedUser);
     }
     localStorage.setItem('loggedInUsers', JSON.stringify(users));
+    console.log('User added/updated:', sanitizedUser);
 }
 
-function removeLoggedInUser(userId) {
+async function removeLoggedInUser(userId) {
+    await syncLoggedInUsersWithBackend();
+
     const users = getLoggedInUsers();
     console.log("Before removal:", users);
     const updatedUsers = users.filter(u => u.id.toString() !== userId.toString());
     console.log("After removal:", updatedUsers);
     localStorage.setItem('loggedInUsers', JSON.stringify(updatedUsers));
 }
-
 
 async function getCSRFCookie() {
     try {

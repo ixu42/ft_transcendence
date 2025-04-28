@@ -11,14 +11,55 @@ const setupGameJs = async () => {
             const userOptions = loggedInUsers
                 .map(user => `${user.id}: ${user.username}`)
                 .join("\n");
-            const selected = window.prompt(
-                "Please enter your user ID to create the game:\n" + userOptions
+            let selected;
+            let isValid = false;
+
+            do {
+                selected = window.prompt(
+                    "Please enter your user ID to create the game:\n" + userOptions
+                );
+                if (!selected) {
+                    window.location.hash = "#lobby";
+                    return null;
+                }
+                selected = selected.trim();
+                isValid = loggedInUsers.some(user => user.id.toString() === selected);
+                if (!isValid) {
+                    alert("Invalid user ID. Please select a valid user ID from the list.");
+                }
+            } while (!isValid);
+
+            return selected;
+        };
+
+        const selectOpponentForGame = () => {
+            const potentialOpponents = loggedInUsers.filter(
+                user => user.id.toString() !== currentUserId.toString()
             );
-            if (!selected) {
-                window.location.hash = "#lobby";
-                return null;
-            }
-            return selected.trim();
+            const opponentOptions = potentialOpponents
+                .map(user => `${user.id}: ${user.username}`)
+                .concat("guest: Guest")
+                .join("\n");
+            let selected;
+            let isValid = false;
+
+            do {
+                selected = window.prompt(
+                    `Select an opponent for the ${mode.toUpperCase()} game:\n` + opponentOptions
+                );
+                if (!selected) {
+                    window.location.hash = "#lobby";
+                    return null;
+                }
+                selected = selected.trim();
+                isValid = selected === "guest" || 
+                          potentialOpponents.some(user => user.id.toString() === selected);
+                if (!isValid) {
+                    alert("Invalid opponent ID. Please select a valid user ID or 'guest'.");
+                }
+            } while (!isValid);
+
+            return selected;
         };
 
         if (loggedInUsers.length === 0) {
@@ -39,22 +80,9 @@ const setupGameJs = async () => {
         }
 
         if ((mode === "1v1") && opponentId !== "guest") {
-            const potentialOpponents = loggedInUsers.filter(
-                user => user.id.toString() !== currentUserId.toString()
-            );
-            let opponentOptions = potentialOpponents
-                .map(user => `${user.id}: ${user.username}`)
-                .join("\n");
-            opponentOptions += "\nguest: Guest";
-
-            const selectedOpponent = window.prompt(
-                `Select an opponent for the ${mode.toUpperCase()} game:\n` + opponentOptions
-            );
-            if (!selectedOpponent) {
-                window.location.hash = "#lobby";
-                return;
-            }
-            opponentId = selectedOpponent.trim();
+            const selectedOpponent = selectOpponentForGame();
+            if (!selectedOpponent) return;
+            opponentId = selectedOpponent;
         }
 
         let response;
@@ -97,8 +125,6 @@ const setupGameJs = async () => {
         console.error("Error setting up the game:", error);
     }
 };
-
-
 
 
 async function saveGameStats(gameId, player1Score, player2Score, userId)
