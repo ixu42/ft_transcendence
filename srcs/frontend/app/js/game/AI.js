@@ -7,7 +7,6 @@ const initializeAIGame = (gameId, userId) => {
     const game = createGame();
     game.state = "levelSelection";
     game.isAI = true;
-    setupAILevelControls(game);
     setupAndStart(gameId, userId, game);
 };
 

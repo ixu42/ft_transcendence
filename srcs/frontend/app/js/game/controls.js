@@ -20,6 +20,20 @@ const setupControls = async (player, player2, game, gameId, userId, isTournament
             game.state = 'game';
         }
 
+        if (game.state === 'levelSelection') {
+            if (event.key === '1') {
+                game.aiLevel = 'easy';
+                game.state = 'scoreSelection';
+            } else if (event.key === '2') {
+                game.aiLevel = 'medium';
+                game.state = 'scoreSelection';
+            } else if (event.key === '3') {
+                game.aiLevel = 'hard';
+                game.state = 'scoreSelection';
+            }
+            return;
+        }
+
         if (game.state === 'scoreSelection') {
             if (key === '1') {
                 game.winningScore = 3;
@@ -69,23 +83,6 @@ const setupTournamentControls = (tournament) => {
     document.addEventListener('keydown', function(event) {
         const key = event.key.toLowerCase();
         key === 'enter' ? tournament.keyboardEnter = true : null;
-    });
-}
-
-const setupAILevelControls = (game) => {
-    document.addEventListener('keydown', function(event) {
-        if (game.state === 'levelSelection') {
-            if (event.key === '1') {
-                game.aiLevel = 'easy';
-                game.state = 'scoreSelection';
-            } else if (event.key === '2') {
-                game.aiLevel = 'medium';
-                game.state = 'scoreSelection';
-            } else if (event.key === '3') {
-                game.aiLevel = 'hard';
-                game.state = 'scoreSelection';
-            }
-        }
     });
 }
 
