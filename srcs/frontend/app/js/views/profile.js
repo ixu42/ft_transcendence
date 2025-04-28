@@ -258,18 +258,16 @@ const setupMatchHistoryModal = (userId) => {
 
 // Function to handle account deletion
 const handleAccountDeletion = async (userId) => {
-
     if (!userId) {
         alert("User not logged in.");
         return;
     }
 
-    // Show confirmation dialog
     const isConfirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
 
     if (isConfirmed) {
         try {
-            const csrfToken = await getCSRFCookie(); // If using CSRF protection
+            const csrfToken = await getCSRFCookie();
             const response = await fetch(`api/users/${userId}/`, {
                 method: "DELETE",
                 headers: { "X-CSRFToken": csrfToken },
@@ -284,7 +282,8 @@ const handleAccountDeletion = async (userId) => {
 
             alert("✅ Account deleted successfully.");
             removeLoggedInUser(userId);
-            window.location.hash = "#login";
+            const loggedInUsers = getLoggedInUsers();
+            window.location.hash = loggedInUsers.length > 0 ? "#menu" : "#login";
         } catch (error) {
             console.error("❌ Error deleting account:", error);
             alert("❌ Error deleting account.");
@@ -292,39 +291,40 @@ const handleAccountDeletion = async (userId) => {
     }
 };
 
-const handleAnonymization  = async (userId) => {
-  if (!userId) {
-      console.error("⚠️ User ID not found.");
-      alert("Error: Unable to anonymize personal data.");
-      return;
-  }
+const handleAnonymization = async (userId) => {
+    if (!userId) {
+        console.error("⚠️ User ID not found.");
+        alert("Error: Unable to anonymize personal data.");
+        return;
+    }
 
-  const confirmation = confirm("Are you sure you want to anonymize your personal data? This cannot be undone, and your account will be unusable.");
-  if (!confirmation) return;
+    const confirmation = confirm("Are you sure you want to anonymize your personal data? This cannot be undone, and your account will be unusable.");
+    if (!confirmation) return;
 
-  try {
-      const response = await fetch(`api/users/${userId}/anonymize/`, {
-          method: "PATCH",
-          credentials: "include",
-          headers: { "X-CSRFToken": await getCSRFCookie(), }
-      });
+    try {
+        const response = await fetch(`api/users/${userId}/anonymize/`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "X-CSRFToken": await getCSRFCookie() },
+        });
 
-      if (response.ok) {
-          const data = await response.json();
-          alert(`✅ ${data.message}`);
-          localStorage.clear();
-          window.location.hash = "#login";
-      } else {
-          const errorData = await response.json();
-          alert(`❌ Error: ${errorData.errors || "Failed to anonymize personal data."}`);
-      }
-  } catch (error) {
-      console.error("⚠️ Network or server error:", error);
-      alert("An error occurred while anonymizing personal data.");
-  }
+        if (response.ok) {
+            const data = await response.json();
+            alert(`✅ ${data.message}`);
+            removeLoggedInUser(userId);
+            localStorage.clear();
+            const loggedInUsers = getLoggedInUsers();
+            window.location.hash = loggedInUsers.length > 0 ? "#menu" : "#login";
+        } else {
+            const errorData = await response.json();
+            alert(`❌ Error: ${errorData.errors || "Failed to anonymize personal data."}`);
+        }
+    } catch (error) {
+        console.error("⚠️ Network or server error:", error);
+        alert("An error occurred while anonymizing personal data.");
+    }
 };
 
-// Button callbacks for profile page
 const setupButtons = (userId) => {
     [
         { 
