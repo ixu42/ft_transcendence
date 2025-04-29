@@ -198,7 +198,7 @@ const initializeGame = (gameId, userId) => {
 
 const setupAndStart = (gameId, userId, game) => 
 {
-    setupControls(game.player, game.player2, game, gameId, userId);
+    setupControls(game.player, game.player2, game);
     setupWindowEvents(game);
     startGameLoop(game, () => {
         if (getLoggedInUsers().length > 0) {
