@@ -151,7 +151,6 @@ const setupTournament = async (response) => {
                             players,
                             allPlayers: [...players],
                             winningScore,
-                            keyboardEnter: false,
                             state: "table",
                             tournamentId,
                             isTournamentRunning: false
@@ -210,7 +209,6 @@ const setupTournament = async (response) => {
                             players,
                             allPlayers: [...players],
                             winningScore,
-                            keyboardEnter: false,
                             state: "table",
                             tournamentId,
                             isTournamentRunning: false
@@ -254,7 +252,6 @@ const setupTournament = async (response) => {
                             players,
                             allPlayers: [...players],
                             winningScore,
-                            keyboardEnter: false,
                             state: "table",
                             tournamentId,
                             isTournamentRunning: false
@@ -301,7 +298,6 @@ const setupTournament = async (response) => {
         players,
         allPlayers: [...players],
         winningScore,
-        keyboardEnter: false,
         state: "table",
         tournamentId,
         isTournamentRunning
@@ -344,7 +340,7 @@ const initializeTournament = async (response, currentUserId) => {
     await startTournament(tournament);
     const game = createGame();
     game.winningScore = tournament.winningScore;
-    setupTournamentControls(tournament);
+    // setupTournamentControls(tournament);
     setupControls(game.player, game.player2, game, response.game_id, currentUserId, true);
     setupWindowEvents(game);
     setupWindowEventsTournament(tournament);
@@ -365,18 +361,20 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
     }
     if (tournament.state === 'table') {
         drawTable(tournament.players, game.canvas);
-        if (tournament.keyboardEnter) {
+        waitForButton('enter', () => {
             tournament.state = 'prepare';
-            tournament.keyboardEnter = false;
-        }
+            tournamentLoop(tournament, game, currentMatchIndex, game_id);
+        });
+        return;
     }
     if (tournament.state === 'prepare') {
         drawMatch(tournament.players, game.canvas, currentMatchIndex);
-        if (tournament.keyboardEnter) {
+        waitForButton('enter', () => {
             tournament.state = 'playing';
-            game.state = 'wallSelection';
-            tournament.keyboardEnter = false;
-        }
+            game.state = 'wallSelection'
+            tournamentLoop(tournament, game, currentMatchIndex, game_id);
+        });
+        return;
     }
     if (tournament.state === 'playing') {
         startGameLoop(game, () => {
@@ -408,6 +406,9 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
     }
     if (tournament.state === 'gameOver') {
         drawWinner(tournament.players[0], game.canvas);
+        waitForButton('x', () => {
+            window.location.hash = 'lobby';
+        });
         return;
     }
     requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex, game_id));

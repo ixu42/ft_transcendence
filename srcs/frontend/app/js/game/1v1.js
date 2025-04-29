@@ -134,18 +134,47 @@ const gameLoop = (game, onGameEnd) => {
     const deltaTime = (currentTime - game.lastTime); 
     game.lastTime = currentTime;
 
-    if (game.state === "game" || game.state === "pause" || game.state === "prepare") {
+    if (game.state === "game" || game.state === "pause") {
         updateGame(deltaTime, game);
         drawGame(game);
+        requestAnimationFrame(() => gameLoop(game, onGameEnd));
+    }
+    if (game.state === "prepare") {
+        drawGame(game);
+        waitForAnyButton(() => {
+            game.state = "game"; // Change the state to "game" when a button is pressed
+            game.lastTime = performance.now(); // Reset the lastTime to start the game loop
+            gameLoop(game, onGameEnd); // Restart the game loop
+        });
+        return;
     }
     if (game.state === "levelSelection") {
         drawLevelSelection(game);
+        waitForSelection((selection) => {
+            game.aiLevel = selection === '1' ? 'easy' : selection === '2' ? 'medium' : 'hard';
+            game.state = 'scoreSelection';
+            gameLoop(game, onGameEnd);
+        });
+        return;
     }
     if (game.state === "scoreSelection") {
         drawScoreSelection(game);
+        waitForSelection((selection) => {
+            game.winningScore = selection === '1' ? 3 : selection === '2' ? 7 : 20;
+            game.state = 'wallSelection';
+            gameLoop(game, onGameEnd);
+        });
+        return;
     }
     if (game.state === "wallSelection") {
         drawWallSelection(game);
+        waitForWallSelection((selection) => {
+            game.options.walls = selection === '1' ? 1 : 0; // Enable walls
+            game.walls = { player: game.winningScore, player2: game.winningScore }; // Initialize wall HP
+            game.state = 'prepare'; // Change the state
+            gameLoop(game, onGameEnd);
+        });
+        return;
     }
     if (game.state === "gameOver") {
         drawGameOver(game);
@@ -155,7 +184,6 @@ const gameLoop = (game, onGameEnd) => {
         }
         return;
     }
-    requestAnimationFrame(() => gameLoop(game, onGameEnd));
 };
 
 const initializeGame = (gameId, userId) => {
@@ -176,5 +204,8 @@ const setupAndStart = (gameId, userId, game) =>
         if (getLoggedInUsers().length > 0) {
             saveGameStats(gameId, game.player.score, game.player2.score, userId);
          }
+         waitForButton('x', () => {
+            window.location.href = "/#lobby"; // Adjust the URL to your lobby page
+         });
     }); 
 }
