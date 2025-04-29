@@ -818,9 +818,6 @@ Save the stats for a completed game for a logged-in user.
     "player2_score": 10
   }
   ```
-
-````
-
 - **Response**
   - **200**
     ```json
@@ -1080,7 +1077,6 @@ Save the stats of a completed tournament.
     ```
 
 </details>
-````
 
 ---
 
@@ -1111,4 +1107,3 @@ Save the stats of a completed tournament.
     ```
 
 </details>
-````
