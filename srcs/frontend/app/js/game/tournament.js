@@ -155,7 +155,6 @@ const setupTournament = async (response) => {
                             players,
                             allPlayers: [...players],
                             winningScore,
-                            keyboardEnter: false,
                             state: "table",
                             tournamentId,
                             isTournamentRunning: false
@@ -199,7 +198,6 @@ const setupTournament = async (response) => {
                             players,
                             allPlayers: [...players],
                             winningScore,
-                            keyboardEnter: false,
                             state: "table",
                             tournamentId,
                             isTournamentRunning: false
@@ -355,7 +353,6 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
         });
         return;
     }
-    requestAnimationFrame(() => tournamentLoop(tournament, game, currentMatchIndex, game_id));
 };
 
 const drawTable = (players, canvas) => {
