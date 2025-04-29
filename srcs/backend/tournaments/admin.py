@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tournament
+from .models import Tournament, TournamentPlayer
 
 
 class TournamentAdmin(admin.ModelAdmin):
@@ -7,7 +7,8 @@ class TournamentAdmin(admin.ModelAdmin):
         "id",
         "name",
         "get_creator",
-        "get_players",
+        "get_players_usernames",
+        "get_players_display_names",
         "started_at",
         "status",
         "get_winner",
@@ -18,14 +19,20 @@ class TournamentAdmin(admin.ModelAdmin):
     def get_creator(self, obj):
         return obj.creator.username
 
-    def get_players(self, obj):
+    def get_players_usernames(self, obj):
         return ", ".join(player.username for player in obj.players.all())
+    
+    def get_players_display_names(self, obj):
+      return ", ".join(
+          tp.display_name for tp in TournamentPlayer.objects.filter(tournament=obj)
+      )
 
     def get_winner(self, obj):
         return obj.winner.username if obj.winner else "-"
 
     get_creator.short_description = "Creator"
-    get_players.short_description = "Players"
+    get_players_usernames.short_description = "Players (username)"
+    get_players_display_names.short_description = "Players (display_name)"
     get_winner.short_description = "Winner"
 
     def has_add_permission(self, request):
