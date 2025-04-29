@@ -268,6 +268,11 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
             currentMatchIndex++;
             if (currentMatchIndex >= tournament.players.length - 1) {
                 currentMatchIndex = 0;
+                if (tournament.players.length % 2 === 1) {
+                    // Move the last player to the first position
+                    const lastPlayer = tournament.players.pop(); // Remove the last player
+                    tournament.players.unshift(lastPlayer); // Add the last player to the beginning
+                }
             }
             if (tournament.players.length === 1) {
                 tournament.state = 'gameOver';
