@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from backend.decorators import validate_user_id_query_param
-from .models import Tournament, TournamentPlayer
+from .models import Tournament
 
 User = get_user_model()
 
@@ -19,7 +19,7 @@ class BaseTestCase(TestCase):
             name="test tournament", creator=self.user1
         )
         for user in [self.user1, self.user2, self.user3]:
-            self.add_player(self.tournament, user)
+            self.tournament.players.add(user)
 
     def login(self, user):
         session = self.client.session
@@ -49,11 +49,6 @@ class BaseTestCase(TestCase):
     def get_url(self, url_name, tournament_id, user_id):
         url = reverse(url_name, args=[tournament_id])
         return f"{url}?user_id={user_id}"
-
-    def add_player(self, tournament, user):
-        TournamentPlayer.objects.create(
-            tournament=tournament, user=user, display_name=f"{user.username}"
-        )
 
 
 @validate_user_id_query_param
@@ -107,7 +102,7 @@ class TestCreateTournament(BaseTestCase):
     def test_create_tournament_success(self):
         response = self.make_request(
             self.url,
-            json.dumps({"tournament_name": "", "display_name": "player1"}),
+            json.dumps({"tournament_name": ""}),
             "POST",
         )
 
@@ -116,27 +111,18 @@ class TestCreateTournament(BaseTestCase):
         self.assertJSONEqual(
             response.content,
             {
-                "message": "Tournament created.",
+                "message": f"{self.user.username} created tournament.",
                 "tournament_id": 1,
-                "tournament_name": "player1's tournament",
+                "tournament_name": f"{self.user.username}'s tournament",
             },
         )
         tournament = Tournament.objects.first()
-        self.assertEqual(tournament.name, "player1's tournament")
+        self.assertEqual(tournament.name, f"{self.user.username}'s tournament")
 
     def test_create_tournament_invalid_json_input(self):
         response = self.make_request(self.url, "invalid", "POST")
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"errors": "Invalid JSON input."})
-
-    def test_create_tournament_invalid_form(self):
-        response = self.make_request(
-            self.url, json.dumps({"tournament_name": "", "display_name": ""}), "POST"
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(
-            response.content, {"errors": {"display_name": ["This field is required."]}}
-        )
 
 
 class TestJoinTournament(BaseTestCase):
@@ -151,13 +137,13 @@ class TestJoinTournament(BaseTestCase):
         self.login(self.user2)
 
     def test_join_tournament_success(self):
-        response = self.make_request(self.url, json.dumps({"display_name": "player2"}))
+        response = self.make_request(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             response.content,
             {
-                "message": "player2 joined tournament.",
+                "message": f"{self.user2.username} joined tournament.",
                 "tournament_id": self.tournament.id,
                 "tournament_name": self.tournament.name,
             },
@@ -165,32 +151,18 @@ class TestJoinTournament(BaseTestCase):
 
     def test_join_tournament_tournament_not_found(self):
         url = self.get_url(self.url_name, 4242, self.user2.id)
-        response = self.make_request(url, json.dumps({"display_name": "player2"}))
+        response = self.make_request(url)
         self.assertEqual(response.status_code, 404)
         self.assertJSONEqual(
             response.content,
             {"errors": "Tournament not found with tournament_id 4242."},
         )
 
-    def test_join_tournament_invalid_json_input(self):
-        response = self.make_request(self.url, "invalid")
-        self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(response.content, {"errors": "Invalid JSON input."})
-
-    def test_join_tournament_empty_display_name(self):
-        response = self.make_request(self.url, json.dumps({"display_name": ""}))
-        self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(
-            response.content, {"errors": {"display_name": ["This field is required."]}}
-        )
-
     def test_join_tournament_tournament_full(self):
         for i in range(Tournament.MAX_PLAYERS):
             user = User.objects.create(username=f"new_user{i}")
-            TournamentPlayer.objects.create(
-                tournament=self.tournament, user=user, display_name=f"new_player{i}"
-            )
-        response = self.make_request(self.url, json.dumps({"display_name": "player2"}))
+            self.tournament.players.add(user)
+        response = self.make_request(self.url)
 
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {"errors": "['Tournament is full']"})

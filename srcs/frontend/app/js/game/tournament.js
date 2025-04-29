@@ -42,11 +42,10 @@ const setupTournament = async (response) => {
         `❌ Number of players must be between 3 and ${MAX_PLAYERS}.`
     );
 
-    const joinPlayer = async (playerId, displayName) => {
+    const joinPlayer = async (playerId) => {
         const joinResponse = await apiRequest(
             `tournaments/${tournamentId}/players/?user_id=${playerId}`,
-            "PATCH",
-            { display_name: displayName }
+            "PATCH"
         );
         return joinResponse.errors ? null : true;
     };
@@ -190,8 +189,7 @@ const startTournament = async (tournament) => {
 
     const startResponse = await apiRequest(
         `tournaments/${tournament.tournamentId}/start/?user_id=${creator.userId}`,
-        "PATCH",
-        {}
+        "PATCH"
     );
     if (startResponse.errors) {
         console.error(

@@ -818,9 +818,6 @@ Save the stats for a completed game for a logged-in user.
     "player2_score": 10
   }
   ```
-
-````
-
 - **Response**
   - **200**
     ```json
@@ -871,30 +868,21 @@ Create a tournament.
   ```json
   {
     "tournament_name": "",
-    "display_name": "player1"
   }
   ```
 - **Response**
   - **201**
     ```json
     {
-      "message": "Tournament created.",
+      "message": "{user's username} created tournament.",
       "tournament_id": 1,
-      "tournament_name": "player1's tournament"
+      "tournament_name": "{user's username}'s tournament"
     }
     ```
   - **400**
     - When the data in Json payload is malformed
       ```json
       { "errors": "Invalid JSON input." }
-      ```
-    - When errors occur during the form validation
-      ```json
-      {
-        "errors": {
-          "display_name": ["This field is required."]
-        }
-      }
       ```
     - When user_id is not passed as query param
       ```json
@@ -923,30 +911,16 @@ Join a tournament.
         <code><b>tournaments/{id}/players/?user_id={user_id}</b></code>
     </summary>
 
-- **Expected Request Body**:
-  ```json
-  { "display_name": "player2" }
-  ```
 - **Response**
   - **200**
     ```json
     {
-      "message": "player2 joined tournament.",
+      "message": "{user's username} joined tournament.",
       "tournament_id": 1,
-      "tournament_name": "player1's tournament"
+      "tournament_name": "{creator's username}'s tournament"
     }
     ```
   - **400**
-    ```json
-    { "errors": "Invalid JSON input." }
-    ```
-    ```json
-    {
-      "errors": {
-        "display_name": ["This field is required."]
-      }
-    }
-    ```
     ```json
     { "errors": "Missing user_id query parameter." }
     ```
@@ -961,11 +935,6 @@ Join a tournament.
     ```
     ```json
     { "errors": "['You are already in this tournament.']" }
-    ```
-    ```json
-    {
-      "errors": "['Display name is already taken in this tournament. Choose another.']"
-    }
     ```
   - **401**
     ```json
@@ -996,7 +965,7 @@ Start a tournament.
     {
       "message": "Tournament started.",
       "tournament_id": 1,
-      "tournament_name": "player1's tournament"
+      "tournament_name": "{creator's username}'s tournament"
     }
     ```
   - **400**
@@ -1048,7 +1017,7 @@ Save the stats of a completed tournament.
     {
       "message": "Tournament stats saved.",
       "tournament_id": 1,
-      "tournament_name": "player1's tournament"
+      "tournament_name": "{creator's username}'s tournament"
     }
     ```
   - **400**
@@ -1108,7 +1077,6 @@ Save the stats of a completed tournament.
     ```
 
 </details>
-````
 
 ---
 
@@ -1139,4 +1107,3 @@ Save the stats of a completed tournament.
     ```
 
 </details>
-````

@@ -498,8 +498,8 @@ class TestParticipatedTournaments(BaseTestCase):
             creator=self.user,
             status=Tournament.TournamentStatus.PENDING,
         )
-        self.tournament.add_player(user=self.user, display_name="User1")
-        self.tournament.add_player(user=self.other_user, display_name="User2")
+        self.tournament.players.add(self.user)
+        self.tournament.players.add(self.other_user)
 
     def test_participated_tournaments_success(self):
         response = self.client.get(self.url)

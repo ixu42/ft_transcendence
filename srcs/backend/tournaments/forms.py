@@ -1,17 +1,11 @@
 from django import forms
-from .models import Tournament, TournamentPlayer
+from .models import Tournament
 
 
 class TournamentCreationForm(forms.ModelForm):
-    display_name = forms.CharField(
-        max_length=50,
-        required=True,
-        help_text="This will be your name in the tournament.",
-    )
-
     class Meta:
         model = Tournament
-        fields = ["name", "display_name"]
+        fields = ["name"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,24 +17,11 @@ class TournamentCreationForm(forms.ModelForm):
         """Create a tournament and add the creator as a player."""
         tournament = super().save(commit=False)
         tournament.creator = user
-        display_name = self.cleaned_data.get("display_name")
         if not tournament.name:
-            tournament.name = f"{display_name}'s tournament"
+            tournament.name = f"{user.username}'s tournament"
+
         if commit:
             tournament.save()
-            TournamentPlayer.objects.create(
-                tournament=tournament, user=user, display_name=display_name
-            )
+            tournament.players.add(user)
+
         return tournament
-
-
-class TournamentJoiningForm(forms.ModelForm):
-    display_name = forms.CharField(
-        max_length=50,
-        required=True,
-        help_text="This will be your name in the tournament.",
-    )
-
-    class Meta:
-        model = Tournament
-        fields = ["display_name"]
