@@ -5,16 +5,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tournaments', '0006_remove_tournament_players_delete_tournamentplayer'),
+        ("tournaments", "0006_remove_tournament_players_delete_tournamentplayer"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tournament',
-            name='players',
-            field=models.ManyToManyField(related_name='participated_tournaments', to=settings.AUTH_USER_MODEL),
+            model_name="tournament",
+            name="players",
+            field=models.ManyToManyField(
+                related_name="participated_tournaments", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

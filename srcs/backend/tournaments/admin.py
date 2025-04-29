@@ -25,7 +25,7 @@ class TournamentAdmin(admin.ModelAdmin):
         return obj.winner.username if obj.winner else "-"
 
     get_creator.short_description = "Creator"
-    get_players_usernames.short_description = "Players (username)"
+    get_players_usernames.short_description = "Players"
     get_winner.short_description = "Winner"
 
     def has_add_permission(self, request):
