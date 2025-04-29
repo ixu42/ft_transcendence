@@ -26,4 +26,4 @@ const drawPaddle = (context, paddle) => {
 
 const resetPaddle = (paddle, canvas) => {
     paddle.y = canvas.height / 2 - 50;
-}
+};

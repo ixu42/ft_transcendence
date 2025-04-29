@@ -2,7 +2,7 @@ const setupTournament = async (response) => {
     const tournamentId = response.tournament_id;
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
-    const MAX_PLAYERS = 6;
+    const MAX_PLAYERS = 5;
 
     const redirectToLobby = () => {
         window.location.hash = 'lobby';
@@ -383,9 +383,9 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
                         const lastPlayer = tournament.players.pop(); // Remove the last player
                         tournament.players.unshift(lastPlayer); // Add the last player to the beginning
                         console.log("1player0: ", tournament.players[0].name);
-                        tournament.upcomingMatches = null;
-                        initializeUpcomingMatches(tournament);
                     }
+                    tournament.upcomingMatches = null;
+                    initializeUpcomingMatches(tournament);
                 }
 
                 if (!checkTournamentEnd()) {
