@@ -2,7 +2,7 @@ const setupTournament = async (response) => {
     const tournamentId = response.tournament_id;
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
-    const MAX_PLAYERS = 6;
+    const MAX_PLAYERS = 5;
 
     const redirectToLobby = () => {
         window.location.hash = 'lobby';
