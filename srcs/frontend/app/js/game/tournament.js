@@ -233,6 +233,27 @@ const stopTournamentLoop = (tournament) => {
 }
 
 const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
+    // Initialize upcoming matches if not already set
+    if (!tournament.upcomingMatches) {
+        tournament.upcomingMatches = [];
+        for (let i = 0; i < tournament.players.length - 1; i += 2) {
+            const match = {
+                player1: tournament.players[i].name,
+                player2: tournament.players[i + 1] ? tournament.players[i + 1].name : "?"
+            };
+            tournament.upcomingMatches.push(match);
+        }
+        // Handle odd number of players by pushing the last player to play against "?" to the bottom
+        if (tournament.players.length % 2 !== 0) {
+            const lastPlayer = tournament.players[tournament.players.length - 1];
+            const byeMatch = {
+                player1: lastPlayer.name,
+                player2: "?"
+            };
+            tournament.upcomingMatches.push(byeMatch);
+        }
+    }
+
     if (tournament.isTournamentRunning === false) {
         return;
     }
@@ -245,10 +266,10 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
         return;
     }
     if (tournament.state === 'prepare') {
-        drawMatch(tournament.players, game.canvas, currentMatchIndex);
+        drawMatch(tournament.players, game.canvas, currentMatchIndex, tournament.upcomingMatches);
         waitForButton('enter', () => {
             tournament.state = 'playing';
-            game.state = 'wallSelection'
+            game.state = 'wallSelection';
             tournamentLoop(tournament, game, currentMatchIndex, game_id);
         });
         return;
@@ -265,6 +286,12 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
             }
             winner.score++;
             tournament.players = tournament.players.filter(player => player !== loser);
+            
+            // Remove the played match from upcoming matches
+            if (tournament.upcomingMatches.length > 0) {
+                tournament.upcomingMatches.splice(Math.floor(currentMatchIndex / 2), 1);
+            }
+
             currentMatchIndex++;
             if (currentMatchIndex >= tournament.players.length - 1) {
                 currentMatchIndex = 0;
@@ -286,6 +313,7 @@ const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
     }
 };
 
+
 const drawTable = (players, canvas) => {
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -303,21 +331,24 @@ const drawTable = (players, canvas) => {
     context.fillText('Press Enter to start', canvas.width / 2 - 50, y + 50);
 };
 
-const drawMatch = (players, canvas, matchIndex) => {
+const drawMatch = (players, canvas, matchIndex, upcomingMatches) => {
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.font = '30px Arial';
     context.fillStyle = '#fff';
     context.textAlign = 'center';
 
+    // Draw current match
     context.fillText('Match', canvas.width / 2, 30);
+    const player2Name = players[matchIndex + 1] ? players[matchIndex + 1].name : "?";
     context.fillText(
-        `${players[matchIndex].name} vs ${players[matchIndex + 1].name}`,
+        `${players[matchIndex].name} vs ${player2Name}`,
         canvas.width / 2,
         100
     );
     context.fillText('Press Enter to start', canvas.width / 2, 150);
 
+    // Draw current standings
     context.fillText('Current Standings:', canvas.width / 2, 220);
     context.font = '20px Arial';
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
@@ -331,20 +362,20 @@ const drawMatch = (players, canvas, matchIndex) => {
         y += 30;
     }
 
-    context.textAlign = 'left';
+    // Draw upcoming matches
     context.font = '20px Arial';
+    context.textAlign = 'left';
     context.fillText('Upcoming Matches:', 20, 50);
     y = 80;
-    for (let i = 0; i < players.length - 1; i += 2) {
-        if (i !== matchIndex) {
-            context.fillText(
-                `${players[i].name} vs ${players[i + 1].name}`,
-                20,
-                y
-            );
-            y += 30;
-        }
+    for (const match of upcomingMatches) {
+        context.fillText(
+            `${match.player1} vs ${match.player2}`,
+            20,
+            y
+        );
+        y += 30;
     }
+
     context.textAlign = 'start';
 };
 
