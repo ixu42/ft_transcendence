@@ -4,7 +4,7 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from backend.decorators import validate_user_id_query_param
-from .forms import TournamentCreationForm, TournamentJoiningForm
+from .forms import TournamentCreationForm
 from .models import Tournament
 
 User = get_user_model()
@@ -26,7 +26,7 @@ def create_tournament(request):
         tournament = form.save(user=user)
         return JsonResponse(
             {
-                "message": "Tournament created.",
+                "message": f"{user.username} created tournament.",
                 "tournament_id": tournament.id,
                 "tournament_name": tournament.name,
             },
@@ -43,25 +43,18 @@ def join_tournament(request, tournament_id):
 
     try:
         tournament = Tournament.objects.get(id=tournament_id)
-        data = json.loads(request.body)
-        form = TournamentJoiningForm(data)
-        if not form.is_valid():
-            return JsonResponse({"errors": form.errors}, status=400)
-        display_name = data.get("display_name")
-        tournament.add_player(user, data.get("display_name"))
+        tournament.add_player(user)
     except Tournament.DoesNotExist:
         return JsonResponse(
             {"errors": f"Tournament not found with tournament_id {tournament_id}."},
             status=404,
         )
-    except json.JSONDecodeError:
-        return JsonResponse({"errors": "Invalid JSON input."}, status=400)
     except ValidationError as e:
         return JsonResponse({"errors": str(e)}, status=400)
 
     return JsonResponse(
         {
-            "message": f"{display_name} joined tournament.",
+            "message": f"{user.username} joined tournament.",
             "tournament_id": tournament.id,
             "tournament_name": tournament.name,
         },

@@ -21,7 +21,7 @@ class Tournament(models.Model):
         related_name="created_tournaments",
     )
     players = models.ManyToManyField(
-        CustomUser, through="TournamentPlayer", related_name="participated_tournaments"
+        CustomUser, related_name="participated_tournaments"
     )
     started_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
@@ -43,24 +43,13 @@ class Tournament(models.Model):
         if self.status == Tournament.TournamentStatus.COMPLETED:
             raise ValidationError("Tournament has already completed.")
 
-    def add_player(self, user, display_name):
+    def add_player(self, user):
         self.check_status()
         if self.players.count() >= Tournament.MAX_PLAYERS:
             raise ValidationError("Tournament is full")
-        if (
-            user.username != "guest_player"
-            and TournamentPlayer.objects.filter(tournament=self, user=user).exists()
-        ):
+        if user.username != "guest_player" and self.players.filter(id=user.id).exists():
             raise ValidationError("You are already in this tournament.")
-        if TournamentPlayer.objects.filter(
-            tournament=self, display_name=display_name
-        ).exists():
-            raise ValidationError(
-                "Display name is already taken in this tournament. Choose another."
-            )
-        return TournamentPlayer.objects.create(
-            tournament=self, user=user, display_name=display_name
-        )
+        self.players.add(user)
 
     def start(self, user):
         self.check_status()
@@ -92,16 +81,3 @@ class Tournament(models.Model):
             f"players: {players}, "
             f"{self.players.count()}/{Tournament.MAX_PLAYERS} joined.)"
         )
-
-
-class TournamentPlayer(models.Model):
-    tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.SET(get_deleted_user))
-    display_name = models.CharField(max_length=50)
-
-    class Meta:
-        # Enforce unique display name per tournament
-        unique_together = ("tournament", "display_name")
-
-    def __str__(self):
-        return f"{self.display_name} in {self.tournament.name}"
