@@ -115,6 +115,8 @@ const resetGame = (game) => {
     game.player.score = 0;
     game.player2.score = 0;
     resetBall(game.ball, game.canvas);
+    resetPaddle(game.player, game.canvas);
+    resetPaddle(game.player2, game.canvas);
 };
 
 const startGameLoop = (game, onGameEnd) => {

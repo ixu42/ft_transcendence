@@ -7,7 +7,7 @@ from backend.utils import get_deleted_user
 
 
 class Tournament(models.Model):
-    MAX_PLAYERS = 6
+    MAX_PLAYERS = 5
 
     class TournamentStatus(models.TextChoices):
         PENDING = "PENDING", _("Pending")

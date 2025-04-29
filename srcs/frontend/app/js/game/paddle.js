@@ -23,3 +23,7 @@ const movePaddle = (paddle, canvas) => {
 const drawPaddle = (context, paddle) => {
     context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 };
+
+const resetPaddle = (paddle, canvas) => {
+    paddle.y = canvas.height / 2 - 50;
+};
