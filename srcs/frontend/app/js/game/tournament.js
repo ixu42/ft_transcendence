@@ -403,21 +403,20 @@ const drawTable = (players, canvas, upcomingMatches) => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.font = '30px Arial';
     context.fillStyle = '#fff';
-    context.fillText('Tournament', canvas.width / 2 - 50, 30);
+    context.textAlign = 'center';
+    context.fillText('Tournament', canvas.width / 2, 30);
 
     let y = 100;
     // Draw upcoming matches
     context.font = '20px Arial';
-    context.textAlign = 'left';
     y = 100;
-    context.fillText('Upcoming Matches:', canvas.width / 2 - 50, 70);
+    context.fillText('Upcoming Matches:', canvas.width / 2, 70);
     for (const match of upcomingMatches) {
-        context.fillText(
-            `${match.player1} vs ${match.player2}`,canvas.width / 2 - 50, y);
+        context.fillText(`${match.player1} vs ${match.player2}`,canvas.width / 2, y);
         y += 30;
     }
     context.font = '30px Arial';
-    context.fillText('Press Enter to start', canvas.width / 2 - 50, y + 50);
+    context.fillText('Press Enter to start', canvas.width / 2, 280);
 };
 
 const drawMatch = (players, canvas, matchIndex) => {
@@ -435,10 +434,7 @@ const drawMatch = (players, canvas, matchIndex) => {
         canvas.width / 2,
         100
     );
-    context.fillText('Press Enter to start', canvas.width / 2, 150);
-
-
-
+    context.fillText('Press Enter to start', canvas.width / 2, 280);
     context.textAlign = 'start';
 };
 
