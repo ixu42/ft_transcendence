@@ -232,87 +232,164 @@ const stopTournamentLoop = (tournament) => {
     tournament.isTournamentRunning = false;
 }
 
-const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
-    // Initialize upcoming matches if not already set
-    if (!tournament.upcomingMatches) {
-        tournament.upcomingMatches = [];
+const initializeUpcomingMatches = (tournament) => {
+    if (tournament.upcomingMatches) return;
+    
+    tournament.upcomingMatches = [];
+    const playerCount = tournament.players.length;
+    
+    const createMatch = (p1, p2 = "?") => ({
+        player1: p1.name,
+        player2: p2 === "?" ? p2 : p2.name
+    });
+
+    if (playerCount === 5) {
+        tournament.upcomingMatches = [
+            createMatch(tournament.players[0], tournament.players[1]),
+            createMatch(tournament.players[2], tournament.players[3]),
+            createMatch(tournament.players[4]) // Bye
+        ];
+    } else if (playerCount === 6) {
+        tournament.upcomingMatches = [
+            createMatch(tournament.players[0], tournament.players[1]),
+            createMatch(tournament.players[2], tournament.players[3]),
+            createMatch(tournament.players[4], tournament.players[5])
+        ];
+    } else {
         for (let i = 0; i < tournament.players.length - 1; i += 2) {
-            const match = {
-                player1: tournament.players[i].name,
-                player2: tournament.players[i + 1] ? tournament.players[i + 1].name : "?"
-            };
-            tournament.upcomingMatches.push(match);
+            tournament.upcomingMatches.push(
+                createMatch(tournament.players[i], tournament.players[i + 1])
+            );
         }
-        // Handle odd number of players by pushing the last player to play against "?" to the bottom
         if (tournament.players.length % 2 !== 0) {
-            const lastPlayer = tournament.players[tournament.players.length - 1];
-            const byeMatch = {
-                player1: lastPlayer.name,
-                player2: "?"
-            };
-            tournament.upcomingMatches.push(byeMatch);
+            tournament.upcomingMatches.push(
+                createMatch(tournament.players[tournament.players.length - 1])
+            );
         }
-    }
-
-    if (tournament.isTournamentRunning === false) {
-        return;
-    }
-    if (tournament.state === 'table') {
-        drawTable(tournament.players, game.canvas);
-        waitForButton('enter', () => {
-            tournament.state = 'prepare';
-            tournamentLoop(tournament, game, currentMatchIndex, game_id);
-        });
-        return;
-    }
-    if (tournament.state === 'prepare') {
-        drawMatch(tournament.players, game.canvas, currentMatchIndex, tournament.upcomingMatches);
-        waitForButton('enter', () => {
-            tournament.state = 'playing';
-            game.state = 'wallSelection';
-            tournamentLoop(tournament, game, currentMatchIndex, game_id);
-        });
-        return;
-    }
-    if (tournament.state === 'playing') {
-        startGameLoop(game, () => {
-            let winner, loser;
-            if (game.player.score > game.player2.score) {
-                winner = tournament.players[currentMatchIndex];
-                loser = tournament.players[currentMatchIndex + 1];
-            } else {
-                winner = tournament.players[currentMatchIndex + 1];
-                loser = tournament.players[currentMatchIndex];
-            }
-            winner.score++;
-            tournament.players = tournament.players.filter(player => player !== loser);
-            
-            // Remove the played match from upcoming matches
-            if (tournament.upcomingMatches.length > 0) {
-                tournament.upcomingMatches.splice(Math.floor(currentMatchIndex / 2), 1);
-            }
-
-            currentMatchIndex++;
-            if (currentMatchIndex >= tournament.players.length - 1) {
-                currentMatchIndex = 0;
-            }
-            if (tournament.players.length === 1) {
-                tournament.state = 'gameOver';
-                drawWinner(tournament.players[0], game.canvas);
-                saveTournamentStats(tournament.tournamentId, tournament.players[0].userId);
-                waitForButton('x', () => {
-                    window.location.hash = 'lobby';
-                });
-                return;
-            }
-            tournament.state = 'table';
-            resetGame(game);
-            tournamentLoop(tournament, game, currentMatchIndex, game_id);
-        });
-        return;
     }
 };
 
+const tournamentLoop = async (tournament, game, currentMatchIndex, game_id) => {
+    
+    const processMatchResult = () => {
+        const determineWinner = () => {
+            return game.player.score > game.player2.score
+                ? { winner: tournament.players[currentMatchIndex], loser: tournament.players[currentMatchIndex + 1] }
+                : { winner: tournament.players[currentMatchIndex + 1], loser: tournament.players[currentMatchIndex] };
+        };
+
+        const { winner, loser } = determineWinner();
+        winner.score++;
+        tournament.players = tournament.players.filter(player => player !== loser);
+
+        if (tournament.upcomingMatches.length > 0) {
+            tournament.upcomingMatches.splice(Math.floor(currentMatchIndex / 2), 1);
+        }
+
+        return winner;
+    };
+
+    const setupNextRound = (winner) => {
+        const setupSpecialRound = (count, currentCount) => {
+            if (count === 5 && currentCount === 3) {
+                tournament.upcomingMatches = [
+                    { player1: tournament.players[0].name, player2: tournament.players[1].name },
+                    { player1: tournament.players[2].name, player2: "?" }
+                ];
+            } else if (count === 6) {
+                if (currentCount === 3) {
+                    // After first round (3 winners)
+                    tournament.upcomingMatches = [
+                        { player1: tournament.players[0].name, player2: tournament.players[1].name },
+                        { player1: tournament.players[2].name, player2: "?" }
+                    ];
+                } else if (currentCount === 2) {
+                    // After semifinals (2 winners)
+                    tournament.upcomingMatches = [
+                        { player1: tournament.players[0].name, player2: tournament.players[1].name }
+                    ];
+                }
+            }
+        };
+    
+        if ([5, 6].includes(tournament.allPlayers.length)) {
+            setupSpecialRound(tournament.allPlayers.length, tournament.players.length);
+        } else {
+            // Standard bracket progression
+            const upcomingWithQuestion = tournament.upcomingMatches.find(m => m.player2 === "?");
+            if (upcomingWithQuestion) {
+                upcomingWithQuestion.player2 = winner.name;
+            } else if (tournament.players.length > 1) {
+                tournament.upcomingMatches.push({ player1: winner.name, player2: "?" });
+            }
+        }
+    };
+
+    const checkTournamentEnd = () => {
+        if (tournament.players.length === 1) {
+            tournament.state = 'gameOver';
+            drawWinner(tournament.players[0], game.canvas);
+            saveTournamentStats(tournament.tournamentId, tournament.players[0].userId);
+            waitForButton('x', () => {
+                window.location.hash = 'lobby';
+            });
+            return true;
+        }
+        return false;
+    };
+
+    if (!tournament.upcomingMatches) initializeUpcomingMatches(tournament);
+    if (tournament.isTournamentRunning === false) return;
+
+    switch (tournament.state) {
+        case 'table':
+            drawTable(tournament.players, game.canvas);
+            waitForButton('enter', () => {
+                tournament.state = 'prepare';
+                tournamentLoop(tournament, game, currentMatchIndex, game_id);
+            });
+            break;
+
+        case 'prepare':
+            // Replace "?" with waiting players
+            tournament.upcomingMatches.forEach(match => {
+                if (match.player2 === "?") {
+                    const waitingPlayer = tournament.players.find(p => 
+                        !tournament.upcomingMatches.some(m => 
+                            m.player1 === p.name || m.player2 === p.name
+                        )
+                    );
+                    if (waitingPlayer) match.player2 = waitingPlayer.name;
+                }
+            });
+            
+            drawMatch(tournament.players, game.canvas, currentMatchIndex, tournament.upcomingMatches);
+            waitForButton('enter', () => {
+                tournament.state = 'playing';
+                game.state = 'wallSelection';
+                tournamentLoop(tournament, game, currentMatchIndex, game_id);
+            });
+            break;
+
+        case 'playing':
+            startGameLoop(game, () => {
+                const winner = processMatchResult();
+                setupNextRound(winner);
+
+                currentMatchIndex++;
+                if (currentMatchIndex >= tournament.players.length - 1) {
+                    currentMatchIndex = 0;
+                }
+
+                if (!checkTournamentEnd()) {
+                    tournament.state = 'table';
+                    resetGame(game);
+                    tournamentLoop(tournament, game, currentMatchIndex, game_id);
+                }
+            });
+            break;
+    }
+};
 
 const drawTable = (players, canvas) => {
     const context = canvas.getContext('2d');
@@ -347,20 +424,6 @@ const drawMatch = (players, canvas, matchIndex, upcomingMatches) => {
         100
     );
     context.fillText('Press Enter to start', canvas.width / 2, 150);
-
-    // Draw current standings
-    context.fillText('Current Standings:', canvas.width / 2, 220);
-    context.font = '20px Arial';
-    const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-    let y = 250;
-    for (let i = 0; i < sortedPlayers.length; i++) {
-        context.fillText(
-            `${i + 1}. ${sortedPlayers[i].name}: ${sortedPlayers[i].score} W`,
-            canvas.width / 2,
-            y
-        );
-        y += 30;
-    }
 
     // Draw upcoming matches
     context.font = '20px Arial';
