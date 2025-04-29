@@ -51,7 +51,8 @@ async function initializeUserOverview(userId) {
 
 async function initializeTournamentOverview(userId, username) {
   try {
-    const tournamentData = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
+    let tournamentData = await apiRequest(`users/${userId}/tournaments-history/`, "GET");
+    tournamentData = tournamentData.participated_tournaments
     const tournaments = Array.isArray(tournamentData) ? tournamentData : [];
     const totalTournaments = tournaments.length;
     const completedTournaments = tournaments.filter(t => t.status === "COMPLETED").length;
