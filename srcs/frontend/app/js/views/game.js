@@ -93,8 +93,7 @@ const setupGameJs = async () => {
             switch (mode) {
                 case "tournament":
                     response = await apiRequest(`tournaments/?user_id=${currentUserId}`, "POST", {
-                        tournament_name: `${loggedInUsers.find(u => u.id == currentUserId).username}'s tournament`,
-                        display_name: loggedInUsers.find(u => u.id == currentUserId).username
+                        tournament_name: `${loggedInUsers.find(u => u.id == currentUserId).username}'s tournament`
                     });
                     if (response.error) { throw new Error(response.error); }
                     initializeTournament(response, currentUserId);
