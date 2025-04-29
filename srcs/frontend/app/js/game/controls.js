@@ -75,15 +75,6 @@ const setupWindowEvents = (game) => {
     });
 }
 
-const setupWindowEventsTournament = (tournament) => {
-    window.addEventListener('beforeunload', () => {
-        tournament.isTournamentRunning = false;
-    });
-    window.addEventListener('popstate', () => {
-        tournament.isTournamentRunning = false;
-    });
-}
-
 const pauseIfGame = (game) => {
     if (game.state === 'game') {
         game.lastState = game.state; // Save the current state

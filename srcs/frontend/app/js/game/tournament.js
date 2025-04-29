@@ -2,7 +2,7 @@ const setupTournament = async (response) => {
     const tournamentId = response.tournament_id;
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
-    const MAX_PLAYERS = 5;
+    const MAX_PLAYERS = 12;
 
     const redirectToLobby = () => {
         window.location.hash = 'lobby';
@@ -177,7 +177,6 @@ const setupTournament = async (response) => {
         keyboardEnter: false,
         state: "table",
         tournamentId,
-        isTournamentRunning: false
     };
 };
 
@@ -217,23 +216,13 @@ const initializeTournament = async (response, currentUserId) => {
     await startTournament(tournament);
     const game = createGame();
     game.winningScore = tournament.winningScore;
-    setupControls(game.player, game.player2, game, response.game_id, currentUserId, true);
+    setupControls(game.player, game.player2, game);
     setupWindowEvents(game);
-    setupWindowEventsTournament(tournament);
-
     initializeUpcomingMatches(tournament);
-    tournament.isTournamentRunning = true;
     tournamentLoop(tournament, game, response.game_id);
 };
 
-
-const stopTournamentLoop = (tournament) => {
-    tournament.isTournamentRunning = false;
-}
-
 const initializeUpcomingMatches = (tournament) => {
-    if (tournament.upcomingMatches) return;
-    
     tournament.upcomingMatches = [];
     for (let i = 0; i < tournament.players.length - 2; i += 2)
         createMatch(tournament.upcomingMatches, tournament.players[i], tournament.players[i + 1]);
@@ -254,7 +243,6 @@ const addWinnerToNextMatch = (upcomingMatches, winner) => {
     }
 }
 const tournamentLoop = async (tournament, game, game_id) => {
-    
     const processMatchResult = () => {
         winner = game.player.score > game.player2.score ? tournament.upcomingMatches[0].player1 : tournament.upcomingMatches[0].player2;
         addWinnerToNextMatch(tournament.upcomingMatches, winner);
@@ -275,7 +263,6 @@ const tournamentLoop = async (tournament, game, game_id) => {
         return false;
     };
 
-    if (tournament.isTournamentRunning === false) return;
     switch (tournament.state) {
         case 'table':
             drawTable(game.canvas, tournament.upcomingMatches);
@@ -341,7 +328,6 @@ const drawMatch = (canvas, match) => {
     context.fillText('Press Enter to start', canvas.width / 2, 280);
     context.textAlign = 'start';
 };
-
 
 const drawWinner = (player, canvas) => {
     const context = canvas.getContext('2d');
