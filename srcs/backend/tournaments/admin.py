@@ -21,11 +21,11 @@ class TournamentAdmin(admin.ModelAdmin):
 
     def get_players_usernames(self, obj):
         return ", ".join(player.username for player in obj.players.all())
-    
+
     def get_players_display_names(self, obj):
-      return ", ".join(
-          tp.display_name for tp in TournamentPlayer.objects.filter(tournament=obj)
-      )
+        return ", ".join(
+            tp.display_name for tp in TournamentPlayer.objects.filter(tournament=obj)
+        )
 
     def get_winner(self, obj):
         return obj.winner.username if obj.winner else "-"
