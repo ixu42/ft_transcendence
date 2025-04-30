@@ -464,7 +464,7 @@ const setupEditProfile = (userId) => {
     
             if (!response.ok) {
                 console.error("❌ Failed to update password:", data.errors);
-                const errorMsg = data.errors?.new_password2?.[0] || data.errors?.new_password1?.[0] || data.errors || "Unknown error";
+                const errorMsg = data.errors?.new_password2?.[0] || data.errors?.new_password1?.[0] || data.errors?.old_password?.[0] || data.errors || "Unknown error";
                 errorMessage.textContent = `❌ ${errorMsg}`;
                 errorMessage.style.display = "block";
                 return;
