@@ -17,8 +17,7 @@ async function updateNavbar() {
         homeButton.onclick = () => (window.location.hash = "#menu");
     }
 
-    const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
-    const isAnyUserLoggedIn = loggedInUsers.some(user => user.loggedIn);
+    const isAnyUserLoggedIn = getLoggedInUsers().some(user => user.loggedIn);
 
     if (friendsButton) {
         if (isAnyUserLoggedIn) {
@@ -41,8 +40,7 @@ function handleLogout(userId) {
 
 function populateProfileDropdown(container, userDataArray) {
 
-    const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
-    const activeUsers = loggedInUsers.filter(user => user.loggedIn);
+    const activeUsers = getLoggedInUsers().filter(user => user.loggedIn && user.id);
 
 
     const userEntries = activeUsers.length > 0
@@ -92,12 +90,9 @@ async function setupProfileButton(profileButton) {
     profileButton.addEventListener("mouseenter", async () => {
         if (hideTimer) clearTimeout(hideTimer);
 
-        const loggedInUsers = JSON.parse(localStorage.getItem("loggedInUsers") || "[]");
-        const loggedInUserIds = loggedInUsers
-            .filter(user => user.loggedIn && user.id)
-            .map(user => user.id);
-        const userDataArray = loggedInUserIds.length > 0
-            ? await Promise.all(loggedInUserIds.map(userId => fetchProfileDataById(userId)))
+        const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn && user.id);
+        const userDataArray = loggedInUsers.length > 0
+            ? await Promise.all(loggedInUsers.map(user => fetchProfileDataById(user.id)))
             : [];
 
         populateProfileDropdown(dropdown, userDataArray);
@@ -115,8 +110,6 @@ async function setupProfileButton(profileButton) {
 
     dropdown.addEventListener("mouseleave", () => dropdown.style.display = "none");
 }
-
-
 
 async function setupFriendsButton(friendsButton) {
 

@@ -20,7 +20,9 @@ const logoutUser = async (userId) => {
         updateNavbar();
     } else {
         const { errors } = await response.json();
-        console.error("❌ Logout failed:", errors);
+        const errorMessage = getErrorMsgFromResponse(errors, "Logout failed");
+        console.error("❌ Logout failed:", errorMessage);
+        alert(`❌ ${errorMessage}`);
     }
 };
 
@@ -63,7 +65,6 @@ const fetchProfileData = async (userId) => {
             
             if (response.status === 403 || response.status === 401) {
                 alert("❌ You are not authorized. Redirecting to login.");
-                //removeLoggedInUser(userId);
                 window.location.hash = "#login";
             }
             return;
@@ -487,14 +488,14 @@ const setupEditProfile = (userId) => {
             alert("User ID not found. Please log in again.");
             return;
         }
-
+    
         const updatedData = {
             username: document.getElementById("edit-username").value,
             email: document.getElementById("edit-email").value,
             first_name: document.getElementById("edit-first-name").value,
             last_name: document.getElementById("edit-last-name").value,
         };
-
+    
         try {
             const csrfToken = await getCSRFCookie();
             const response = await fetch(`api/users/${userId}/`, {
@@ -506,15 +507,15 @@ const setupEditProfile = (userId) => {
                 body: JSON.stringify(updatedData),
                 credentials: "include",
             });
-
+    
             const data = await response.json();
-
+    
             if (!response.ok) {
-                console.error("❌ Failed to update profile:", data.errors);
-                alert("❌ Failed to update profile: " + (data.errors || "Unknown error"));
+                let errorMessage = getErrorMsgFromResponse(data.errors, "Failed to update profile");
+                alert(`❌ Failed to update profile: ${errorMessage}`);
                 return;
             }
-
+    
             alert("✅ Profile updated successfully!");
             fetchProfileData(userId);
         } catch (error) {

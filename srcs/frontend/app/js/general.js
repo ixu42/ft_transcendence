@@ -52,6 +52,7 @@ async function syncLoggedInUsersWithBackend() {
             console.error('Failed to sync with backend:', response.error);
             return getLoggedInUsers();
         }
+        
         const backendUsers = response.users || [];
         for (const user of backendUsers) {
             await addOrUpdateLoggedInUser({
@@ -84,7 +85,7 @@ async function addOrUpdateLoggedInUser(user) {
     };
 
     const users = getLoggedInUsers();
-    const index = users.findIndex(u => u.username === sanitizedUser.username);
+    const index = users.findIndex(u => u.id === sanitizedUser.id);
     if (index > -1) {
         users[index] = sanitizedUser;
     } else {
@@ -159,6 +160,21 @@ async function apiRequest(endpoint, method, body = null) {
         console.error('Request failed:', error);
         return { error: error.message };
     }
+}
+
+function getErrorMsgFromResponse(errorData, defaultMessage = "Unknown error") {
+    let errorMessage = defaultMessage;
+
+    if (errorData && typeof errorData === "object") {
+        const firstField = Object.keys(errorData)[0];
+        if (firstField && Array.isArray(errorData[firstField]) && errorData[firstField].length > 0) {
+            errorMessage = errorData[firstField][0];
+        } else {
+            errorMessage = JSON.stringify(errorData);
+        }
+    }
+    console.error(`❌ ${defaultMessage}: ${errorMessage}`);
+    return errorMessage;
 }
 
 async function fetchProfileDataById(userId) {
