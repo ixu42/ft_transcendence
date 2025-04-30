@@ -24,7 +24,7 @@ services:
         aliases:
           - tr-front
     ports:
-      - "8443:8443"
+      - "${NGINX_PORT}:${NGINX_PORT}"
 
   tr_back:
     build: srcs/backend
@@ -33,16 +33,16 @@ services:
     volumes:
         - ./srcs/backend:/app
     environment:
-      - HCP_CLIENT_ID=${HCP_CLIENT_ID}
-      - HCP_CLIENT_SECRET=${HCP_CLIENT_SECRET}
-      - DEBUG=${DEBUG}
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
       - DJANGO_PORT=${DJANGO_PORT}
-      - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - TZ=UTC
+      - TZ=UTC      
     networks:
       tr_network:
         aliases:
@@ -125,22 +125,3 @@ services:
       tr_network:
         aliases:
           - postgres-exporter
-
-  # cadvisor:
-  #   image: google/cadvisor:latest
-  #   container_name: cadvisor
-  #   privileged: true
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:ro
-  #     - /sys:/sys:ro
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #   expose:
-  #     - 8080
-  #   restart: always
-  #   networks:
-  #     tr_network:
-  #       aliases:
-  #         - docker-exporter
-  

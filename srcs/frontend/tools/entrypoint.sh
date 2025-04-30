@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Wait for the backend to be available
-echo "Waiting for backend to be available at tr_back:8000..."
+echo "Waiting for backend to be available at tr_back:$DJANGO_PORT..."
 
-while ! nc -z tr_back 8000; do
+while ! nc -z tr_back $DJANGO_PORT; do
   sleep 2
 done
 
