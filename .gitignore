@@ -6,7 +6,7 @@
 srcs/frontend/tools/ssl
 
 db.sqlite3
-# .env
+.env
 .vscode/
 node_modules/
 dist/
@@ -15,5 +15,4 @@ build/
 .venv
 __pycache__
 venv/
-
-
+.script_to_bash_before_testing
