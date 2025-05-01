@@ -85,21 +85,21 @@ function populateProfileDropdown(container, userDataArray) {
  
   
 async function setupProfileButton(profileButton) {
+    if (profileButton.dataset.initialized === "true") return;
+    profileButton.dataset.initialized = "true";
     const dropdown = document.getElementById("profile-dropdown-content");
     const friendsDropdownContent = document.getElementById("friends-dropdown-content");
     let isOpen = false;
 
     profileButton.addEventListener("click", async (event) => {
         event.stopPropagation();
-        if (isOpen)
-        {
+        if (isOpen) {
             dropdown.style.display = "none";
             isOpen = false;
-        }
-        else
-        {
-            if (friendsDropdownContent) 
+        } else {
+            if (friendsDropdownContent) {
                 friendsDropdownContent.style.display = "none";
+            }
             const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn && user.id);
             const userDataArray = loggedInUsers.length > 0
                 ? await Promise.all(loggedInUsers.map(user => fetchProfileDataById(user.id)))
@@ -121,7 +121,36 @@ async function setupProfileButton(profileButton) {
     });
 }
 
+async function fetchProfileDataById(userId) {
+    if (!userId) {
+        console.error("User ID is missing.");
+        return null;
+    }
+    try {
+        const response = await fetch(`/api/users/${userId}/`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "X-CSRFToken": await getCSRFCookie(),
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            console.error("Failed to fetch profile data:", data.errors || response.status);
+            return null;
+        }
+        return data;
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+        return null;
+    }
+}
+
 async function setupFriendsButton(friendsButton) {
+    if (friendsButton.dataset.initialized === "true") return;
+    friendsButton.dataset.initialized = "true";
+
     const friendsDropdownContent = document.getElementById("friends-dropdown-content");
     const profileDropdown = document.getElementById("profile-dropdown-content");
     const sendFriendRequestBtn = document.getElementById("send-friend-request-btn");
@@ -143,17 +172,19 @@ async function setupFriendsButton(friendsButton) {
 
     friendsButton.addEventListener("click", async (event) => {
         event.stopPropagation();
-        if (isOpen)
-        {
+        if (isOpen) {
             friendsDropdownContent.style.display = "none";
             isOpen = false;
-        }
-        else
-    {
+        } else {
             if (isFetching) return;
             isFetching = true;
-            if (profileDropdown)
+
+            // Close profile dropdown if open
+            if (profileDropdown) {
                 profileDropdown.style.display = "none";
+            }
+
+            //  User selector
             const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
             let userSelectorHtml = "";
             if (loggedInUsers.length > 1) {
@@ -173,6 +204,8 @@ async function setupFriendsButton(friendsButton) {
                     </div>
                 `;
             }
+
+            // Remove existing selector and insert new one
             const existingSelectorContainer = document.getElementById("friends-user-selector-container");
             if (existingSelectorContainer) {
                 existingSelectorContainer.remove();
@@ -181,7 +214,10 @@ async function setupFriendsButton(friendsButton) {
                 friendsDropdownContent.insertAdjacentHTML("afterbegin", userSelectorHtml);
                 const selector = document.getElementById("friends-user-selector");
                 if (selector && selector.tagName.toLowerCase() === "select") {
-                    selector.addEventListener("change", () => updateFriendsForUser(selector.value));
+                    // Remove existing change listeners to prevent duplicates
+                    selector.replaceWith(selector.cloneNode(true)); // Clone to clear listeners
+                    const newSelector = document.getElementById("friends-user-selector");
+                    newSelector.addEventListener("change", () => updateFriendsForUser(newSelector.value));
                 }
             }
 
