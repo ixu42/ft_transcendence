@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0012_customuser_is_anonymized'),
+        ("users", "0012_customuser_is_anonymized"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='customuser',
-            name='username',
-            field=models.CharField(error_messages={'unique': 'A user with that username already exists.'}, max_length=50, unique=True),
+            model_name="customuser",
+            name="username",
+            field=models.CharField(
+                error_messages={"unique": "A user with that username already exists."},
+                max_length=50,
+                unique=True,
+            ),
         ),
     ]
