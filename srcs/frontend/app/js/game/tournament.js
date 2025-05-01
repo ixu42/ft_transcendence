@@ -248,11 +248,11 @@ const tournamentLoop = async (tournament, game, game_id) => {
         return winner;
     };
 
-    const checkTournamentEnd = () => {
+    const checkTournamentEnd = (winner) => {
         if (tournament.upcomingMatches[0].player2 == null) {
             tournament.state = 'gameOver';
-            drawWinner(tournament.upcomingMatches[0].player1, game.canvas);
-            saveTournamentStats(tournament.tournamentId, tournament.players[0].userId);
+            drawWinner(winner, game.canvas);
+            saveTournamentStats(tournament.tournamentId, winner.userId);
             waitForButton('x', () => {
                 window.location.hash = 'lobby';
             });
@@ -281,8 +281,8 @@ const tournamentLoop = async (tournament, game, game_id) => {
 
         case 'playing':
             startGameLoop(game, () => {
-                processMatchResult();
-                if (!checkTournamentEnd()) {
+                winner = processMatchResult();
+                if (!checkTournamentEnd(winner)) {
                     tournament.state = 'table';
                     resetGame(game);
                     tournamentLoop(tournament, game, game_id);
