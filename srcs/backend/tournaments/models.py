@@ -21,7 +21,7 @@ class Tournament(models.Model):
         related_name="created_tournaments",
     )
     players = models.ManyToManyField(
-        CustomUser, related_name="participated_tournaments"
+        CustomUser, through="TournamentPlayer", related_name="participated_tournaments"
     )
     started_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
@@ -49,7 +49,7 @@ class Tournament(models.Model):
             raise ValidationError("Tournament is full")
         if user.username != "guest_player" and self.players.filter(id=user.id).exists():
             raise ValidationError("You are already in this tournament.")
-        self.players.add(user)
+        TournamentPlayer.objects.create(tournament=self, player=user)
 
     def start(self, user):
         self.check_status()
@@ -78,6 +78,13 @@ class Tournament(models.Model):
             f"Tournament(name={self.name}, "
             f"creator={self.creator.username}, "
             f"status: {self.status}, started_at={self.started_at}, "
-            f"players: {players}, "
-            f"{self.players.count()}/{Tournament.MAX_PLAYERS} joined.)"
+            f"players: {players}"
         )
+
+
+class TournamentPlayer(models.Model):
+    tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE)
+    player = models.ForeignKey(CustomUser, on_delete=models.SET(get_deleted_user))
+
+    def __str__(self):
+        return f"{self.player.username} in {self.tournament.name}"
