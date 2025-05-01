@@ -3,6 +3,7 @@ const setupTournament = async (response) => {
     const creatorUsername = response.tournament_name.split("'")[0];
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
     const MAX_PLAYERS = 12;
+    const MAX_NAME_LENGTH = 10;
 
     const redirectToLobby = () => {
         window.location.hash = 'lobby';
@@ -23,7 +24,6 @@ const setupTournament = async (response) => {
         }
     };
 
- 
     const promptWinningScore = () => promptValidInput(
         "Enter the winning match score (e.g., 10):",
         input => {
@@ -40,6 +40,32 @@ const setupTournament = async (response) => {
         },
         `❌ Number of players must be between 3 and ${MAX_PLAYERS}.`);
 
+    const promptDisplayName = (message, defaultName, existingNames) => {
+        while (true) {
+            const input = prompt(message, defaultName);
+            if (input === null) {
+                if (confirm("Are you sure you want to cancel tournament setup?")) {
+                    return null;
+                }
+                continue;
+            }
+            const trimmedInput = input.trim();
+            if (trimmedInput === "") {
+                alert("❌ Display name cannot be empty.");
+                continue;
+            }
+            if (trimmedInput.length > MAX_NAME_LENGTH) {
+                alert(`❌ Display name must be ${MAX_NAME_LENGTH} characters or fewer.`);
+                continue;
+            }
+            if (existingNames.some(name => name.toLowerCase() === trimmedInput.toLowerCase())) {
+                alert(`❌ Display name "${trimmedInput}" is already used. Please choose a unique name.`);
+                continue;
+            }
+            return trimmedInput;
+        }
+    };
+
     const joinPlayer = async (playerId) => {
         const joinResponse = await apiRequest(
             `tournaments/${tournamentId}/players/?user_id=${playerId}`,
@@ -47,117 +73,126 @@ const setupTournament = async (response) => {
         return joinResponse.errors ? null : true;
     };
 
-    // Step 1: Verify creator is logged in
-    const creator = loggedInUsers.find(user => user.username === creatorUsername);
-    if (!creator) {
-        alert("❌ Tournament creator must be logged in. Please log in as the creator.");
-        return redirectToLobby();
-    }
-
-    // Step 2: Prompt for creator's display name
-    let creatorDisplayName = creatorUsername;
-    const creatorCustomName = prompt(
-        `Enter a custom display name for ${creatorUsername} (press OK to keep default, or enter a new name):`,
-        creatorUsername
-    );
-
-    if (creatorCustomName === null) return redirectToLobby();
-    const trimmedCreatorName = creatorCustomName.trim();
-    if (trimmedCreatorName !== "" && trimmedCreatorName.toLowerCase() !== creatorUsername.toLowerCase()) {
-        creatorDisplayName = trimmedCreatorName;
-    }
-
-    // Initialize players with creator
-    const players = [{name: creatorDisplayName, userId: creator.id, score: 0, matches: 0}];
-
-    // Step 3: Prompt for number of players
-    const targetPlayerCount = await promptPlayerCount();
-    if (targetPlayerCount === null) return redirectToLobby();
-
-    // Step 4: Add players
-    const potentialPlayers = loggedInUsers.filter(user => user.username !== creatorUsername);
-
-    while (players.length < targetPlayerCount && players.length < MAX_PLAYERS) {
-        const playerOptions = potentialPlayers
-            .map(user => `${user.id}: ${user.username}`)
-            .concat(["Or enter a guest username (e.g., guest123)"])
-            .join("\n");
-
-        const input = prompt(
-            `Select a player by ID or enter a guest username (need ${targetPlayerCount - players.length} more players, max ${MAX_PLAYERS}):\n${playerOptions}`
-        );
-
-        if (input === null) return redirectToLobby();
-        const trimmedInput = input.trim().toLowerCase();
-        if (trimmedInput === "") {
-            alert("❌ Please select a valid player or enter a guest username.");
-            continue;
+    const verifyCreator = () => {
+        const creator = loggedInUsers.find(user => user.username === creatorUsername);
+        if (!creator) {
+            alert("❌ Tournament creator must be logged in. Please log in as the creator.");
+            return null;
         }
+        return creator;
+    };
 
-        let playerId, displayName;
+    const promptCreatorDisplayName = (creator) => {
+        let creatorDisplayName = creatorUsername;
+        const creatorCustomName = promptDisplayName(
+            `Enter a custom display name for ${creatorUsername} (max ${MAX_NAME_LENGTH} characters, required):`,
+            creatorUsername,
+            []
+        );
+        if (creatorCustomName === null) return null;
+        creatorDisplayName = creatorCustomName;
+        return creatorDisplayName;
+    };
 
-        // Handle logged-in player
-        const loggedInPlayer = potentialPlayers.find(p => p.id.toString() === trimmedInput);
-        if (loggedInPlayer) {
-            playerId = loggedInPlayer.id;
-            displayName = loggedInPlayer.username;
+    const initializePlayers = (creator, creatorDisplayName) => {
+        return [{ name: creatorDisplayName, userId: creator.id, score: 0, matches: 0 }];
+    };
 
-            // Prompt for custom display name
-            const customName = prompt(
-                `Enter a custom display name for ${displayName} (press OK to keep default, or enter a new name):`,
-                displayName
+    const addPlayers = async (players, targetPlayerCount, potentialPlayers) => {
+        while (players.length < targetPlayerCount && players.length < MAX_PLAYERS) {
+            const playerOptions = potentialPlayers
+                .map(user => `${user.id}: ${user.username}`)
+                .concat(["Or enter a guest username (e.g., guest123)"])
+                .join("\n");
+
+            const input = prompt(
+                `Select a player by ID or enter a guest username (max ${MAX_NAME_LENGTH} characters, need ${targetPlayerCount - players.length} more players, max ${MAX_PLAYERS}):\n${playerOptions}`
             );
 
-            if (customName === null) return redirectToLobby();
-            const trimmedCustomName = customName.trim();
-            if (trimmedCustomName !== "" && trimmedCustomName.toLowerCase() !== displayName.toLowerCase()) {
-                if (players.some(p => p.name.toLowerCase() === trimmedCustomName.toLowerCase())) {
-                    alert(`❌ Display name "${trimmedCustomName}" is already used. Please choose a unique name.`);
-                    continue;
+            if (input === null) {
+                if (confirm("Are you sure you want to cancel tournament setup?")) {
+                    return null;
                 }
-                displayName = trimmedCustomName;
-            } else if (players.some(p => p.name.toLowerCase() === displayName.toLowerCase())) {
-                alert(`❌ Display name "${displayName}" is already used. Please choose a unique name.`);
+                continue;
+            }
+            const trimmedInput = input.trim().toLowerCase();
+            if (trimmedInput === "") {
+                alert("❌ Please select a valid player or enter a guest username.");
                 continue;
             }
 
+            let playerId, displayName;
+
+            // Handle logged-in player
+            const loggedInPlayer = potentialPlayers.find(p => p.id.toString() === trimmedInput);
+            if (loggedInPlayer) {
+                playerId = loggedInPlayer.id;
+                displayName = loggedInPlayer.username;
+
+                // Prompt for custom display name
+                const customName = promptDisplayName(
+                    `Enter a custom display name for ${displayName} (max ${MAX_NAME_LENGTH} characters, required):`,
+                    displayName,
+                    players.map(p => p.name)
+                );
+
+                if (customName === null) return null;
+                displayName = customName;
+
+                if (await joinPlayer(playerId, displayName)) {
+                    players.push({ name: displayName, userId: playerId, score: 0, matches: 0 });
+                    potentialPlayers.splice(potentialPlayers.indexOf(loggedInPlayer), 1);
+                } else {
+                    alert(`❌ Failed to add ${displayName}. Please try again.`);
+                }
+                continue;
+            }
+
+            // Handle guest player
+            displayName = trimmedInput;
+            if (displayName.length > MAX_NAME_LENGTH) {
+                alert(`❌ Guest username must be ${MAX_NAME_LENGTH} characters or fewer.`);
+                continue;
+            }
+            if (players.some(p => p.name.toLowerCase() === displayName.toLowerCase())) {
+                alert(`❌ Username "${displayName}" is already used. Please enter a unique username.`);
+                continue;
+            }
+
+            const guestResponse = await apiRequest('get-guest-id/', "GET", null);
+
+            if (guestResponse.errors || !guestResponse.id) {
+                alert(`❌ Failed to fetch guest ID for ${displayName}. Please enter a different username.`);
+                continue;
+            }
+
+            playerId = guestResponse.id;
             if (await joinPlayer(playerId, displayName)) {
                 players.push({ name: displayName, userId: playerId, score: 0, matches: 0 });
-                potentialPlayers.splice(potentialPlayers.indexOf(loggedInPlayer), 1);
             } else {
-                alert(`❌ Failed to add ${displayName}. Please try again.`);
+                alert(`❌ Failed to add guest ${displayName}. Please enter a different username.`);
             }
-            continue;
         }
+        return players;
+    };
 
-        // Handle guest player
-        displayName = trimmedInput;
-        if (players.some(p => p.name.toLowerCase() === displayName.toLowerCase())) {
-            alert(`❌ Username "${displayName}" is already used. Please enter a unique username.`);
-            continue;
-        }
+    const creator = verifyCreator();
+    if (!creator) return redirectToLobby();
 
-        const guestResponse = await apiRequest('get-guest-id/', "GET", null);
+    const creatorDisplayName = promptCreatorDisplayName(creator);
+    if (creatorDisplayName === null) return redirectToLobby();
 
-        if (guestResponse.errors || !guestResponse.id) {
-            alert(`❌ Failed to fetch guest ID for ${displayName}. Please enter a different username.`);
-            continue;
-        }
+    const players = initializePlayers(creator, creatorDisplayName);
+    const targetPlayerCount = await promptPlayerCount();
+    if (targetPlayerCount === null) return redirectToLobby();
 
-        playerId = guestResponse.id;
-        if (await joinPlayer(playerId, displayName)) {
-            players.push({ name: displayName, userId: playerId, score: 0, matches: 0 });
-        } else {
-            alert(`❌ Failed to add guest ${displayName}. Please enter a different username.`);
-        }
-    }
+    const potentialPlayers = loggedInUsers.filter(user => user.username !== creatorUsername);
+    const updatedPlayers = await addPlayers(players, targetPlayerCount, potentialPlayers);
+    if (updatedPlayers === null) return redirectToLobby();
 
-    // Step 5: Set winning score
     const winningScore = await promptWinningScore();
     if (winningScore === null) return redirectToLobby();
-
-    // Step 6: Return tournament data
-    return {players, winningScore, state: "table", tournamentId};
+    return { players: updatedPlayers, winningScore, state: "table", tournamentId };
 };
 
 const startTournament = async (tournament) => {
