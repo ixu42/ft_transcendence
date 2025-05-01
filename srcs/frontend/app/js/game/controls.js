@@ -6,12 +6,7 @@ const setupControls = async (player, player2, game) => {
             key === 'w' ? player.keyboardUp = true :
             key === 's' ? player.keyboardDown = true : null;
         if (key === ' ' || key === 'escape')
-        {
-            if (game.state == 'pause')
-                game.state = game.lastState;
-            else
-                pauseIfGame(game); // Pause the game if the space bar or escape is pressed
-        }         
+            pauseIfGame(game); // Pause the game if the space bar or escape is pressed     
     });
 
     document.addEventListener('keyup', function(event) {

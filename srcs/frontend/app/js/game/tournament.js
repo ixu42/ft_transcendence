@@ -30,8 +30,7 @@ const setupTournament = async (response) => {
             const score = parseInt(input, 10);
             return !isNaN(score) && score > 0 && score <= 100 ? score : null;
         },
-        "❌ Winning score must be a positive integer up to 100."
-    );
+        "❌ Winning score must be a positive integer up to 100.");
 
     const promptPlayerCount = () => promptValidInput(
         `Enter the number of players for the tournament (minimum 3, maximum ${MAX_PLAYERS}):`,
@@ -39,14 +38,12 @@ const setupTournament = async (response) => {
             const count = parseInt(input, 10);
             return !isNaN(count) && count >= 3 && count <= MAX_PLAYERS ? count : null;
         },
-        `❌ Number of players must be between 3 and ${MAX_PLAYERS}.`
-    );
+        `❌ Number of players must be between 3 and ${MAX_PLAYERS}.`);
 
     const joinPlayer = async (playerId) => {
         const joinResponse = await apiRequest(
             `tournaments/${tournamentId}/players/?user_id=${playerId}`,
-            "PATCH"
-        );
+            "PATCH");
         return joinResponse.errors ? null : true;
     };
 
@@ -71,12 +68,7 @@ const setupTournament = async (response) => {
     }
 
     // Initialize players with creator
-    const players = [{
-        name: creatorDisplayName,
-        userId: creator.id,
-        score: 0,
-        matches: 0
-    }];
+    const players = [{name: creatorDisplayName, userId: creator.id, score: 0, matches: 0}];
 
     // Step 3: Prompt for number of players
     const targetPlayerCount = await promptPlayerCount();
@@ -145,11 +137,7 @@ const setupTournament = async (response) => {
             continue;
         }
 
-        const guestResponse = await apiRequest(
-            'get-guest-id/',
-            "GET",
-            null
-        );
+        const guestResponse = await apiRequest('get-guest-id/', "GET", null);
 
         if (guestResponse.errors || !guestResponse.id) {
             alert(`❌ Failed to fetch guest ID for ${displayName}. Please enter a different username.`);
@@ -169,18 +157,11 @@ const setupTournament = async (response) => {
     if (winningScore === null) return redirectToLobby();
 
     // Step 6: Return tournament data
-    return {
-        players,
-        allPlayers: [...players],
-        winningScore,
-        keyboardEnter: false,
-        state: "table",
-        tournamentId,
-    };
+    return {players, winningScore, state: "table", tournamentId};
 };
 
 const startTournament = async (tournament) => {
-    const creator = tournament.allPlayers.find(player => player.name === tournament.allPlayers[0].name);
+    const creator = tournament.players.find(player => player.name === tournament.players[0].name);
     if (!creator || !creator.userId) {
         console.error("Cannot start tournament: Creator not found or not logged in");
         alert("❌ Cannot start tournament: Creator not logged in.");
@@ -189,18 +170,13 @@ const startTournament = async (tournament) => {
 
     const startResponse = await apiRequest(
         `tournaments/${tournament.tournamentId}/start/?user_id=${creator.userId}`,
-        "PATCH"
-    );
+        "PATCH");
     if (startResponse.errors) {
         console.error(
             `Failed to start tournament for ${creator.name} (user_id=${creator.userId}):`,
-            startResponse.errors
-        );
-        alert(
-            `❌ Failed to start tournament: ${JSON.stringify(startResponse.errors)}`
-        );
-    } else {
-    }
+            startResponse.errors);
+        alert(`❌ Failed to start tournament: ${JSON.stringify(startResponse.errors)}`);
+    } 
 };
 
 const initializeTournament = async (response, currentUserId) => {
@@ -234,11 +210,7 @@ const createMatch = (upcomingMatches, p1, p2 = null) => {
 
 const addWinnerToNextMatch = (upcomingMatches, winner) => {
     const lastMatch = upcomingMatches[upcomingMatches.length - 1];
-    if (lastMatch.player2 == null) {
-        lastMatch.player2 = winner;
-    } else {
-        createMatch(upcomingMatches, winner);
-    }
+    lastMatch.player2 == null ? lastMatch.player2 = winner : createMatch(upcomingMatches, winner);
 }
 const tournamentLoop = async (tournament, game, game_id) => {
     const processMatchResult = () => {
@@ -253,9 +225,7 @@ const tournamentLoop = async (tournament, game, game_id) => {
             tournament.state = 'gameOver';
             drawWinner(winner, game.canvas);
             saveTournamentStats(tournament.tournamentId, winner.userId);
-            waitForButton('x', () => {
-                window.location.hash = 'lobby';
-            });
+            waitForButton('x', () => {window.location.hash = 'lobby';});
             return true;
         }
         return false;

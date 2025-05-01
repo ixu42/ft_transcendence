@@ -5,16 +5,16 @@ const createBall = (x, y) => {
         radius: 10,
         speed: 0.3,
         speedUp: 0.03,
-        dx: Math.cos(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1,
-        dy: Math.sin(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1
+        dx: Math.cos(Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1),
+        dy: Math.sin(Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1)
     };
 }
 
 const resetBall = (ball, canvas) => {
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
-    ball.dx = Math.cos(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1;
-    ball.dy = Math.sin(Math.PI / 4) * Math.random() > 0.5 ? 1 : -1;
+    ball.dx = Math.cos(Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1);
+    ball.dy = Math.sin(Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1);
     ball.speed = 0.3;
 }
 
@@ -59,8 +59,9 @@ const moveBall = (ball, player, player2, canvas, game, deltatime) => {
             ball.dx *= -1;
             return;
         }
-        if (game.winningScore > 0 && (game.player.score >= game.winningScore || game.player2.score >= game.winningScore))
-            game.state = "gameOver";
+        game.state = game.player.score >= game.winningScore || game.player2.score >= game.winningScore ? "gameOver" : "prepare";
+        resetPaddle(player, canvas);
+        resetPaddle(player2, canvas);
         resetBall(ball, canvas);
     }
 }

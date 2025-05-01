@@ -5,25 +5,32 @@ const initializeAIGame = (gameId, userId) => {
         return;
     }
     const game = createGame();
-    game.state = "levelSelection";
     game.isAI = true;
     game.AI = createAI();
-    setupAndStart(gameId, userId, game);
+    levelSelection(game, () => {
+        setupAndStart(gameId, userId, game)});
 };
+    
+const levelSelection = (game, callback) => {
+    drawLevelSelection(game);
+    waitForSelection((selection) => {
+        game.AI.level = selection === '1' ? "easy" : selection === '2' ? "medium" : "hard";
+        callback();
+    });
+}
 
 const createAI = () => {
     const lastAICheckTime = 0;
     const targetPaddleY = 0;
     return {lastAICheckTime, targetPaddleY};
 }
-
+    
 const moveAIPaddle = (paddle, ball, canvas, aiLevel, AI) => {
-
+        
     const currentTime = performance.now();
-    // Check the ball's position only once per second
-    if (currentTime - AI.lastAICheckTime >= 1000) {
+    if (currentTime - AI.lastAICheckTime >= 1000) { // Check the ball's position only once per second
         AI.lastAICheckTime = currentTime;
-
+        
         // Predict the ball's future position
         let projectedX = ball.x;
         let projectedY = ball.y;
@@ -40,7 +47,7 @@ const moveAIPaddle = (paddle, ball, canvas, aiLevel, AI) => {
                 velocityY = -velocityY; // Reverse vertical direction
                 projectedY = Math.max(ball.radius, Math.min(canvas.height - ball.radius, projectedY)); // Clamp within bounds
             }
-        }
+            }
 
         // Set the target position for the paddle
         AI.targetPaddleY = projectedY - paddle.height / 2; // Center the paddle on the ball

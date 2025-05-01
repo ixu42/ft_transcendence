@@ -20,7 +20,7 @@ const createGame = () => {
 const updateGame = (deltatime, game) => {
     movePaddle(game.player, game.canvas);
     game.isAI ? moveAIPaddle(game.player2, game.ball, game.canvas, game.aiLevel, game.AI) : movePaddle(game.player2, game.canvas);
-    game.state === "game" && moveBall(game.ball, game.player, game.player2, game.canvas, game, deltatime);
+    moveBall(game.ball, game.player, game.player2, game.canvas, game, deltatime);
 };
 
 const drawWalls = (game) => {
@@ -86,106 +86,100 @@ const drawScoreSelection = (game) => {
     context.fillText('Press 1, 2, or 3 to select', game.canvas.width / 2 - 100, game.canvas.height / 2 + 100);
 };
 
-
-
 const drawGameOver = (game) => {
     const context = game.context;
     context.clearRect(0, 0, game.canvas.width, game.canvas.height);
     context.font = '30px Arial';
     context.fillStyle = '#fff';
     context.fillText('Game Over', game.canvas.width / 2 - 50, game.canvas.height / 2 - 60);
-    if (game.isAI)
-    {
-        if ((game.options.walls && game.walls.player2 <= 0) || game.player.score >= game.winningScore)
-            context.fillText('You Win!', game.canvas.width / 2 - 50, game.canvas.height / 2 - 20);
-        else 
-            context.fillText('You lost!', game.canvas.width / 2 - 50, game.canvas.height / 2 - 20);
-    }
-    else
-    {
-        if ((game.options.walls && game.walls.player2 <= 0) || game.player.score >= game.winningScore)
-            context.fillText('Player 1 Wins!', game.canvas.width / 2 - 50, game.canvas.height / 2 - 20);
-        else 
-            context.fillText('Player 2 Wins!', game.canvas.width / 2 - 50, game.canvas.height / 2 - 20);
-    }
+    msg = game.player.score >= game.winningScore ? (game.isAI ? "You win!" : "Player 1 won!") : (game.isAI ? "You lost!" : "Player 2 won!");
+    context.fillText(msg, game.canvas.width / 2 - 50, game.canvas.height / 2 - 20);
     context.fillText('Press X to exit', game.canvas.width / 2 - 50, game.canvas.height / 2 + 40);
 };
 
 const resetGame = (game) => {
     game.player.score = 0;
     game.player2.score = 0;
+    resetBallAndPaddles(game);
+};
+
+const resetBallAndPaddles = (game) => {
     resetBall(game.ball, game.canvas);
     resetPaddle(game.player, game.canvas);
     resetPaddle(game.player2, game.canvas);
-};
-
-const startGameLoop = (game, onGameEnd) => {
-    game.isGameRunning = true;
-    gameLoop(game, onGameEnd);
 }
 
 const stopGameLoop = (game) => {
     game.isGameRunning = false;
 }
 
+const scoreSelection = (game, callback) => {
+    drawScoreSelection(game);
+    waitForSelection((selection) => {
+        game.winningScore = selection === '1' ? 3 : selection === '2' ? 7 : 20;
+        callback();
+    });
+}
+
+const wallSelection = (game, callback) => {
+    drawWallSelection(game);
+    waitForWallSelection((selection) => {
+        game.options.walls = selection === '1' ? 1 : 0; // Enable walls
+        game.walls = { player: game.winningScore, player2: game.winningScore }; // Initialize wall HP
+        callback();
+    });
+}
+
+const startGameLoop = (game, onGameEnd) => {
+    prepareGame(game, () => {
+        game.isGameRunning = true,
+        gameLoop(game, onGameEnd);});
+}
+
+const prepareGame = (game, callback) => {
+    resetBallAndPaddles(game);
+    drawGame(game);
+    waitForAnyButton(() => {
+        game.state = "game"; // Change the state to "game" when a button is pressed
+        game.lastTime = performance.now(); // Reset the lastTime to start the game loop
+        callback();
+    });
+}
+
+const pauseGame = (game, callback) => {
+    drawGame(game);
+    waitForButton(' ', () => { // Wait for space bar to resume the game
+        game.lastTime = performance.now(); // Reset the lastTime to avoid jump in time
+        game.state = game.lastState; // Resume the game
+        callback();
+    });
+}
+
+const gameOver = (game, onGameEnd) => {
+    drawGameOver(game);
+    game.isGameRunning = false;
+    if (onGameEnd) onGameEnd();
+}
+
 const gameLoop = (game, onGameEnd) => {
-    if (game.isGameRunning == false)
-        return;
+    if (game.isGameRunning == false) return;
     
     const currentTime = performance.now();
     const deltaTime = (currentTime - game.lastTime); 
     game.lastTime = currentTime;
 
-    if (game.state === "game" || game.state === "pause") {
+    if (game.state === "game") {
         updateGame(deltaTime, game);
         drawGame(game);
         requestAnimationFrame(() => gameLoop(game, onGameEnd));
-    }
-    if (game.state === "prepare") {
-        drawGame(game);
-        waitForAnyButton(() => {
-            game.state = "game"; // Change the state to "game" when a button is pressed
-            game.lastTime = performance.now(); // Reset the lastTime to start the game loop
-            gameLoop(game, onGameEnd); // Restart the game loop
-        });
         return;
     }
-    if (game.state === "levelSelection") {
-        drawLevelSelection(game);
-        waitForSelection((selection) => {
-            game.aiLevel = selection === '1' ? 'easy' : selection === '2' ? 'medium' : 'hard';
-            game.state = 'scoreSelection';
-            gameLoop(game, onGameEnd);
-        });
-        return;
-    }
-    if (game.state === "scoreSelection") {
-        drawScoreSelection(game);
-        waitForSelection((selection) => {
-            game.winningScore = selection === '1' ? 3 : selection === '2' ? 7 : 20;
-            game.state = 'wallSelection';
-            gameLoop(game, onGameEnd);
-        });
-        return;
-    }
-    if (game.state === "wallSelection") {
-        drawWallSelection(game);
-        waitForWallSelection((selection) => {
-            game.options.walls = selection === '1' ? 1 : 0; // Enable walls
-            game.walls = { player: game.winningScore, player2: game.winningScore }; // Initialize wall HP
-            game.state = 'prepare'; // Change the state
-            gameLoop(game, onGameEnd);
-        });
-        return;
-    }
-    if (game.state === "gameOver") {
-        drawGameOver(game);
-        game.isGameRunning = false;
-        if (onGameEnd) {
-            onGameEnd();
-        }
-        return;
-    }
+    if (game.state === "prepare")
+        return prepareGame(game, () => gameLoop(game, onGameEnd)); // Restart the game loop after preparation
+    if (game.state === "pause")
+        return pauseGame(game, () => gameLoop(game, onGameEnd)); // Restart the game loop after pause
+    if (game.state === "gameOver")
+        return gameOver(game, onGameEnd);
 };
 
 const initializeGame = (gameId, userId) => {
@@ -198,16 +192,18 @@ const initializeGame = (gameId, userId) => {
     setupAndStart(gameId, userId, game);
 };
 
-const setupAndStart = (gameId, userId, game) => 
-{
-    setupControls(game.player, game.player2, game);
-    setupWindowEvents(game);
-    startGameLoop(game, () => {
-        if (getLoggedInUsers().length > 0) {
-            saveGameStats(gameId, game.player.score, game.player2.score, userId);
-         }
-         waitForButton('x', () => {
-            window.location.href = "/#lobby"; // Adjust the URL to your lobby page
-         });
-    }); 
-}
+const setupAndStart = (gameId, userId, game) => {
+    scoreSelection(game, () => {
+        wallSelection(game, () => {
+            setupControls(game.player, game.player2, game);
+            setupWindowEvents(game);
+            startGameLoop(game, () => {
+                if (getLoggedInUsers().length > 0)
+                    saveGameStats(gameId, game.player.score, game.player2.score, userId);
+                waitForButton('x', () => {
+                    window.location.href = "/#lobby"; // Redirect to lobby after game over
+                });
+            });
+        });
+    });
+};
