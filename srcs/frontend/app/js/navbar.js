@@ -1,3 +1,4 @@
+
 async function updateNavbar() {
 
     const authButton = document.getElementById("tr-auth-btn");
@@ -85,150 +86,177 @@ function populateProfileDropdown(container, userDataArray) {
   
 async function setupProfileButton(profileButton) {
     const dropdown = document.getElementById("profile-dropdown-content");
-    let hideTimer;
+    const friendsDropdownContent = document.getElementById("friends-dropdown-content");
+    let isOpen = false;
 
-    profileButton.addEventListener("mouseenter", async () => {
-        if (hideTimer) clearTimeout(hideTimer);
+    profileButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (isOpen)
+        {
+            dropdown.style.display = "none";
+            isOpen = false;
+        }
+        else
+        {
+            if (friendsDropdownContent) 
+                friendsDropdownContent.style.display = "none";
+            const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn && user.id);
+            const userDataArray = loggedInUsers.length > 0
+                ? await Promise.all(loggedInUsers.map(user => fetchProfileDataById(user.id)))
+                : [];
 
-        const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn && user.id);
-        const userDataArray = loggedInUsers.length > 0
-            ? await Promise.all(loggedInUsers.map(user => fetchProfileDataById(user.id)))
-            : [];
-
-        populateProfileDropdown(dropdown, userDataArray);
-        dropdown.style.display = "block";
+            populateProfileDropdown(dropdown, userDataArray);
+            dropdown.style.display = "block";
+            isOpen = true;
+        }
     });
-
-    profileButton.addEventListener("mouseleave", () => {
-        hideTimer = setTimeout(() => dropdown.style.display = "none", 200);
+    document.addEventListener("click", (event) => {
+        if (isOpen && !dropdown.contains(event.target) && !profileButton.contains(event.target)) {
+            dropdown.style.display = "none";
+            isOpen = false;
+        }
     });
-
-    dropdown.addEventListener("mouseenter", () => {
-        if (hideTimer) clearTimeout(hideTimer);
-        dropdown.style.display = "block";
+    dropdown.addEventListener("click", (event) => {
+        event.stopPropagation();
     });
-
-    dropdown.addEventListener("mouseleave", () => dropdown.style.display = "none");
 }
 
 async function setupFriendsButton(friendsButton) {
-
-    const friendsDropdown = document.getElementById("friends-dropdown");
     const friendsDropdownContent = document.getElementById("friends-dropdown-content");
+    const profileDropdown = document.getElementById("profile-dropdown-content");
     const sendFriendRequestBtn = document.getElementById("send-friend-request-btn");
-    let isFetching = false;  
+    let isOpen = false;
+    let isFetching = false;
     const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
     let userSelectorHtml = "";
 
     if (loggedInUsers.length > 1) {
-      userSelectorHtml = `
-        <div id="friends-user-selector-container" style="margin-bottom: 10px;">
-          <select id="friends-user-selector" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
-            ${loggedInUsers.map(user => `<option value="${user.id}">${user.username}</option>`).join("")}
-          </select>
-        </div>
-      `;
+        userSelectorHtml = `
+            <div id="friends-user-selector-container" style="margin-bottom: 10px;">
+                <select id="friends-user-selector" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
+                    ${loggedInUsers.map(user => `<option value="${user.id}">${user.username}</option>`).join("")}
+                </select>
+            </div>
+        `;
     } else if (loggedInUsers.length === 1) {
-      userSelectorHtml = `
-        <div id="friends-user-selector-container" style="margin-bottom: 10px;">
-          <span id="friends-user-selector" data-user-id="${loggedInUsers[0].id}" style="display: inline-block; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
-            ${loggedInUsers[0].username}
-          </span>
-        </div>
-      `;
+        userSelectorHtml = `
+            <div id="friends-user-selector-container" style="margin-bottom: 10px;">
+                <span id="friends-user-selector" data-user-id="${loggedInUsers[0].id}" style="display: inline-block; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
+                    ${loggedInUsers[0].username}
+                </span>
+            </div>
+        `;
     }
-    
+
     async function updateFriendsForUser(userId) {
-      const friendsSection = document.getElementById("friends-section");
-      const friendRequestsSection = document.getElementById("friend-requests-section");
-      try {
-        const friends = await fetchFriends(userId);
-        populateFriendsDropdown(friendsSection, friends, userId);
-        const friendRequests = await fetchFriendRequests(userId);
-        populateFriendRequests(friendRequestsSection, friendRequests, userId);
-      } catch (error) {
-        console.error(`Error fetching friends for user ${userId}:`, error);
-      }
-    }
-  
-    friendsDropdown.addEventListener("mouseenter", async () => {
-      if (isFetching) return;
-      isFetching = true;
-  
-      if (!document.getElementById("friends-user-selector") && userSelectorHtml) {
-        friendsDropdownContent.insertAdjacentHTML("afterbegin", userSelectorHtml);
-        const selector = document.getElementById("friends-user-selector");
-        if (selector.tagName.toLowerCase() === "select") {
-          selector.addEventListener("change", () => updateFriendsForUser(selector.value));
-        }
-      }
-  
-      let currentUserId;
-      const selector = document.getElementById("friends-user-selector");
-      if (selector) {
-        if (selector.tagName.toLowerCase() === "select") {
-          currentUserId = selector.value;
-        } else {
-          currentUserId = selector.getAttribute("data-user-id");
-        }
-      }
-      if (currentUserId) {
-        await updateFriendsForUser(currentUserId);
-      }
-      friendsDropdownContent.style.display = "block";
-      isFetching = false;
-    });
-  
-    friendsDropdown.addEventListener("mouseleave", () => {
-      friendsDropdownContent.style.display = "none";
-    });
-  
-    if (sendFriendRequestBtn) {
-      const newSendBtn = sendFriendRequestBtn.cloneNode(true);
-      sendFriendRequestBtn.parentNode.replaceChild(newSendBtn, sendFriendRequestBtn);
-      newSendBtn.addEventListener("click", async () => {
-        const friendUsername = document.getElementById("friend-username-input").value.trim();
-        if (!friendUsername) {
-          alert("Please enter a valid username.");
-          return;
-        }
-        let currentUserId;
-        const selector = document.getElementById("friends-user-selector");
-        if (selector) {
-          if (selector.tagName.toLowerCase() === "select") {
-            currentUserId = selector.value;
-          } else {
-            currentUserId = selector.getAttribute("data-user-id");
-          }
-        }
-        if (!currentUserId) {
-          alert("No user selected for sending friend request.");
-          return;
-        }
+        const friendsSection = document.getElementById("friends-section");
+        const friendRequestsSection = document.getElementById("friend-requests-section");
         try {
-          const response = await fetch(
-            `api/users/${currentUserId}/friends/requests/?recipient_username=${encodeURIComponent(friendUsername)}`,
-            {
-              method: "POST",
-              credentials: "include",
-              headers: { "X-CSRFToken": await getCSRFCookie() },
-            }
-          );
-          if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Error:", errorData);
-            alert(`Error: ${errorData.errors || response.statusText}`);
-            return;
-          }
-          alert("Friend request sent!");
+            const friends = await fetchFriends(userId);
+            populateFriendsDropdown(friendsSection, friends, userId);
+            const friendRequests = await fetchFriendRequests(userId);
+            populateFriendRequests(friendRequestsSection, friendRequests, userId);
         } catch (error) {
-          console.error("Friend request error:", error);
-          alert("Something went wrong. Please try again.");
+            console.error(`Error fetching friends for user ${userId}:`, error);
         }
-      });
     }
-  }
-  
+
+    friendsButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (isOpen)
+        {
+            friendsDropdownContent.style.display = "none";
+            isOpen = false;
+        }
+        else
+        {
+            if (isFetching) return;
+            isFetching = true;
+
+            if (profileDropdown) 
+                profileDropdown.style.display = "none";
+            if (!document.getElementById("friends-user-selector") && userSelectorHtml) {
+                friendsDropdownContent.insertAdjacentHTML("afterbegin", userSelectorHtml);
+                const selector = document.getElementById("friends-user-selector");
+                if (selector.tagName.toLowerCase() === "select") {
+                    selector.addEventListener("change", () => updateFriendsForUser(selector.value));
+                }
+            }
+
+            let currentUserId;
+            const selector = document.getElementById("friends-user-selector");
+            if (selector)
+            {
+                if (selector.tagName.toLowerCase() === "select")
+                    currentUserId = selector.value;
+                else
+                    currentUserId = selector.getAttribute("data-user-id");
+            }
+            if (currentUserId)
+                await updateFriendsForUser(currentUserId);
+            friendsDropdownContent.style.display = "block";
+            isOpen = true;
+            isFetching = false;
+        }
+    });
+
+    document.addEventListener("click", (event) => {
+        if (isOpen && !friendsDropdownContent.contains(event.target) && !friendsButton.contains(event.target))
+        {
+            friendsDropdownContent.style.display = "none";
+            isOpen = false;
+        }
+    });
+
+    friendsDropdownContent.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+
+    if (sendFriendRequestBtn) {
+        const newSendBtn = sendFriendRequestBtn.cloneNode(true);
+        sendFriendRequestBtn.parentNode.replaceChild(newSendBtn, sendFriendRequestBtn);
+        newSendBtn.addEventListener("click", async () => {
+            const friendUsername = document.getElementById("friend-username-input").value.trim();
+            if (!friendUsername) {
+                alert("Please enter a valid username.");
+                return;
+            }
+            let currentUserId;
+            const selector = document.getElementById("friends-user-selector");
+            if (selector) {
+                if (selector.tagName.toLowerCase() === "select") {
+                    currentUserId = selector.value;
+                } else {
+                    currentUserId = selector.getAttribute("data-user-id");
+                }
+            }
+            if (!currentUserId) {
+                alert("No user selected for sending friend request.");
+                return;
+            }
+            try {
+                const response = await fetch(
+                    `api/users/${currentUserId}/friends/requests/?recipient_username=${encodeURIComponent(friendUsername)}`,
+                    {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "X-CSRFToken": await getCSRFCookie() },
+                    }
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Error:", errorData);
+                    alert(`Error: ${errorData.errors || response.statusText}`);
+                    return;
+                }
+                alert("Friend request sent!");
+            } catch (error) {
+                console.error("Friend request error:", error);
+                alert("Something went wrong. Please try again.");
+            }
+        });
+    }
+}
 
 // Function to fetch friends
 async function fetchFriends(userId) {
