@@ -1,22 +1,32 @@
-const setupControls = async (player, player2, game) => {
-    document.addEventListener('keydown', async (event) => {
+let keydownListener, keyupListener;
+
+const setupGameControls = async (player, player2, game) => {
+    keydownListener = (event) => {
         const key = event.key.toLowerCase();
         key === 'arrowup' ? player2.keyboardUp = true :
             key === 'arrowdown' ? player2.keyboardDown = true :
             key === 'w' ? player.keyboardUp = true :
             key === 's' ? player.keyboardDown = true : null;
         if (key === ' ' || key === 'escape')
-            pauseIfGame(game); // Pause the game if the space bar or escape is pressed     
-    });
+            pauseIfGame(game); // Pause the game if the space bar or escape is pressed
+    };
 
-    document.addEventListener('keyup', function(event) {
+    keyupListener = (event) => {
         const key = event.key.toLowerCase();
         key === 'arrowup' ? player2.keyboardUp = false :
             key === 'arrowdown' ? player2.keyboardDown = false :
             key === 'w' ? player.keyboardUp = false :
             key === 's' ? player.keyboardDown = false : null;
-    });
-}
+    };
+
+    document.addEventListener('keydown', keydownListener);
+    document.addEventListener('keyup', keyupListener);
+};
+
+const removeGameControls = () => {
+    document.removeEventListener('keydown', keydownListener);
+    document.removeEventListener('keyup', keyupListener);
+};
 
 const waitForSelection = (callback) => {
     console.log('Waiting for selection...');

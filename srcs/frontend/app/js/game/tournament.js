@@ -190,7 +190,7 @@ const initializeTournament = async (response, currentUserId) => {
     await startTournament(tournament);
     const game = createGame();
     game.winningScore = tournament.winningScore;
-    setupControls(game.player, game.player2, game);
+    setupGameControls(game.player, game.player2, game);
     setupWindowEvents(game);
     initializeUpcomingMatches(tournament);
     tournamentLoop(tournament, game, response.game_id);
@@ -198,7 +198,7 @@ const initializeTournament = async (response, currentUserId) => {
 
 const initializeUpcomingMatches = (tournament) => {
     tournament.upcomingMatches = [];
-    for (let i = 0; i < tournament.players.length - 2; i += 2)
+    for (let i = 0; i + 1 < tournament.players.length; i += 2)
         createMatch(tournament.upcomingMatches, tournament.players[i], tournament.players[i + 1]);
     if (tournament.players.length % 2 !== 0)
         createMatch(tournament.upcomingMatches, tournament.players[tournament.players.length - 1]);
@@ -208,14 +208,14 @@ const createMatch = (upcomingMatches, p1, p2 = null) => {
     upcomingMatches.push({ player1: p1, player2: p2});
 };
 
-const addWinnerToNextMatch = (upcomingMatches, winner) => {
+const addPlayerToNextMatch = (upcomingMatches, winner) => {
     const lastMatch = upcomingMatches[upcomingMatches.length - 1];
     lastMatch.player2 == null ? lastMatch.player2 = winner : createMatch(upcomingMatches, winner);
 }
 const tournamentLoop = async (tournament, game, game_id) => {
     const processMatchResult = () => {
         winner = game.player.score > game.player2.score ? tournament.upcomingMatches[0].player1 : tournament.upcomingMatches[0].player2;
-        addWinnerToNextMatch(tournament.upcomingMatches, winner);
+        addPlayerToNextMatch(tournament.upcomingMatches, winner);
         tournament.upcomingMatches.shift();
         return winner;
     };
@@ -244,19 +244,19 @@ const tournamentLoop = async (tournament, game, game_id) => {
             drawMatch(game.canvas, tournament.upcomingMatches[0]);
             waitForButton('enter', () => {
                 tournament.state = 'playing';
-                game.state = 'wallSelection';
                 tournamentLoop(tournament, game, game_id);
             });
             break;
 
         case 'playing':
-            startGameLoop(game, () => {
-                winner = processMatchResult();
-                if (!checkTournamentEnd(winner)) {
-                    tournament.state = 'table';
-                    resetGame(game);
-                    tournamentLoop(tournament, game, game_id);
-                }});
+            wallSelection(game, () => {
+                startGameLoop(game, () => {
+                    winner = processMatchResult();
+                    if (!checkTournamentEnd(winner)) {
+                        tournament.state = 'table';
+                        resetGame(game);
+                        tournamentLoop(tournament, game, game_id);
+                    }})});
             break;
     }
 };

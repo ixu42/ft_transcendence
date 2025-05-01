@@ -132,6 +132,8 @@ const wallSelection = (game, callback) => {
 
 const startGameLoop = (game, onGameEnd) => {
     prepareGame(game, () => {
+        setupGameControls(game.player, game.player2, game);
+        setupWindowEvents(game);
         game.isGameRunning = true,
         gameLoop(game, onGameEnd);});
 }
@@ -157,6 +159,7 @@ const pauseGame = (game, callback) => {
 
 const gameOver = (game, onGameEnd) => {
     drawGameOver(game);
+    removeGameControls();
     game.isGameRunning = false;
     if (onGameEnd) onGameEnd();
 }
@@ -195,8 +198,6 @@ const initializeGame = (gameId, userId) => {
 const setupAndStart = (gameId, userId, game) => {
     scoreSelection(game, () => {
         wallSelection(game, () => {
-            setupControls(game.player, game.player2, game);
-            setupWindowEvents(game);
             startGameLoop(game, () => {
                 if (getLoggedInUsers().length > 0)
                     saveGameStats(gameId, game.player.score, game.player2.score, userId);
