@@ -24,6 +24,13 @@ def validate_file_size(value):
 
 
 class CustomUser(AbstractUser):
+    username = models.CharField(
+        max_length=50,
+        unique=True,
+        error_messages={
+            "unique": "A user with that username already exists.",
+        },
+    )
     avatar = models.ImageField(
         upload_to=user_avatar_upload_path,
         blank=True,
