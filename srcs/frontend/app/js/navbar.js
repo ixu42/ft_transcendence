@@ -127,26 +127,6 @@ async function setupFriendsButton(friendsButton) {
     const sendFriendRequestBtn = document.getElementById("send-friend-request-btn");
     let isOpen = false;
     let isFetching = false;
-    const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
-    let userSelectorHtml = "";
-
-    if (loggedInUsers.length > 1) {
-        userSelectorHtml = `
-            <div id="friends-user-selector-container" style="margin-bottom: 10px;">
-                <select id="friends-user-selector" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
-                    ${loggedInUsers.map(user => `<option value="${user.id}">${user.username}</option>`).join("")}
-                </select>
-            </div>
-        `;
-    } else if (loggedInUsers.length === 1) {
-        userSelectorHtml = `
-            <div id="friends-user-selector-container" style="margin-bottom: 10px;">
-                <span id="friends-user-selector" data-user-id="${loggedInUsers[0].id}" style="display: inline-block; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
-                    ${loggedInUsers[0].username}
-                </span>
-            </div>
-        `;
-    }
 
     async function updateFriendsForUser(userId) {
         const friendsSection = document.getElementById("friends-section");
@@ -169,31 +149,54 @@ async function setupFriendsButton(friendsButton) {
             isOpen = false;
         }
         else
-        {
+    {
             if (isFetching) return;
             isFetching = true;
-
-            if (profileDropdown) 
+            if (profileDropdown)
                 profileDropdown.style.display = "none";
-            if (!document.getElementById("friends-user-selector") && userSelectorHtml) {
+            const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
+            let userSelectorHtml = "";
+            if (loggedInUsers.length > 1) {
+                userSelectorHtml = `
+                    <div id="friends-user-selector-container" style="margin-bottom: 10px;">
+                        <select id="friends-user-selector" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
+                            ${loggedInUsers.map(user => `<option value="${user.id}">${user.username}</option>`).join("")}
+                        </select>
+                    </div>
+                `;
+            } else if (loggedInUsers.length === 1) {
+                userSelectorHtml = `
+                    <div id="friends-user-selector-container" style="margin-bottom: 10px;">
+                        <span id="friends-user-selector" data-user-id="${loggedInUsers[0].id}" style="display: inline-block; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; font-size: 1rem;">
+                            ${loggedInUsers[0].username}
+                        </span>
+                    </div>
+                `;
+            }
+            const existingSelectorContainer = document.getElementById("friends-user-selector-container");
+            if (existingSelectorContainer) {
+                existingSelectorContainer.remove();
+            }
+            if (userSelectorHtml) {
                 friendsDropdownContent.insertAdjacentHTML("afterbegin", userSelectorHtml);
                 const selector = document.getElementById("friends-user-selector");
-                if (selector.tagName.toLowerCase() === "select") {
+                if (selector && selector.tagName.toLowerCase() === "select") {
                     selector.addEventListener("change", () => updateFriendsForUser(selector.value));
                 }
             }
 
             let currentUserId;
             const selector = document.getElementById("friends-user-selector");
-            if (selector)
-            {
-                if (selector.tagName.toLowerCase() === "select")
+            if (selector) {
+                if (selector.tagName.toLowerCase() === "select") {
                     currentUserId = selector.value;
-                else
+                } else {
                     currentUserId = selector.getAttribute("data-user-id");
+                }
             }
-            if (currentUserId)
+            if (currentUserId) {
                 await updateFriendsForUser(currentUserId);
+            }
             friendsDropdownContent.style.display = "block";
             isOpen = true;
             isFetching = false;
@@ -201,8 +204,7 @@ async function setupFriendsButton(friendsButton) {
     });
 
     document.addEventListener("click", (event) => {
-        if (isOpen && !friendsDropdownContent.contains(event.target) && !friendsButton.contains(event.target))
-        {
+        if (isOpen && !friendsDropdownContent.contains(event.target) && !friendsButton.contains(event.target)) {
             friendsDropdownContent.style.display = "none";
             isOpen = false;
         }
