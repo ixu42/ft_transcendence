@@ -1,7 +1,6 @@
 
 function setupLoginPageJs()
 {
-    checkAndShowSplash();
     const loginButton = document.getElementById("login-btn");
     if (loginButton){
         handleLogin(loginButton);
@@ -10,19 +9,6 @@ function setupLoginPageJs()
         console.error("Login button not found!");
     }
     displayLoggedInUsers();
-}
-
-function checkAndShowSplash() {
-    const splashScreen = document.querySelector(".splash-screen");
-    const loginContainer = document.getElementById("login-container");
-
-
-    if (localStorage.getItem("splashShown") === "true") {
-        splashScreen?.classList.add("hidden");
-        loginContainer?.classList.remove("hidden");
-    } else {
-        splashScreen?.classList.remove("hidden");
-    }
 }
 
 function handleLogin(loginButton) {
