@@ -14,7 +14,7 @@ rebuild: build up
 
 clean:
 	docker compose down -v --rmi all --remove-orphans
-	rm .env
+#	rm .env
 
 logs:
 	docker compose logs --follow
