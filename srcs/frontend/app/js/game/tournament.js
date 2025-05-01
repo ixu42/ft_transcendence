@@ -146,7 +146,7 @@ const setupTournament = async (response) => {
         }
 
         const guestResponse = await apiRequest(
-            `get-guest-id/?username=${encodeURIComponent(displayName)}`,
+            'get-guest-id/',
             "GET",
             null
         );
