@@ -13,7 +13,7 @@ const initializeAIGame = (gameId, userId) => {
     
 const levelSelection = (game, callback) => {
     drawLevelSelection(game);
-    waitForSelection((selection) => {
+    waitForSelection(game, (selection) => {
         game.AI.level = selection === '1' ? "easy" : selection === '2' ? "medium" : "hard";
         callback();
     });

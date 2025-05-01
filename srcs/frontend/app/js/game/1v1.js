@@ -13,8 +13,9 @@ const createGame = () => {
     const options = {walls: 0};
     const walls = {player: 0, player2: 0};
     const isGameRunning = false;
+    const eventListeners = [];
 
-    return { player, player2, ball, canvas, context, state, lastState, isAI, AI, aiLevel, winningScore, options, walls, isGameRunning, lastTime: 0 };
+    return { player, player2, ball, canvas, context, state, lastState, isAI, AI, aiLevel, winningScore, options, walls, isGameRunning, lastTime: 0, eventListeners };
 };
 
 const updateGame = (deltatime, game) => {
@@ -115,7 +116,7 @@ const stopGameLoop = (game) => {
 
 const scoreSelection = (game, callback) => {
     drawScoreSelection(game);
-    waitForSelection((selection) => {
+    waitForSelection(game, (selection) => {
         game.winningScore = selection === '1' ? 3 : selection === '2' ? 7 : 20;
         callback();
     });
@@ -123,7 +124,7 @@ const scoreSelection = (game, callback) => {
 
 const wallSelection = (game, callback) => {
     drawWallSelection(game);
-    waitForWallSelection((selection) => {
+    waitForWallSelection(game, (selection) => {
         game.options.walls = selection === '1' ? 1 : 0; // Enable walls
         game.walls = { player: game.winningScore, player2: game.winningScore }; // Initialize wall HP
         callback();
@@ -132,8 +133,6 @@ const wallSelection = (game, callback) => {
 
 const startGameLoop = (game, onGameEnd) => {
     prepareGame(game, () => {
-        setupGameControls(game.player, game.player2, game);
-        setupWindowEvents(game);
         game.isGameRunning = true,
         gameLoop(game, onGameEnd);});
 }
@@ -141,7 +140,7 @@ const startGameLoop = (game, onGameEnd) => {
 const prepareGame = (game, callback) => {
     resetBallAndPaddles(game);
     drawGame(game);
-    waitForAnyButton(() => {
+    waitForAnyButton(game, () => {
         game.state = "game"; // Change the state to "game" when a button is pressed
         game.lastTime = performance.now(); // Reset the lastTime to start the game loop
         callback();
@@ -150,7 +149,7 @@ const prepareGame = (game, callback) => {
 
 const pauseGame = (game, callback) => {
     drawGame(game);
-    waitForButton(' ', () => { // Wait for space bar to resume the game
+    waitForButton(game, ' ', () => { // Wait for space bar to resume the game
         game.lastTime = performance.now(); // Reset the lastTime to avoid jump in time
         game.state = game.lastState; // Resume the game
         callback();
@@ -159,14 +158,14 @@ const pauseGame = (game, callback) => {
 
 const gameOver = (game, onGameEnd) => {
     drawGameOver(game);
-    removeGameControls();
+    removeAllEventListeners(game.eventListeners);
     game.isGameRunning = false;
     if (onGameEnd) onGameEnd();
 }
 
 const gameLoop = (game, onGameEnd) => {
     if (game.isGameRunning == false) return;
-    
+
     const currentTime = performance.now();
     const deltaTime = (currentTime - game.lastTime); 
     game.lastTime = currentTime;
@@ -196,12 +195,13 @@ const initializeGame = (gameId, userId) => {
 };
 
 const setupAndStart = (gameId, userId, game) => {
+    setupGameControls(game.player, game.player2, game);
     scoreSelection(game, () => {
         wallSelection(game, () => {
             startGameLoop(game, () => {
                 if (getLoggedInUsers().length > 0)
                     saveGameStats(gameId, game.player.score, game.player2.score, userId);
-                waitForButton('x', () => {
+                waitForButton(game, 'x', () => {
                     window.location.href = "/#lobby"; // Redirect to lobby after game over
                 });
             });

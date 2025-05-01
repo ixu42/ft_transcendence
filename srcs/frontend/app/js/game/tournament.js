@@ -190,8 +190,6 @@ const initializeTournament = async (response, currentUserId) => {
     await startTournament(tournament);
     const game = createGame();
     game.winningScore = tournament.winningScore;
-    setupGameControls(game.player, game.player2, game);
-    setupWindowEvents(game);
     initializeUpcomingMatches(tournament);
     tournamentLoop(tournament, game, response.game_id);
 };
@@ -225,7 +223,7 @@ const tournamentLoop = async (tournament, game, game_id) => {
             tournament.state = 'gameOver';
             drawWinner(winner, game.canvas);
             saveTournamentStats(tournament.tournamentId, winner.userId);
-            waitForButton('x', () => {window.location.hash = 'lobby';});
+            waitForButton(game, 'x', () => {window.location.hash = 'lobby';});
             return true;
         }
         return false;
@@ -234,7 +232,7 @@ const tournamentLoop = async (tournament, game, game_id) => {
     switch (tournament.state) {
         case 'table':
             drawTable(game.canvas, tournament.upcomingMatches);
-            waitForButton('enter', () => {
+            waitForButton(game, 'enter', () => {
                 tournament.state = 'prepare';
                 tournamentLoop(tournament, game, game_id);
             });
@@ -242,13 +240,14 @@ const tournamentLoop = async (tournament, game, game_id) => {
 
         case 'prepare':
             drawMatch(game.canvas, tournament.upcomingMatches[0]);
-            waitForButton('enter', () => {
+            waitForButton(game, 'enter', () => {
                 tournament.state = 'playing';
                 tournamentLoop(tournament, game, game_id);
             });
             break;
 
         case 'playing':
+            setupGameControls(game.player, game.player2, game);
             wallSelection(game, () => {
                 startGameLoop(game, () => {
                     winner = processMatchResult();
@@ -256,7 +255,7 @@ const tournamentLoop = async (tournament, game, game_id) => {
                         tournament.state = 'table';
                         resetGame(game);
                         tournamentLoop(tournament, game, game_id);
-                    }})});
+            }})});
             break;
     }
 };
