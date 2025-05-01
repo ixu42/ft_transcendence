@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from backend.decorators import validate_user_id_query_param
-from .models import Tournament
+from .models import Tournament, TournamentPlayer
 
 User = get_user_model()
 
@@ -19,7 +19,7 @@ class BaseTestCase(TestCase):
             name="test tournament", creator=self.user1
         )
         for user in [self.user1, self.user2, self.user3]:
-            self.tournament.players.add(user)
+            TournamentPlayer.objects.create(tournament=self.tournament, player=user)
 
     def login(self, user):
         session = self.client.session
@@ -161,7 +161,7 @@ class TestJoinTournament(BaseTestCase):
     def test_join_tournament_tournament_full(self):
         for i in range(Tournament.MAX_PLAYERS):
             user = User.objects.create(username=f"new_user{i}")
-            self.tournament.players.add(user)
+            TournamentPlayer.objects.create(tournament=self.tournament, player=user)
         response = self.make_request(self.url)
 
         self.assertEqual(response.status_code, 400)
