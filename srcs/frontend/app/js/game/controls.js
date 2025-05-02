@@ -18,7 +18,6 @@ const removeAllEventListeners = (eventListeners) => {
         element.removeEventListener(type, listener);
     });
     eventListeners.length = 0; // Clear the array after removing all listeners
-    console.log("All controls removed.");
 };
 
 const setupGameControls = async (player, player2, game) => {
@@ -71,7 +70,6 @@ const waitForSelection = (game, callback) => {
     const selectionHandler = (event) => {
         const key = event.key.toLowerCase();
         if (key === '1' || key === '2' || key === '3') {
-            console.log('Selection made:', key);
             removeEventListener(game.eventListeners, document, 'keydown', selectionHandler); 
             callback(key);
         }
@@ -83,7 +81,6 @@ const waitForWallSelection = (game, callback) => {
     const wallSelectionHandler = (event) => {
         const key = event.key.toLowerCase();
         if (key === '1' || key === '2') {
-            console.log('Wall option selected:', key);
             removeEventListener(game.eventListeners, document, 'keydown', wallSelectionHandler);
             callback(key);
         }
@@ -95,7 +92,6 @@ const waitForButton = (game, button, callback) => {
     const buttonHandler = (event) => {
         const key = event.key.toLowerCase();
         if (key === button) {
-            console.log('Button pressed:', button);
             removeEventListener(game.eventListeners, document, 'keydown', buttonHandler);
             callback();
         }
@@ -105,7 +101,6 @@ const waitForButton = (game, button, callback) => {
 
 const waitForAnyButton = (game, callback) => {
     const anyButtonHandler = (event) => {
-        console.log('Any button pressed:', event.key);
         removeEventListener(game.eventListeners, document, 'keydown', anyButtonHandler);
         callback();
     };
