@@ -239,8 +239,6 @@ const session_check = async () => {
             if (response.ok) {
                 const data = await response.json();
                 validUsers.push(user);
-            } else {
-                console.warn(`⚠️ Session expired for user ${userId}`);
             }
         } catch (err) {
             console.error(`❌ Error checking session for user ${userId}:`, err);
