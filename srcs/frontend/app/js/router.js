@@ -61,6 +61,7 @@ const startHeartbeat = async () => {
   }
 
   async function sendHeartbeat() {
+      await session_check();
       const loggedInUsers = getLoggedInUsers().filter(user => user.loggedIn);
       for (const user of loggedInUsers) {
           try {
