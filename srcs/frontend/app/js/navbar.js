@@ -30,12 +30,24 @@ async function updateNavbar() {
     }
 }
 
-
 function handleLogout(userId) {
     logoutUser(userId);
     const dropdown = document.querySelector('.profile-list-container');
     if (dropdown) {
         dropdown.parentElement.style.display = 'none';
+    }
+}
+
+async function updateFriendsForUser(userId) {
+    const friendsSection = document.getElementById("friends-section");
+    const friendRequestsSection = document.getElementById("friend-requests-section");
+    try {
+        const friends = await fetchFriends(userId);
+        populateFriendsDropdown(friendsSection, friends, userId);
+        const friendRequests = await fetchFriendRequests(userId);
+        populateFriendRequests(friendRequestsSection, friendRequests, userId);
+    } catch (error) {
+        console.error(`Error fetching friends for user ${userId}:`, error);
     }
 }
 
@@ -157,18 +169,7 @@ async function setupFriendsButton(friendsButton) {
     let isOpen = false;
     let isFetching = false;
 
-    async function updateFriendsForUser(userId) {
-        const friendsSection = document.getElementById("friends-section");
-        const friendRequestsSection = document.getElementById("friend-requests-section");
-        try {
-            const friends = await fetchFriends(userId);
-            populateFriendsDropdown(friendsSection, friends, userId);
-            const friendRequests = await fetchFriendRequests(userId);
-            populateFriendRequests(friendRequestsSection, friendRequests, userId);
-        } catch (error) {
-            console.error(`Error fetching friends for user ${userId}:`, error);
-        }
-    }
+
 
     friendsButton.addEventListener("click", async (event) => {
         event.stopPropagation();
@@ -347,11 +348,11 @@ async function fetchFriendRequests(userId) {
 
 function populateFriendRequests(container, requests, userId) {
     if (!container) return;
-    
+
     async function handleFriendRequestAction(requestId, action) {
         try {
             const accepted = action === 'accept';
-    
+
             const response = await fetch(`/api/users/${userId}/friends/requests/${requestId}/`, {
                 method: 'POST',
                 credentials: 'include',
@@ -359,25 +360,24 @@ function populateFriendRequests(container, requests, userId) {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': await getCSRFCookie(),
                 },
-                body: JSON.stringify({ accepted: accepted }), 
+                body: JSON.stringify({ accepted: accepted }),
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.errors || `Failed to ${action} friend request.`);
             }
-    
+
             const data = await response.json();
             alert(data.message || `Friend request ${action}ed.`);
-    
+            await updateFriendsForUser(userId);
+
         } catch (error) {
             console.error(`Error ${action}ing friend request:`, error);
             alert(error.message);
         }
     }
-    
-    container.innerHTML = ""; 
-
+    container.innerHTML = "";
     if (requests.length === 0) {
         const noRequestsMessage = document.createElement("div");
         noRequestsMessage.className = "friend-item";
@@ -394,14 +394,12 @@ function populateFriendRequests(container, requests, userId) {
             `;
             container.appendChild(requestItem);
         });
-        // Add event listeners for accept and decline buttons
         container.querySelectorAll('.accept-request-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const requestId = button.dataset.id;
                 await handleFriendRequestAction(requestId, 'accept');
             });
         });
-
         container.querySelectorAll('.decline-request-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const requestId = button.dataset.id;
