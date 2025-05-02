@@ -50,6 +50,21 @@ function attachRegisterEvent(form) {
             return;
         }
 
+        if (userData.username.length > 20) {
+            alert("⚠️ Use 20 characters or fewer for your username.");
+            return;
+        }
+
+        if (userData.password1.length > 30) {
+            alert("⚠️ Use 30 characters or fewer for your password.");
+            return;
+        }
+
+        if (userData.password1 !== userData.password2) {
+            alert("⚠️ Passwords do not match. Try again.");
+            return;
+      }
+
         const response = await register(userData);
 
         if (!response.ok) {
