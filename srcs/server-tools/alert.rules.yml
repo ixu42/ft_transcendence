@@ -1,0 +1,35 @@
+groups:
+- name: monitoring
+  rules:
+  - alert: HighNginxErrorRate
+    expr: rate(nginx_http_response_count_total{status=~"5.."}[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High Nginx 5xx error rate"
+      description: "{{ $labels.instance }} has a 5xx error rate above 0.1 for 2 minutes."
+  - alert: PostgresDown
+    expr: pg_up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Postgres instance down"
+      description: "{{ $labels.instance }} is not responding."
+  - alert: BackendDown
+    expr: up{job="backend"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Django backend down"
+      description: "{{ $labels.instance }} (Django backend) is not responding."
+  - alert: HighBackendErrorRate
+    expr: rate(http_requests_total{job="backend", status=~"5.."}[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High Django backend 5xx error rate"
+      description: "{{ $labels.instance }} has a 5xx error rate above 0.1 for 2 minutes."

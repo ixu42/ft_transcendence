@@ -5,6 +5,9 @@
 # Ignore ssl certificate and key
 srcs/frontend/tools/ssl
 
+# Ignore grafana data
+srcs/server-tools/grafana/data/
+
 db.sqlite3
 .env
 .vscode/

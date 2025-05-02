@@ -1,0 +1,11 @@
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: https://tr-front:8443/prometheus/  # Must match NGINX proxy endpoint
+    access: proxy
+    isDefault: true
+    jsonData:
+      tlsSkipVerify: true  # Skip TLS verification for self-signed certificates
+      httpMethod: POST    # Ensure POST is used for queries
+    editable: true
