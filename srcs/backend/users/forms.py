@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, SetPasswordForm
 from django import forms
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ValidationError
 from users.models import CustomUser
 
 
@@ -8,6 +9,12 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ("username", "password1", "password2")
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if username and username.lower() == "deleted_user":
+            raise ValidationError("A user with that username already exists.")
+        return username
 
 
 class AvatarUpdateForm(forms.ModelForm):
