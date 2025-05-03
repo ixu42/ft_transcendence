@@ -51,7 +51,7 @@ class CustomUser(AbstractUser):
     @property
     def total_games(self):
         return Game.objects.filter(
-            models.Q(player1=self) | models.Q(player2=self)
+            (models.Q(player1=self) | models.Q(player2=self)) & models.Q(completed=True)
         ).count()
 
     @property

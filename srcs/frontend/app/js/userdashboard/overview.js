@@ -11,9 +11,10 @@ async function initializeUserOverview(userId) {
 // -    }
 // -
     const matches = Array.isArray(matchData.match_history) ? matchData.match_history : [];
-    const totalMatches = matches.length;
-    const wins = matches.filter(m => m.winner === user.username).length;
-    const winRate = totalMatches ? ((wins / totalMatches) * 100).toFixed(1) + '%' : 'N/A';
+    const wins = user.total_wins ?? 0;
+    const losses = user.total_losses ?? 0;
+    const completedMatches = wins + losses;
+    const winRate = completedMatches ? ((wins / completedMatches) * 100).toFixed(1) + '%' : 'N/A';
 
     const opponents = {};
     matches.forEach(m => {
@@ -28,7 +29,7 @@ async function initializeUserOverview(userId) {
     const overviewContainer = document.getElementById("user-overview");
     overviewContainer.innerHTML = `
       <p><strong>Username:</strong> ${user.username}</p>
-      <p><strong>Total Matches:</strong> ${totalMatches}</p>
+      <p><strong>Completed Matches:</strong> ${completedMatches}</p>
       <p><strong>Wins:</strong> ${wins}</p>
       <p><strong>Win Rate:</strong> ${winRate}</p>
       <p><strong>Most Frequent Opponent:</strong> ${mostFrequentOpponent}</p>
@@ -38,8 +39,8 @@ async function initializeUserOverview(userId) {
       </div>
       <button class="basicbutton menu-btn" onclick="window.location.hash='dashy'" style="margin-top: 10px;">Back</button>
     `;
-    
-    renderWinLossChart(matches, user.username, "winloss-chart");
+
+    renderWinLossChart(wins, losses, "winloss-chart");
     document.getElementById("view-tournament-stats-btn").addEventListener("click", () => {
       initializeTournamentOverview(userId, user.username);
     });
@@ -94,9 +95,7 @@ async function initializeTournamentOverview(userId, username) {
   }
 }
 
-function renderWinLossChart(matches, username, containerId) {
-  const wins = matches.filter(m => m.winner === username).length;
-  const losses = matches.length - wins;
+function renderWinLossChart(wins, losses, containerId) {
 
   const ctx = document.getElementById(containerId).getContext("2d");
   new Chart(ctx, {

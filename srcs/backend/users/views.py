@@ -305,7 +305,11 @@ def match_history(request, user_id):
             "date_played": game.date_played,
             "player1": game.player1.username if game.player1 else "AI",
             "player2": game.player2.username if game.player2 else "AI",
-            "winner": game.winner.username if game.winner else "AI",
+            "winner": (
+                game.winner.username if game.winner
+                else "AI" if game.completed
+                else "Not determined"
+            ),
             "player1_score": game.player1_score,
             "player2_score": game.player2_score,
         }
