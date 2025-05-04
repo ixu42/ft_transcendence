@@ -48,8 +48,8 @@ services:
       tr_network:
         aliases:
           - tr-back
-    ports:
-        - "${DJANGO_PORT}:${DJANGO_PORT}"
+    # ports:
+    #     - "${DJANGO_PORT}:${DJANGO_PORT}"
     depends_on:
       - tr_db
   tr_db:

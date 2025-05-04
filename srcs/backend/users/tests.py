@@ -529,16 +529,17 @@ class TestLeaderboard(BaseTestCase):
         other_user = User.objects.create(
             username="testuser2", password="securepassword123"
         )
-        self.create_game(self.user, None, self.user, 10, 5)
-        self.create_game(self.user, other_user, other_user, 5, 10)
+        self.simulate_game(self.user, None, self.user, 10, 5)
+        self.simulate_game(self.user, other_user, other_user, 5, 10)
 
-    def create_game(self, player1, player2, winner, player1_score, player2_score):
+    def simulate_game(self, player1, player2, winner, player1_score, player2_score):
         Game.objects.create(
             player1=player1,
             player2=player2,
             winner=winner,
             player1_score=player1_score,
             player2_score=player2_score,
+            completed=True,
         )
 
     def assert_leaderboard_entry(self, entry, username, total_wins, win_rate, rank):
