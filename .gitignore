@@ -5,10 +5,7 @@
 # Ignore ssl certificate and key
 srcs/frontend/tools/ssl
 
-# Ignore grafana data
-srcs/server-tools/grafana/data/
-
-db.sqlite3
+.hashicorp
 .env
 .vscode/
 node_modules/
@@ -18,4 +15,4 @@ build/
 .venv
 __pycache__
 venv/
-.script_to_bash_before_testing
+.ruff_cache
