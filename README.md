@@ -5,9 +5,10 @@ Developing a full-stack web application where users can register, log in, play a
 ## Getting Started
 
 1. Clone the repository and navigate to the project root.
-2. Create .hashicorp file and add hashicorp credentials (HCP_CLIENT_ID, HCP_CLIENT_SECRET).
-3. Run `make up` to build docker images and start containers.
-4. Visit the app in your browser at https://localhost:8443/.
+2. Run `make up` to build docker images and start containers.
+3. Visit the app in your browser at https://localhost:8443/.
+
+**Security Notice**: This repository includes a .hashicorp file containing example credentials for illustrative purposes only, as part of a student project. Do not upload any real credentials, .env files, or other sensitive information to GitHub under any circumstances.
 
 ## Maintenance Commands
 
