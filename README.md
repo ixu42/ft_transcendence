@@ -1,35 +1,15 @@
-# ft_transcendence Project Overview
+# ft_transcendence
 
+Developing a full-stack web application where users can register, log in, play a pong game, participate in tournaments, view their game states, and interact socially through features like friends, matchmaking and profiles.
 
-## Issue Management 📝
-- For any future tasks, bugs, or issues you can't fix immediately, **create a new issue** to track them.
+## Getting Started
 
-## Branching Strategy 🚀
+1. Clone the repository and navigate to the project root.
+2. Create .hashicorp file and add hashicorp credentials (HCP_CLIENT_ID, HCP_CLIENT_SECRET).
+3. Run `make up` to build docker images and start containers.
+4. Visit the app in your browser at https://localhost:8443/.
 
-This project follows a structured Git workflow. All changes pass through the `dev` branch before merging into `main`.
+## Maintenance Commands
 
-### 1. **Main Branch (`main`)** 🌟
-- Contains stable, tested code.
-- Merge into `main` only after testing in `dev`.
-
-### 2. **Development Branch (`dev`)** 🔧
-- All features/updates are merged into `dev` first.
-- Create feature/bugfix branches from `dev`.
-
-### 3. **Feature/Hotfix Branches** 🌱
-- Branch naming convention:
-  - `feature/<feature-name>`
-  - `bugfix/<issue-description>`
-- After local testing, merge back into `dev`.
-
-### 4. **Merging to Main** ✅
-- Once tested in `dev`, create a pull request to merge into `main`.
-
-### Workflow:
-- `dev` → `feature/awesome-feature` → Develop → Test → Merge into `dev` → Merge `dev` into `main`.
-
-
-
-
-### [Project Subject / things to do](assets/SIMPLE_SUBJECT.md) 📄
-For detailed project instructions, refer to the [SIMPLE_SUBJECT.md](assets/SIMPLE_SUBJECT.md) file.
+- Run `make down` to stop and remove docker containers and network.
+- Run `make clean` to completely clean the environment (containers, images, volumes, orphaned services, and .env file).
